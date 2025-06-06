@@ -211,19 +211,40 @@ src/
 - **Performance**: Optimize for mobile CPUs and networks
 - **Native Features**: Prepare for push notifications and biometric auth
 
-## Task Management with Taskmaster
+### Documentation and Knowledge Strategy
 
-This project uses Taskmaster for comprehensive task and project management. Key integration points:
+Documentation is not a task to be done at the end of a project; it is an ongoing product that ensures the health, maintainability, and scalability of our team and system, as well as clarity for other teams.
 
-### Initialization
-- Project initialized with `task-master init` 
-- PRD parsed to generate initial task structure
-- Detailed task breakdown available in `/tasks` directory
+#### Documentation Philosophy
 
-### Task Organization
-- **39 detailed tasks** across 12 major epics
-- Each task includes acceptance criteria, dependencies, and effort estimates
-- Mobile-first and i18n requirements built into every task
+- **Document the "Why", not just the "What":** Code is self-explanatory about *what* it does. Quality documentation explains *why* it was done that way, what alternatives were considered, and what trade-offs were made.
+
+- **Documentation Lives Close to the Code:** To avoid it becoming outdated, we prioritize documentation that can be versioned alongside the source code (Markdown files in the repository, TSDoc in the comments), rather than relying on external platforms like Confluence or Notion.
+
+#### The three layers of our documentation
+
+##### **The `README.md` (The Gateway)**
+
+- **Tool:** `README.md` in the root of the monorepo.
+- **Purpose:** To allow a new developer to set up the environment, install dependencies, and run the project locally in the shortest possible time. It is our "quick start guide".
+- **Responsibility:** It must be kept impeccably clear and up to date. It is the first impression a new team member will have of our project. It should contain the project vision, prerequisites, step-by-step setup guide, main commands (`dev`, `test`, `build`), and a link to this complete Design Doc.
+
+##### **Architectural Documentation (The Constitution)**
+
+- **Tool:** This document (`DESIGN_DOC.md`) and a `/docs/adr` directory for new Architecture Decision Records (ADRs).
+- **Purpose:** To explain the high-level decisions, trade-offs, system structure, and rationale behind our technology choices. It is the "why" record.
+- **Responsibility:** Technical leadership is the custodian of this document. Significant new architectural decisions (e.g., adding a new microservice, changing a database provider) **should** be documented with a new ADR, which will be reviewed by the team.
+
+##### **Documentation in Code (The Immediate Context)**
+
+- **Tool:** Comments in **TSDoc** format.
+- **Purpose:** To explain the "why" of code snippets that are not immediately obvious. We don't comment on the obvious. We do comment on:
+- Complex business logic.
+- The purpose of public functions and their parameters.
+- Temporary workarounds or "hacks", always with a `// TODO:` and a link to the ticket that tracks their removal.
+- **Responsibility:** Each developer. The Code Review process should actively look for complex code without proper documentation and request its addition.
+
+
 
 ### Available Commands
 ```bash
@@ -316,6 +337,7 @@ This is a greenfield project with a comprehensive Product Requirements Document 
 
 #### ✅ Completed Tasks
 - **E1_T1.1**: Next.js Project Setup (Next.js 15.3.3, React 19, TypeScript strict mode)
+- **E1_T1.2**: Build System Configuration (Production build optimization, PWA setup, bundle analysis)
 
 #### 🎯 Key Implementation Learnings
 
@@ -344,6 +366,21 @@ This is a greenfield project with a comprehensive Product Requirements Document 
 - **Zero Tolerance**: No `any` types allowed in codebase
 - **Import Aliases**: Essential for clean mobile component organization
 
+##### Build System Configuration
+- **Next.js 15 Stability**: React 19 experimental features (ppr, reactCompiler) require canary versions
+- **Bundle Size Management**: Started with 300KB limit, optimized to 102KB actual size
+- **PWA Integration**: next-pwa automatically generates service worker and manifest
+- **Webpack Configuration**: Bundle analyzer works with both static reports and development integration
+- **Database Integration**: Prisma requires postinstall script for client generation
+- **Development Scripts**: Complete test and database management commands ready for future implementation
+
+##### Production Build Optimization
+- **Bundle Analysis**: Generates reports in `analyze/` and `.next/analyze/` directories
+- **Mobile Performance**: 102KB bundle size is 32% under 150KB target
+- **Tree Shaking**: Configured for optimal dead code elimination
+- **SVG Support**: @svgr/webpack enables SVG-as-React-component imports
+- **Security Headers**: Production-ready CSP, XSS protection, and HSTS configured
+
 ### Development Workflow
 
 #### Before Writing Code
@@ -355,12 +392,26 @@ This is a greenfield project with a comprehensive Product Requirements Document 
 
 #### Enhanced Scripts Available
 ```bash
+# Development
 pnpm dev          # Development server
 pnpm build        # Production build
 pnpm check        # TypeScript + ESLint check
 pnpm lint:fix     # Auto-fix linting issues
 pnpm analyze      # Bundle analysis with visualization
 pnpm clean        # Clean build artifacts
+
+# Database (Prisma)
+pnpm db:push      # Push schema changes
+pnpm db:migrate   # Run migrations
+pnpm db:studio    # Open Prisma Studio
+pnpm db:seed      # Seed database
+pnpm db:generate  # Generate Prisma client
+
+# Testing (Future Implementation)
+pnpm test         # Run unit tests
+pnpm test:ui      # Test with UI
+pnpm test:coverage # Coverage reports
+pnpm test:e2e     # End-to-end tests
 ```
 
 ### Next Steps
@@ -369,3 +420,5 @@ pnpm clean        # Clean build artifacts
 3. Follow mobile-first development principles
 4. Ensure all code meets the Definition of Done criteria
 5. **Use `pnpm check` before every commit**
+6. **NEW**: Use `pnpm analyze` to monitor bundle size during feature development
+7. **NEW**: Database operations ready with Prisma scripts when schema is implemented
