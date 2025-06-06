@@ -60,5 +60,5 @@ tasks.json
 tasks/
 
 # Cursor/IDE with API keys
-.cursor/mcp.json
-.vscode/settings.json 
+.cursor/
+.vscode/settings.json
