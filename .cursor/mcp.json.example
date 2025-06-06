@@ -1,0 +1,73 @@
+{
+    "mcpServers": {
+        "task-master-ai": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "--package=task-master-ai",
+                "task-master-ai"
+            ],
+            "env": {
+                "ANTHROPIC_API_KEY": "your-anthropic-api-key-here",
+                "PERPLEXITY_API_KEY": "your-perplexity-api-key-here",
+                "OPENAI_API_KEY": "your-openai-api-key-here",
+                "GOOGLE_API_KEY": "your-google-api-key-here",
+                "XAI_API_KEY": "your-xai-api-key-here",
+                "OPENROUTER_API_KEY": "your-openrouter-api-key-here",
+                "MISTRAL_API_KEY": "your-mistral-api-key-here",
+                "AZURE_OPENAI_API_KEY": "your-azure-openai-api-key-here",
+                "OLLAMA_API_KEY": "your-ollama-api-key-here"
+            }
+        },
+        "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--vision"
+      ]
+    },
+    "sequential-thinking": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-sequential-thinking"
+      ]
+    },
+    "Context7": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@upstash/context7-mcp"
+      ]
+    },
+    "tavily-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "tavily-mcp@0.1.2"
+      ],
+      "env": {
+        "TAVILY_API_KEY": "your-tavily-api-key-here"
+      }
+    },
+    "firecrawl-mcp": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "firecrawl-mcp"
+      ],
+      "env": {
+        "FIRECRAWL_API_KEY": "your-firecrawl-api-key-here"
+      }
+    },
+    "stripe": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@stripe/mcp",
+        "--tools=all",
+        "--api-key=your-stripe-api-key-here"
+      ]
+    }
+  }
+}
