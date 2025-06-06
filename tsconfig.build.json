@@ -7,17 +7,17 @@
     "inlineSourceMap": false,
     "declaration": false,
     "declarationMap": false,
-    
+
     // Strip development-only code
     "stripInternal": true,
-    
+
     // Additional checks for production
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
-    
+
     // Performance optimizations
     "incremental": false,
     "tsBuildInfoFile": null

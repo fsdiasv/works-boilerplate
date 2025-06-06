@@ -60,18 +60,18 @@ const withPWA = require('next-pwa')({
           maxEntries: 50,
           maxAgeSeconds: 24 * 60 * 60, // 24 hours
         },
-        networkTimeoutSeconds: 3,
+        networkTimeoutSeconds: 8,
         cacheableResponse: {
           statuses: [0, 200],
         },
       },
     },
   ],
-});
+})
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
-});
+})
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -92,16 +92,11 @@ const nextConfig = {
     // React 19 optimizations
     // ppr: true, // Partial Prerendering - only available in canary
     // reactCompiler: true, // React Compiler - requires additional setup
-    
+
     // Mobile optimizations
-    optimizePackageImports: [
-      '@/components',
-      '@/lib',
-      'lucide-react',
-      'framer-motion'
-    ],
+    optimizePackageImports: ['@/components', '@/lib', 'lucide-react', 'framer-motion'],
   },
-  
+
   // Mobile-first image optimization
   images: {
     formats: ['image/avif', 'image/webp'],
@@ -123,39 +118,39 @@ const nextConfig = {
       maxAssetSize: 300000, // 300KB - temporary limit for boilerplate
       maxEntrypointSize: 300000, // Will optimize to 150KB as we build features
       hints: 'warning', // Warnings for now, will change to 'error' later
-    };
+    }
 
     // Tree shaking optimizations
     config.optimization = {
       ...config.optimization,
       usedExports: true,
       sideEffects: false,
-    };
+    }
 
     // SVG handling
     config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack'],
-    });
+    })
 
     // Bundle analyzer integration
     if (process.env.ANALYZE === 'true' && !isServer) {
-      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
       config.plugins.push(
         new BundleAnalyzerPlugin({
           analyzerMode: 'static',
           reportFilename: '../analyze/client.html',
           openAnalyzer: false,
         })
-      );
+      )
     }
 
-    return config;
+    return config
   },
 
   // Compression for mobile networks
   compress: true,
-  
+
   // Source maps for production debugging
   productionBrowserSourceMaps: true,
 
@@ -183,10 +178,10 @@ const nextConfig = {
           },
         ],
       },
-    ];
+    ]
   },
-  
-  poweredByHeader: false,
-};
 
-module.exports = withBundleAnalyzer(withPWA(nextConfig));
+  poweredByHeader: false,
+}
+
+module.exports = withBundleAnalyzer(withPWA(nextConfig))

@@ -1,0 +1,27 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run lint-staged for comprehensive pre-commit checks
+npx lint-staged
+
+# Type check the entire project
+echo "🔍 Running TypeScript checks..."
+pnpm typecheck
+
+# Check for mobile-specific issues
+echo "📱 Running mobile-specific validations..."
+# Check for proper touch targets (minimum 44x44px)
+if grep -r "w-\[.*px\].*h-\[.*px\]" src/ --include="*.tsx" --include="*.ts" | grep -E "(w-\[[0-3][0-9]px\]|h-\[[0-3][0-9]px\])"; then
+  echo "❌ Found elements smaller than 44px (mobile touch target minimum)"
+  echo "Please ensure interactive elements are at least 44x44px for mobile accessibility"
+  exit 1
+fi
+
+# Check for accessibility issues
+echo "♿ Checking for accessibility compliance..."
+if grep -r "onClick" src/ --include="*.tsx" | grep -v "onKeyDown\|role="; then
+  echo "⚠️  Warning: Found onClick handlers without keyboard support"
+  echo "Consider adding onKeyDown handlers for keyboard accessibility"
+fi
+
+echo "✅ Pre-commit checks passed!"

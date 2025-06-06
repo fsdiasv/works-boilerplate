@@ -28,10 +28,10 @@ export function initializePWA(): void {
   if (typeof window === 'undefined') return
 
   // Listen for the beforeinstallprompt event
-  window.addEventListener('beforeinstallprompt', (e) => {
+  window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault()
     deferredPrompt = e as BeforeInstallPromptEvent
-    
+
     // Dispatch custom event to notify components
     window.dispatchEvent(new CustomEvent('pwa-installable', { detail: true }))
   })
@@ -48,10 +48,10 @@ export function initializePWA(): void {
  */
 export function isStandalone(): boolean {
   if (typeof window === 'undefined') return false
-  
+
   return (
     window.matchMedia('(display-mode: standalone)').matches ||
-    (window.navigator as any).standalone === true ||
+    (window.navigator as { standalone?: boolean }).standalone === true ||
     document.referrer.includes('android-app://')
   )
 }
@@ -61,7 +61,7 @@ export function isStandalone(): boolean {
  */
 export function isIOS(): boolean {
   if (typeof window === 'undefined') return false
-  
+
   return /iPad|iPhone|iPod/.test(navigator.userAgent)
 }
 
@@ -88,16 +88,18 @@ export function getPWAInstallPrompt(): PWAInstallPrompt {
     isInstalled: isInstalled(),
     isIOS: isIOS(),
     isStandalone: isStandalone(),
-    prompt: deferredPrompt ? async () => {
-      if (deferredPrompt) {
-        await deferredPrompt.prompt()
-        const choiceResult = await deferredPrompt.userChoice
-        
-        if (choiceResult.outcome === 'accepted') {
-          deferredPrompt = null
+    prompt: deferredPrompt
+      ? async () => {
+          if (deferredPrompt) {
+            await deferredPrompt.prompt()
+            const choiceResult = await deferredPrompt.userChoice
+
+            if (choiceResult.outcome === 'accepted') {
+              deferredPrompt = null
+            }
+          }
         }
-      }
-    } : null,
+      : null,
   }
 }
 
@@ -106,16 +108,16 @@ export function getPWAInstallPrompt(): PWAInstallPrompt {
  */
 export async function showInstallPrompt(): Promise<boolean> {
   if (!deferredPrompt) return false
-  
+
   try {
     await deferredPrompt.prompt()
     const choiceResult = await deferredPrompt.userChoice
-    
+
     if (choiceResult.outcome === 'accepted') {
       deferredPrompt = null
       return true
     }
-    
+
     return false
   } catch (error) {
     console.error('Error showing install prompt:', error)
@@ -129,12 +131,12 @@ export async function showInstallPrompt(): Promise<boolean> {
 export async function registerServiceWorker(): Promise<boolean> {
   if (typeof window === 'undefined') return false
   if (!('serviceWorker' in navigator)) return false
-  
+
   try {
     const registration = await navigator.serviceWorker.register('/sw.js', {
       scope: '/',
     })
-    
+
     // Update service worker when a new version is available
     registration.addEventListener('updatefound', () => {
       const newWorker = registration.installing
@@ -147,7 +149,7 @@ export async function registerServiceWorker(): Promise<boolean> {
         })
       }
     })
-    
+
     return true
   } catch (error) {
     console.error('Service Worker registration failed:', error)
@@ -169,17 +171,23 @@ export async function requestNotificationPermission(): Promise<NotificationPermi
   if (!isNotificationSupported()) {
     return 'denied'
   }
-  
+
   if (Notification.permission === 'default') {
     return await Notification.requestPermission()
   }
-  
+
   return Notification.permission
 }
 
 /**
  * Get network status
  */
+interface NetworkConnection {
+  effectiveType?: '2g' | '3g' | '4g' | 'slow-2g'
+  downlink?: number
+  rtt?: number
+}
+
 export function getNetworkStatus(): {
   isOnline: boolean
   connectionType?: string
@@ -187,29 +195,28 @@ export function getNetworkStatus(): {
   if (typeof window === 'undefined') {
     return { isOnline: true }
   }
-  
-  const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection
-  
+
+  const connection: NetworkConnection | undefined =
+    (navigator as { connection?: NetworkConnection }).connection ??
+    (navigator as { mozConnection?: NetworkConnection }).mozConnection ??
+    (navigator as { webkitConnection?: NetworkConnection }).webkitConnection
+
   return {
     isOnline: navigator.onLine,
-    connectionType: connection?.effectiveType || 'unknown',
+    connectionType: connection?.effectiveType ?? 'unknown',
   }
 }
-
 /**
  * Add network status listeners
  */
-export function addNetworkListeners(
-  onOnline: () => void,
-  onOffline: () => void
-): () => void {
+export function addNetworkListeners(onOnline: () => void, onOffline: () => void): () => void {
   if (typeof window === 'undefined') {
     return () => {}
   }
-  
+
   window.addEventListener('online', onOnline)
   window.addEventListener('offline', onOffline)
-  
+
   return () => {
     window.removeEventListener('online', onOnline)
     window.removeEventListener('offline', onOffline)
@@ -228,10 +235,12 @@ export function isBackgroundSyncSupported(): boolean {
  */
 export async function registerBackgroundSync(tag: string): Promise<boolean> {
   if (!isBackgroundSyncSupported()) return false
-  
+
   try {
     const registration = await navigator.serviceWorker.ready
-    await (registration as any).sync.register(tag)
+    await (
+      registration as unknown as { sync: { register: (tag: string) => Promise<void> } }
+    ).sync.register(tag)
     return true
   } catch (error) {
     console.error('Background sync registration failed:', error)

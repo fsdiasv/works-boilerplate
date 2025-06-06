@@ -1,6 +1,7 @@
 # Works Boilerplate
 
-A mobile-first, production-ready SaaS starter kit built with Next.js 15, React 19, and TypeScript.
+A mobile-first, production-ready SaaS starter kit built with Next.js 15, React
+19, and TypeScript.
 
 ## 🚀 Features
 
@@ -23,6 +24,7 @@ A mobile-first, production-ready SaaS starter kit built with Next.js 15, React 1
 ## 🏃‍♂️ Quick Start
 
 1. **Clone and install dependencies**
+
    ```bash
    git clone <repository-url>
    cd works-boilerplate
@@ -30,12 +32,14 @@ A mobile-first, production-ready SaaS starter kit built with Next.js 15, React 1
    ```
 
 2. **Set up environment variables**
+
    ```bash
    cp .env.example .env.local
    # Edit .env.local with your values
    ```
 
 3. **Start development server**
+
    ```bash
    pnpm dev
    ```
@@ -74,19 +78,22 @@ src/
 ## 🔧 Development Guidelines
 
 ### Mobile-First Always
+
 - Every feature must work perfectly on mobile before desktop
 - Minimum 44x44px touch targets for all interactive elements
 - Test on slow 3G networks
 - **Current bundle size: 101KB** (32% under 150KB target)
 
 ### Code Quality
+
 - TypeScript strict mode with zero `any` types
 - All user-facing strings must use i18n
-- >80% test coverage for new code
+- > 80% test coverage for new code
 - ESLint and Prettier compliance
 - **Run `pnpm check` before every commit**
 
 ### Performance Targets
+
 - Lighthouse score >95 on mobile
 - Time to Interactive <3s on 3G
 - Initial bundle size <150KB ✅ **Currently: 101KB**
@@ -95,6 +102,7 @@ src/
 ### 🎯 Implementation Learnings
 
 #### Tailwind CSS v4 Setup
+
 ```bash
 # Required dependencies for Tailwind v4
 pnpm add -D @tailwindcss/postcss autoprefixer
@@ -103,6 +111,7 @@ pnpm add -D @tailwindcss/postcss autoprefixer
 ```
 
 #### pnpm Configuration
+
 ```bash
 # Essential .npmrc settings
 echo "auto-install-peers=true" >> .npmrc
@@ -110,6 +119,7 @@ echo "shamefully-hoist=true" >> .npmrc
 ```
 
 #### Mobile-First Development
+
 - Use Next.js 15's separate `viewport` export for mobile optimization
 - Include PWA meta tags from project start
 - Bundle analyzer only runs with `ANALYZE=true` environment variable
@@ -117,17 +127,20 @@ echo "shamefully-hoist=true" >> .npmrc
 ## 🚧 Project Status
 
 ### ✅ Completed (Phase 1 - Foundation)
+
 - **E1_T1.1**: Next.js 15.3.3 + React 19 + TypeScript setup
 - Mobile-first architecture established
 - Bundle optimization and analysis tools configured
 - Security headers and PWA preparation completed
 
 ### 🎯 Next Tasks
-- **E1_T1.2**: Build System Configuration  
+
+- **E1_T1.2**: Build System Configuration
 - **E2_T2.1**: Internationalization Setup
 - **E3_T3.1**: Enhanced Tailwind Configuration
 
 ### 📊 Current Metrics
+
 - **Bundle Size**: 101KB / 150KB target (32% under limit)
 - **TypeScript**: Zero errors (strict mode)
 - **ESLint**: Zero warnings
@@ -139,6 +152,7 @@ echo "shamefully-hoist=true" >> .npmrc
 ### Common Issues
 
 #### Tailwind Not Working
+
 ```bash
 # Ensure correct dependencies are installed
 pnpm add -D @tailwindcss/postcss autoprefixer
@@ -148,6 +162,7 @@ pnpm add -D @tailwindcss/postcss autoprefixer
 ```
 
 #### TypeScript Errors
+
 ```bash
 # Run type check to see specific issues
 pnpm typecheck
@@ -157,6 +172,7 @@ pnpm typecheck
 ```
 
 #### Bundle Size Issues
+
 ```bash
 # Analyze bundle composition
 pnpm analyze
@@ -166,6 +182,7 @@ pnpm analyze
 ```
 
 #### pnpm Installation Issues
+
 ```bash
 # Clear cache and reinstall
 pnpm clean
