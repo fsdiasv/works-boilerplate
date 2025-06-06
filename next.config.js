@@ -2,14 +2,67 @@ const withPWA = require('next-pwa')({
   dest: 'public',
   register: true,
   skipWaiting: true,
+  disable: process.env.NODE_ENV === 'development',
+  fallbacks: {
+    document: '/offline',
+  },
   runtimeCaching: [
+    // API Routes - Network First
     {
-      urlPattern: /^https?.*/,
+      urlPattern: /^https?.*\/api\/.*/,
       handler: 'NetworkFirst',
       options: {
-        cacheName: 'offlineCache',
+        cacheName: 'api-cache',
         expiration: {
-          maxEntries: 200,
+          maxEntries: 50,
+          maxAgeSeconds: 5 * 60, // 5 minutes
+        },
+        networkTimeoutSeconds: 10,
+        cacheableResponse: {
+          statuses: [0, 200],
+        },
+      },
+    },
+    // Images - Cache First
+    {
+      urlPattern: /\.(?:png|jpg|jpeg|gif|webp|svg|ico)$/,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'images-cache',
+        expiration: {
+          maxEntries: 100,
+          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 days
+        },
+        cacheableResponse: {
+          statuses: [0, 200],
+        },
+      },
+    },
+    // Static Assets - Stale While Revalidate
+    {
+      urlPattern: /\.(?:js|css|woff|woff2|ttf|eot)$/,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'static-assets',
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+        },
+      },
+    },
+    // Pages - Network First with offline fallback
+    {
+      urlPattern: /^https?.*\/.*$/,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'pages-cache',
+        expiration: {
+          maxEntries: 50,
+          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+        },
+        networkTimeoutSeconds: 3,
+        cacheableResponse: {
+          statuses: [0, 200],
         },
       },
     },
@@ -64,7 +117,7 @@ const nextConfig = {
   },
 
   // Bundle optimization
-  webpack: (config, { dev, isServer, webpack }) => {
+  webpack: (config, { isServer }) => {
     // Mobile bundle size limits
     config.performance = {
       maxAssetSize: 300000, // 300KB - temporary limit for boilerplate
