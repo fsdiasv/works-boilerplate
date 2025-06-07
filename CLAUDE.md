@@ -434,6 +434,11 @@ This is a greenfield project with a comprehensive Product Requirements Document
   typography, dark mode, touch optimization, component variants, PostCSS
   pipeline)
 
+#### 🎯 Next Task Ready
+
+- **E3_T3.2**: Advanced Component Library Development - Building on the Tailwind
+  foundation
+
 #### 🎯 Key Implementation Learnings
 
 ##### Tailwind CSS v4 Migration
@@ -597,37 +602,63 @@ This is a greenfield project with a comprehensive Product Requirements Document
 
 ##### Tailwind CSS v4 Advanced Implementation
 
-- **Mobile-First Design System**: Complete touch-optimized breakpoint system
-  with PWA-specific queries (`touch`, `standalone`)
-- **Fluid Typography**: Clamp-based responsive typography system with mobile
-  reading optimization
-- **CSS Custom Properties**: Advanced theming system with automatic dark mode
-  detection and smooth transitions
-- **Touch Target Compliance**: Minimum 44px touch targets with proper spacing
-  and gesture-friendly interactions
-- **PostCSS Pipeline**: Enhanced with nesting, preset-env, and production
-  optimization (cssnano)
-- **Bundle Performance**: Maintained 117KB bundle size (22% under 150KB target)
-  with tree-shaking
-- **Component Variants**: CVA-based variant system with TypeScript integration
-  for scalable UI components
-- **Safe Area Handling**: Complete PWA support for notched devices with CSS
-  env() variables
+- **v4 Migration Strategy**: Successfully upgraded from v3 with PostCSS pipeline
+  optimization
+- **Mobile-First Breakpoint System**: Added touch-specific media queries
+  (`touch`, `no-touch`, `standalone`)
+- **Fluid Typography Implementation**: Complete clamp-based responsive scaling
+  with mobile-optimized line heights
+- **Touch Target Compliance**: 44px minimum with comprehensive spacing utilities
+  (`touch-sm`, `touch`, `touch-lg`)
+- **Dark Mode Architecture**: CSS custom properties system with smooth 200ms
+  transitions
+- **Component Variant System**: CVA integration with TypeScript for maintainable
+  component styling
+- **PostCSS Pipeline Enhancement**: Modern CSS features (nesting, preset-env,
+  cssnano) with build optimization
+- **Bundle Size Achievement**: 117KB total (22% under 150KB mobile target) with
+  advanced features included
+- **Safe Area Handling**: Complete PWA support for notched devices with `env()`
+  variables
+- **Performance Optimization**: Tree-shaking, critical CSS inlining, and mobile
+  network optimization
 
-##### Critical Bug Resolution - Hydration & i18n
+##### Critical Bug Resolution During Implementation
 
-- **Hydration Mismatch Fix**: Resolved duplicate HTML/body tags between root and
-  locale layouts causing React hydration failures
-- **Infinite Loop Prevention**: Fixed circular redirects by removing problematic
-  notFound() calls in middleware and i18n config
-- **Translation Synchronization**: Ensured server-client translation sync by
-  explicitly passing locale to all getTranslations() calls
-- **Layout Hierarchy**: Established proper root vs locale layout separation for
-  Next.js 15 App Router
-- **NextIntlClientProvider**: Added explicit locale prop to fix client-side
-  translation state
-- **Middleware Simplification**: Direct next-intl middleware usage vs custom
-  implementation for better reliability
+- **Layout Hierarchy Issues**: Fixed Next.js 15 hydration mismatches by
+  restructuring root/locale layout relationship
+- **Routing Loop Prevention**: Resolved infinite redirects by simplifying
+  middleware and removing problematic `notFound()` calls
+- **Translation Synchronization**: Achieved perfect server/client translation
+  sync with explicit locale parameter passing
+- **Build System Compatibility**: Resolved PostCSS v4 integration issues with
+  autoprefixer and optimization plugins
+- **TypeScript Strict Compliance**: Maintained zero `any` types throughout
+  complex component variant implementations
+
+##### Git Workflow and Commit Standards
+
+- **Conventional Commits**: Project uses strict conventional commit format with
+  commitlint validation
+- **Sentence-Case Rule**: Commit subjects must be in sentence-case (only first
+  word capitalized)
+  - ✅ **Correct**:
+    `feat: Implement advanced tailwind design system with mobile optimization`
+  - ❌ **Incorrect**:
+    `feat: Implement Tailwind CSS v4 Mobile-First Design System`
+- **Subject Length**: Maximum 72 characters for commit subject line
+- **Body Formatting**: Maximum 100 characters per line in commit body
+- **Scope Validation**: Must use predefined scopes (mobile, pwa, ui, i18n, etc.)
+- **Type Validation**: Must use conventional types (feat, fix, docs, style,
+  etc.)
+- **Husky Hooks**: Updated to remove deprecated v10.0.0 incompatible lines
+- **Pre-commit Checks**: Automatic linting, TypeScript validation, mobile
+  compliance, and accessibility checks
+- **Package Manager**: Project uses pnpm exclusively (`.npmrc` contains
+  pnpm-specific configs)
+- **npm Warnings**: Normal to see npm warnings about pnpm configs - use `pnpm`
+  commands only
+- **IMPORTANT**: Always use sentence-case format to avoid commitlint failures
 
 ### Development Workflow
 
