@@ -1,6 +1,11 @@
 module.exports = {
-  // TypeScript and JavaScript files
-  '**/*.{ts,tsx,js,jsx}': ['eslint --fix', 'prettier --write'],
+  // TypeScript and JavaScript files (excluding public directory)
+  '**/*.{ts,tsx,js,jsx}': filenames => {
+    const filteredFiles = filenames.filter(file => !file.includes('/public/'))
+    return filteredFiles.length > 0
+      ? ['eslint --fix', 'prettier --write'].map(cmd => `${cmd} ${filteredFiles.join(' ')}`)
+      : []
+  },
 
   // JSON files
   '**/*.json': ['prettier --write'],

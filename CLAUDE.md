@@ -401,6 +401,8 @@ This is a greenfield project with a comprehensive Product Requirements Document
   service worker caching, iOS optimization)
 - **E1_T1.4**: Developer Environment Setup (ESLint, Prettier, Husky, VS Code
   optimization, mobile-first development tools)
+- **E2_T2.1**: Internationalization Setup (next-intl with pt-BR, en-US, es-ES,
+  mobile-optimized locale switcher, type-safe translations)
 
 #### 🎯 Key Implementation Learnings
 
@@ -487,14 +489,42 @@ This is a greenfield project with a comprehensive Product Requirements Document
   features included
 
 ##### Developer Environment Setup Implementation
-- **ESLint v8 Compatibility**: ESLint v9 requires new config format, downgraded to v8 for stability
-- **TypeScript Strict Rules**: Configured comprehensive type checking with mobile-first accessibility rules
-- **Git Hooks Integration**: Husky + lint-staged for automated quality checks on commit
-- **VS Code Optimization**: Complete workspace setup with mobile debugging configurations and recommended extensions
-- **Mobile-First Validation**: Touch target compliance checking (44x44px minimum) built into pre-commit hooks
-- **Conventional Commits**: Commitlint configuration with project-specific scopes (mobile, pwa, ui, etc.)
-- **Code Quality Pipeline**: Zero-warning policy with auto-formatting and comprehensive linting
-- **Performance Monitoring**: Bundle analysis integration with mobile network optimization targets
+
+- **ESLint v8 Compatibility**: ESLint v9 requires new config format, downgraded
+  to v8 for stability
+- **TypeScript Strict Rules**: Configured comprehensive type checking with
+  mobile-first accessibility rules
+- **Git Hooks Integration**: Husky + lint-staged for automated quality checks on
+  commit
+- **VS Code Optimization**: Complete workspace setup with mobile debugging
+  configurations and recommended extensions
+- **Mobile-First Validation**: Touch target compliance checking (44x44px
+  minimum) built into pre-commit hooks
+- **Conventional Commits**: Commitlint configuration with project-specific
+  scopes (mobile, pwa, ui, etc.)
+- **Code Quality Pipeline**: Zero-warning policy with auto-formatting and
+  comprehensive linting
+- **Performance Monitoring**: Bundle analysis integration with mobile network
+  optimization targets
+
+##### Internationalization Setup Implementation
+
+- **next-intl Integration**: Configured with Next.js 15 App Router using new
+  async params pattern
+- **Locale Routing**: All routes now use `/[locale]/` prefix with automatic
+  detection and persistence
+- **Type-Safe Translations**: Full TypeScript integration with autocomplete for
+  all translation keys
+- **Mobile-First Locale Switcher**: 44px touch targets, loading states, native
+  select for best mobile UX
+- **Dynamic Message Loading**: Translations loaded on-demand to minimize bundle
+  size impact
+- **SEO Optimization**: Proper hreflang tags, locale-specific meta tags, and
+  alternate URLs
+- **Build Configuration**: Migrated to ES modules (next.config.mjs) for
+  next-intl plugin support
+- **Middleware Setup**: Automatic browser language detection with fallback to
+  Portuguese (pt-BR)
 
 ### Development Workflow
 

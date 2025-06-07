@@ -1,0 +1,104 @@
+{
+  "common": {
+    "description": "Kit inicial SaaS mobile-first para aplicações modernas",
+    "language": {
+      "select": "Selecionar idioma",
+      "current": "Idioma atual"
+    },
+    "navigation": {
+      "dashboard": "Painel",
+      "settings": "Configurações",
+      "profile": "Perfil",
+      "home": "Início"
+    },
+    "actions": {
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "submit": "Enviar",
+      "loading": "Carregando...",
+      "delete": "Excluir",
+      "edit": "Editar",
+      "create": "Criar",
+      "back": "Voltar",
+      "next": "Próximo",
+      "previous": "Anterior",
+      "confirm": "Confirmar",
+      "close": "Fechar"
+    },
+    "status": {
+      "online": "Online",
+      "offline": "Offline",
+      "error": "Erro",
+      "success": "Sucesso",
+      "warning": "Aviso",
+      "info": "Informação"
+    }
+  },
+  "auth": {
+    "signin": "Entrar",
+    "signup": "Cadastrar",
+    "signout": "Sair",
+    "email": "E-mail",
+    "password": "Senha",
+    "confirmPassword": "Confirmar senha",
+    "forgotPassword": "Esqueceu a senha?",
+    "rememberMe": "Lembrar de mim",
+    "emailRequired": "E-mail é obrigatório",
+    "passwordRequired": "Senha é obrigatória",
+    "invalidCredentials": "Credenciais inválidas",
+    "accountCreated": "Conta criada com sucesso",
+    "welcomeBack": "Bem-vindo de volta!"
+  },
+  "dashboard": {
+    "title": "Painel",
+    "welcome": "Bem-vindo!",
+    "overview": "Visão geral",
+    "recentActivity": "Atividade recente",
+    "statistics": "Estatísticas",
+    "noData": "Sem dados disponíveis"
+  },
+  "profile": {
+    "title": "Perfil",
+    "personalInfo": "Informações pessoais",
+    "name": "Nome",
+    "email": "E-mail",
+    "phone": "Telefone",
+    "bio": "Biografia",
+    "updateProfile": "Atualizar perfil",
+    "changePassword": "Alterar senha",
+    "avatar": "Foto de perfil"
+  },
+  "settings": {
+    "title": "Configurações",
+    "general": "Geral",
+    "preferences": "Preferências",
+    "notifications": "Notificações",
+    "privacy": "Privacidade",
+    "security": "Segurança",
+    "language": "Idioma",
+    "theme": "Tema",
+    "darkMode": "Modo escuro",
+    "lightMode": "Modo claro"
+  },
+  "errors": {
+    "generic": "Algo deu errado. Por favor, tente novamente.",
+    "network": "Erro de conexão. Verifique sua internet.",
+    "notFound": "Página não encontrada",
+    "unauthorized": "Acesso não autorizado",
+    "serverError": "Erro no servidor"
+  },
+  "validation": {
+    "required": "Este campo é obrigatório",
+    "email": "Digite um e-mail válido",
+    "min": "Mínimo de {min} caracteres",
+    "max": "Máximo de {max} caracteres",
+    "passwordMatch": "As senhas não coincidem"
+  },
+  "pwa": {
+    "install": "Instalar aplicativo",
+    "installDescription": "Instale nosso app para uma melhor experiência",
+    "offlineReady": "Pronto para uso offline",
+    "updateAvailable": "Atualização disponível",
+    "updateNow": "Atualizar agora"
+  }
+}

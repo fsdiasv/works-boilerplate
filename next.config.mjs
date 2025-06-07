@@ -1,4 +1,10 @@
-const withPWA = require('next-pwa')({
+import withPWAInit from 'next-pwa'
+import createNextIntlPlugin from 'next-intl/plugin'
+import withBundleAnalyzerInit from '@next/bundle-analyzer'
+
+const withNextIntl = createNextIntlPlugin('./src/i18n.ts')
+
+const withPWA = withPWAInit({
   dest: 'public',
   register: true,
   skipWaiting: true,
@@ -69,7 +75,7 @@ const withPWA = require('next-pwa')({
   ],
 })
 
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
+const withBundleAnalyzer = withBundleAnalyzerInit({
   enabled: process.env.ANALYZE === 'true',
 })
 
@@ -184,4 +190,4 @@ const nextConfig = {
   poweredByHeader: false,
 }
 
-module.exports = withBundleAnalyzer(withPWA(nextConfig))
+export default withBundleAnalyzer(withPWA(withNextIntl(nextConfig)))
