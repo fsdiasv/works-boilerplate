@@ -600,6 +600,29 @@ This is a greenfield project with a comprehensive Product Requirements Document
 - **Progressive Enhancement**: Error pages work without JavaScript, fallback
   strategies implemented
 
+##### shadcn/ui Component Library Integration
+
+- **Component Library Scale**: Successfully integrated 39 mobile-optimized
+  components with comprehensive coverage
+- **Mobile Touch Targets**: All interactive components meet 44x44px minimum
+  requirement with enhanced 48px variant for critical actions
+- **CLI Configuration**: Custom mobile-first configuration with proper aliases
+  and TypeScript integration
+- **Dark Mode Integration**: Seamless ThemeProvider integration with system
+  preference detection and persistence
+- **TypeScript Strict Mode**: Fixed all optional prop issues with proper null
+  coalescing patterns (`checked={checked ?? false}`)
+- **Component Organization**: Comprehensive index file for efficient imports and
+  tree-shaking optimization
+- **Performance Impact**: Maintained bundle size targets with tree-shaking and
+  component-level optimization
+- **Touch Optimization**: Enhanced components with `touch-manipulation` CSS and
+  active states for immediate feedback
+- **Accessibility Ready**: WCAG 2.1 AA compliance with focus indicators and
+  screen reader support built-in
+- **Development Experience**: Streamlined component installation patterns and
+  mobile-first development workflow
+
 ##### Tailwind CSS v4 Advanced Implementation
 
 - **v4 Migration Strategy**: Successfully upgraded from v3 with PostCSS pipeline
@@ -659,6 +682,9 @@ This is a greenfield project with a comprehensive Product Requirements Document
 - **npm Warnings**: Normal to see npm warnings about pnpm configs - use `pnpm`
   commands only
 - **IMPORTANT**: Always use sentence-case format to avoid commitlint failures
+- **🚫 NO CLAUDE ATTRIBUTION**: Never include Claude Code attribution or
+  Co-Authored-By lines in commits. Keep commit messages professional and
+  project-focused only.
 
 ### Development Workflow
 
