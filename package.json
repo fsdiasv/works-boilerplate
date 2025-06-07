@@ -34,7 +34,10 @@
     "mobile:validate": "echo '📱 Checking mobile compliance...' && pnpm typecheck && pnpm lint",
     "pre-commit": "lint-staged",
     "commit": "git-cz",
-    "validate": "pnpm typecheck && pnpm lint && pnpm format:check"
+    "validate": "pnpm typecheck && pnpm lint && pnpm format:check",
+    "i18n:validate": "node scripts/validate-translations.js",
+    "i18n:extract": "echo '🔍 Translation key extraction (future implementation)'",
+    "i18n:check": "pnpm i18n:validate"
   },
   "dependencies": {
     "@prisma/client": "6.9.0",

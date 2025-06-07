@@ -18,6 +18,8 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params
   const messages = await getMessages({ locale })
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://localhost:3000'
+
   const t = (key: string): string => {
     const keys = key.split('.')
     let value: unknown = messages
@@ -31,25 +33,71 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return typeof value === 'string' ? value : key
   }
 
+  const ogLocale = locale === 'pt' ? 'pt_BR' : locale === 'es' ? 'es_ES' : 'en_US'
+  const alternateLocales = locales
+    .filter(l => l !== locale)
+    .map(l => (l === 'pt' ? 'pt_BR' : l === 'es' ? 'es_ES' : 'en_US'))
+
   return {
     title: {
       template: '%s | Works Boilerplate',
       default: 'Works Boilerplate',
     },
     description: t('common.description'),
+    keywords: ['SaaS', 'boilerplate', 'Next.js', 'React', 'TypeScript', 'mobile-first', 'PWA'],
+    authors: [{ name: 'Works Boilerplate Team' }],
+    creator: 'Works Boilerplate',
+    publisher: 'Works Boilerplate',
+    formatDetection: {
+      email: false,
+      address: false,
+      telephone: false,
+    },
+    metadataBase: new URL(baseUrl),
     openGraph: {
-      locale: locale === 'pt' ? 'pt_BR' : locale === 'es' ? 'es_ES' : 'en_US',
-      alternateLocale: locales
-        .filter(l => l !== locale)
-        .map(l => (l === 'pt' ? 'pt_BR' : l === 'es' ? 'es_ES' : 'en_US')),
+      type: 'website',
+      locale: ogLocale,
+      alternateLocale: alternateLocales,
+      title: 'Works Boilerplate',
+      description: t('common.description'),
+      siteName: 'Works Boilerplate',
+      images: [
+        {
+          url: '/og-image.jpg',
+          width: 1200,
+          height: 630,
+          alt: 'Works Boilerplate',
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: 'Works Boilerplate',
+      description: t('common.description'),
+      images: ['/og-image.jpg'],
     },
     alternates: {
-      canonical: `/${locale}`,
+      canonical: `${baseUrl}/${locale}`,
       languages: {
-        'pt-BR': '/pt',
-        'en-US': '/en',
-        'es-ES': '/es',
+        'pt-BR': `${baseUrl}/pt`,
+        'en-US': `${baseUrl}/en`,
+        'es-ES': `${baseUrl}/es`,
+        'x-default': `${baseUrl}/pt`,
       },
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        'max-video-preview': -1,
+        'max-image-preview': 'large',
+        'max-snippet': -1,
+      },
+    },
+    verification: {
+      google: process.env.GOOGLE_SITE_VERIFICATION,
     },
   }
 }

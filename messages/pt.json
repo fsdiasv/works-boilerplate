@@ -23,7 +23,8 @@
       "next": "Próximo",
       "previous": "Anterior",
       "confirm": "Confirmar",
-      "close": "Fechar"
+      "close": "Fechar",
+      "retry": "Tentar novamente"
     },
     "status": {
       "online": "Online",
@@ -92,7 +93,15 @@
     "email": "Digite um e-mail válido",
     "min": "Mínimo de {min} caracteres",
     "max": "Máximo de {max} caracteres",
-    "passwordMatch": "As senhas não coincidem"
+    "passwordMatch": "As senhas não coincidem",
+    "itemCount": "{count, plural, =0 {Nenhum item} =1 {1 item} other {# itens}}"
+  },
+  "formatting": {
+    "currency": "R$ {amount, number, currency}",
+    "date": "{date, date, long}",
+    "time": "{time, time, short}",
+    "number": "{value, number}",
+    "percent": "{value, number, percent}"
   },
   "pwa": {
     "install": "Instalar aplicativo",

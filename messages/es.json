@@ -23,7 +23,8 @@
       "next": "Siguiente",
       "previous": "Anterior",
       "confirm": "Confirmar",
-      "close": "Cerrar"
+      "close": "Cerrar",
+      "retry": "Intentar de nuevo"
     },
     "status": {
       "online": "En línea",
@@ -92,7 +93,15 @@
     "email": "Ingresa un correo electrónico válido",
     "min": "Mínimo {min} caracteres",
     "max": "Máximo {max} caracteres",
-    "passwordMatch": "Las contraseñas no coinciden"
+    "passwordMatch": "Las contraseñas no coinciden",
+    "itemCount": "{count, plural, =0 {Sin elementos} =1 {1 elemento} other {# elementos}}"
+  },
+  "formatting": {
+    "currency": "€{amount, number, currency}",
+    "date": "{date, date, long}",
+    "time": "{time, time, short}",
+    "number": "{value, number}",
+    "percent": "{value, number, percent}"
   },
   "pwa": {
     "install": "Instalar aplicación",

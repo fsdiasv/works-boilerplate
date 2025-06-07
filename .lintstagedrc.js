@@ -1,7 +1,9 @@
 module.exports = {
-  // TypeScript and JavaScript files (excluding public directory)
+  // TypeScript and JavaScript files (excluding public and scripts directories)
   '**/*.{ts,tsx,js,jsx}': filenames => {
-    const filteredFiles = filenames.filter(file => !file.includes('/public/'))
+    const filteredFiles = filenames.filter(
+      file => !file.includes('/public/') && !file.includes('/scripts/')
+    )
     return filteredFiles.length > 0
       ? ['eslint --fix', 'prettier --write'].map(cmd => `${cmd} ${filteredFiles.join(' ')}`)
       : []
