@@ -139,17 +139,7 @@ const nextConfig = {
       use: ['@svgr/webpack'],
     })
 
-    // Bundle analyzer integration
-    if (process.env.ANALYZE === 'true' && !isServer) {
-      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-      config.plugins.push(
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'static',
-          reportFilename: '../analyze/client.html',
-          openAnalyzer: false,
-        })
-      )
-    }
+    // Bundle analyzer integration handled by withBundleAnalyzer
 
     return config
   },

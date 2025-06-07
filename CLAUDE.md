@@ -430,6 +430,9 @@ This is a greenfield project with a comprehensive Product Requirements Document
   validation system, mobile-optimized content, performance optimization)
 - **E2_T2.3**: Internationalized Routing (advanced SEO, localized error pages,
   sitemap generation, mobile-optimized middleware, comprehensive metadata)
+- **E3_T3.1**: Tailwind CSS v4 Setup (mobile-first design system, fluid
+  typography, dark mode, touch optimization, component variants, PostCSS
+  pipeline)
 
 #### 🎯 Key Implementation Learnings
 
@@ -591,6 +594,40 @@ This is a greenfield project with a comprehensive Product Requirements Document
   networks
 - **Progressive Enhancement**: Error pages work without JavaScript, fallback
   strategies implemented
+
+##### Tailwind CSS v4 Advanced Implementation
+
+- **Mobile-First Design System**: Complete touch-optimized breakpoint system
+  with PWA-specific queries (`touch`, `standalone`)
+- **Fluid Typography**: Clamp-based responsive typography system with mobile
+  reading optimization
+- **CSS Custom Properties**: Advanced theming system with automatic dark mode
+  detection and smooth transitions
+- **Touch Target Compliance**: Minimum 44px touch targets with proper spacing
+  and gesture-friendly interactions
+- **PostCSS Pipeline**: Enhanced with nesting, preset-env, and production
+  optimization (cssnano)
+- **Bundle Performance**: Maintained 117KB bundle size (22% under 150KB target)
+  with tree-shaking
+- **Component Variants**: CVA-based variant system with TypeScript integration
+  for scalable UI components
+- **Safe Area Handling**: Complete PWA support for notched devices with CSS
+  env() variables
+
+##### Critical Bug Resolution - Hydration & i18n
+
+- **Hydration Mismatch Fix**: Resolved duplicate HTML/body tags between root and
+  locale layouts causing React hydration failures
+- **Infinite Loop Prevention**: Fixed circular redirects by removing problematic
+  notFound() calls in middleware and i18n config
+- **Translation Synchronization**: Ensured server-client translation sync by
+  explicitly passing locale to all getTranslations() calls
+- **Layout Hierarchy**: Established proper root vs locale layout separation for
+  Next.js 15 App Router
+- **NextIntlClientProvider**: Added explicit locale prop to fix client-side
+  translation state
+- **Middleware Simplification**: Direct next-intl middleware usage vs custom
+  implementation for better reliability
 
 ### Development Workflow
 

@@ -18,8 +18,8 @@ export default function Error({ error, reset }: ErrorProps) {
   }, [error])
 
   return (
-    <div className='min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8'>
-      <div className='max-w-md w-full space-y-8 text-center'>
+    <div className='flex min-h-screen items-center justify-center px-4 sm:px-6 lg:px-8'>
+      <div className='w-full max-w-md space-y-8 text-center'>
         <div>
           <div className='mx-auto h-24 w-24 text-red-500'>
             <svg fill='none' stroke='currentColor' viewBox='0 0 24 24' className='h-full w-full'>
@@ -43,7 +43,7 @@ export default function Error({ error, reset }: ErrorProps) {
               <summary className='cursor-pointer text-sm font-medium text-gray-500 hover:text-gray-700'>
                 Technical Details
               </summary>
-              <pre className='mt-2 text-xs text-gray-400 overflow-auto'>
+              <pre className='mt-2 overflow-auto text-xs text-gray-400'>
                 {error.message}
                 {error.digest != null && (
                   <>
@@ -59,56 +59,14 @@ export default function Error({ error, reset }: ErrorProps) {
         <div className='space-y-4'>
           <button
             onClick={reset}
-            className='
-              inline-flex
-              items-center
-              justify-center
-              min-h-[44px]
-              px-6
-              py-3
-              text-base
-              font-medium
-              text-white
-              bg-blue-600
-              hover:bg-blue-700
-              focus:outline-none
-              focus:ring-2
-              focus:ring-offset-2
-              focus:ring-blue-500
-              rounded-lg
-              transition-colors
-              duration-200
-              touch-manipulation
-            '
+            className='inline-flex min-h-[44px] touch-manipulation items-center justify-center rounded-lg bg-blue-600 px-6 py-3 text-base font-medium text-white transition-colors duration-200 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
           >
             {tCommon('actions.retry')}
           </button>
 
           <button
             onClick={() => (window.location.href = '/')}
-            className='
-              block
-              w-full
-              min-h-[44px]
-              px-6
-              py-3
-              text-base
-              font-medium
-              text-gray-700
-              dark:text-gray-300
-              bg-gray-100
-              dark:bg-gray-800
-              hover:bg-gray-200
-              dark:hover:bg-gray-700
-              focus:outline-none
-              focus:ring-2
-              focus:ring-offset-2
-              focus:ring-gray-500
-              rounded-lg
-              transition-colors
-              duration-200
-              touch-manipulation
-            '
+            className='block min-h-[44px] w-full touch-manipulation rounded-lg bg-gray-100 px-6 py-3 text-base font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
           >
             {tCommon('navigation.home')}
           </button>

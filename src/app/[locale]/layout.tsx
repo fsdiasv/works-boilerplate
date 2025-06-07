@@ -1,10 +1,9 @@
-import type { Metadata } from 'next'
-import { notFound } from 'next/navigation'
+import type { Metadata, Viewport } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import type { ReactNode } from 'react'
 
-import { isValidLocale, locales } from '@/i18n/config'
+import { locales } from '@/i18n/config'
 
 type Props = {
   children: ReactNode
@@ -13,6 +12,18 @@ type Props = {
 
 export function generateStaticParams() {
   return locales.map(locale => ({ locale }))
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+  ],
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -44,6 +55,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       default: 'Works Boilerplate',
     },
     description: t('common.description'),
+    manifest: '/manifest.json',
+    applicationName: 'Works Boilerplate',
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: 'black-translucent',
+      title: 'Works Boilerplate',
+    },
     keywords: ['SaaS', 'boilerplate', 'Next.js', 'React', 'TypeScript', 'mobile-first', 'PWA'],
     authors: [{ name: 'Works Boilerplate Team' }],
     creator: 'Works Boilerplate',
@@ -52,6 +70,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       email: false,
       address: false,
       telephone: false,
+    },
+    icons: {
+      icon: '/favicon.ico',
+    },
+    other: {
+      'mobile-web-app-capable': 'yes',
     },
     metadataBase: new URL(baseUrl),
     openGraph: {
@@ -104,17 +128,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params
-  if (!isValidLocale(locale)) {
-    notFound()
-  }
-
-  const messages = await getMessages()
+  const messages = await getMessages({ locale })
 
   return (
-    <html lang={locale} dir='ltr'>
-      <body className='antialiased'>
-        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      {children}
+    </NextIntlClientProvider>
   )
 }

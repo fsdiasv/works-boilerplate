@@ -31,32 +31,7 @@ export function LocaleSwitcher() {
         value={locale}
         onChange={e => handleLocaleChange(e.target.value as Locale)}
         disabled={isPending}
-        className='
-          appearance-none
-          min-h-[44px]
-          min-w-[44px]
-          px-4
-          py-2
-          pr-10
-          text-base
-          font-medium
-          bg-white
-          dark:bg-gray-800
-          text-gray-900
-          dark:text-gray-100
-          border
-          border-gray-300
-          dark:border-gray-600
-          rounded-lg
-          focus:outline-none
-          focus:ring-2
-          focus:ring-blue-500
-          focus:border-blue-500
-          disabled:opacity-50
-          disabled:cursor-not-allowed
-          cursor-pointer
-          touch-manipulation
-        '
+        className='min-h-[44px] min-w-[44px] cursor-pointer touch-manipulation appearance-none rounded-lg border border-gray-300 bg-white px-4 py-2 pr-10 text-base font-medium text-gray-900 focus:border-blue-500 focus:ring-2 focus:ring-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-100'
         aria-label={t('current')}
       >
         {locales.map(loc => (
@@ -82,7 +57,7 @@ export function LocaleSwitcher() {
         </svg>
       </div>
       {isPending && (
-        <div className='absolute inset-0 flex items-center justify-center bg-white/50 dark:bg-gray-800/50 rounded-lg'>
+        <div className='absolute inset-0 flex items-center justify-center rounded-lg bg-white/50 dark:bg-gray-800/50'>
           <div className='h-5 w-5 animate-spin rounded-full border-2 border-blue-500 border-t-transparent' />
         </div>
       )}

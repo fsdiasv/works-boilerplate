@@ -1,13 +1,15 @@
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 
-export default function NotFound() {
-  const t = useTranslations('errors')
-  const tCommon = useTranslations('common')
+import BackButton from '@/components/shared/BackButton'
+
+export default async function NotFound() {
+  const t = await getTranslations('errors')
+  const tCommon = await getTranslations('common')
 
   return (
-    <div className='min-h-screen flex items-center justify-center px-4 sm:px-6 lg:px-8'>
-      <div className='max-w-md w-full space-y-8 text-center'>
+    <div className='flex min-h-screen items-center justify-center px-4 sm:px-6 lg:px-8'>
+      <div className='w-full max-w-md space-y-8 text-center'>
         <div>
           <h1 className='text-9xl font-bold text-gray-200 dark:text-gray-700'>404</h1>
           <h2 className='mt-4 text-2xl font-bold text-gray-900 dark:text-gray-100'>
@@ -19,59 +21,14 @@ export default function NotFound() {
         <div className='space-y-4'>
           <Link
             href='/'
-            className='
-              inline-flex
-              items-center
-              justify-center
-              min-h-[44px]
-              px-6
-              py-3
-              text-base
-              font-medium
-              text-white
-              bg-blue-600
-              hover:bg-blue-700
-              focus:outline-none
-              focus:ring-2
-              focus:ring-offset-2
-              focus:ring-blue-500
-              rounded-lg
-              transition-colors
-              duration-200
-              touch-manipulation
-            '
+            className='inline-flex min-h-[44px] touch-manipulation items-center justify-center rounded-lg bg-blue-600 px-6 py-3 text-base font-medium text-white transition-colors duration-200 hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:outline-none'
           >
             {tCommon('navigation.home')}
           </Link>
 
-          <button
-            onClick={() => window.history.back()}
-            className='
-              block
-              w-full
-              min-h-[44px]
-              px-6
-              py-3
-              text-base
-              font-medium
-              text-gray-700
-              dark:text-gray-300
-              bg-gray-100
-              dark:bg-gray-800
-              hover:bg-gray-200
-              dark:hover:bg-gray-700
-              focus:outline-none
-              focus:ring-2
-              focus:ring-offset-2
-              focus:ring-gray-500
-              rounded-lg
-              transition-colors
-              duration-200
-              touch-manipulation
-            '
-          >
+          <BackButton className='block min-h-[44px] w-full touch-manipulation rounded-lg bg-gray-100 px-6 py-3 text-base font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'>
             {tCommon('actions.back')}
-          </button>
+          </BackButton>
         </div>
       </div>
     </div>
