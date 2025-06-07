@@ -371,6 +371,29 @@ A feature is considered complete when:
 - ✅ **Code review approved**
 - ✅ **No ESLint warnings or TypeScript errors**
 
+## Task Completion Workflow
+
+**IMPORTANT MEMORY**: When completing any task, you MUST:
+
+1. **Update the original task file** with completion status and learnings
+2. **Move the completed task** from `tasks/` to `tasks/completed/` directory
+3. **Mark all acceptance criteria** as completed with `[x]` checkboxes
+4. **Add implementation summary** at the end of the original task file
+5. **Document key learnings** for future reference
+6. **Update CLAUDE.md** with new implementation learnings section
+
+Example workflow:
+
+```bash
+# After completing task E2_T2.1
+mv tasks/E2_T2.1_Internationalization_Setup.md tasks/completed/
+# Edit the file to add completion status and mark criteria as done
+# Update CLAUDE.md with learnings
+```
+
+This ensures all completed work is properly documented and serves as reference
+for future development.
+
 ## Current Status
 
 This is a greenfield project with a comprehensive Product Requirements Document
