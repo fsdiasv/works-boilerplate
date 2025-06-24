@@ -1,7 +1,3 @@
-import aspectRatio from '@tailwindcss/aspect-ratio'
-import containerQueries from '@tailwindcss/container-queries'
-import forms from '@tailwindcss/forms'
-import typography from '@tailwindcss/typography'
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
@@ -192,16 +188,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [
-    typography({
-      className: 'prose',
-    }),
-    forms({
-      strategy: 'class',
-    }),
-    aspectRatio,
-    containerQueries,
-  ],
+  plugins: [],
 }
 
 export default config

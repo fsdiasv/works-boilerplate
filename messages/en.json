@@ -56,7 +56,11 @@
     "overview": "Overview",
     "recentActivity": "Recent activity",
     "statistics": "Statistics",
-    "noData": "No data available"
+    "noData": "No data available",
+    "meta": {
+      "title": "Dashboard - Acme Inc.",
+      "description": "View your business metrics, documents, and analytics"
+    }
   },
   "profile": {
     "title": "Profile",

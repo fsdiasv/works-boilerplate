@@ -56,7 +56,11 @@
     "overview": "Visão geral",
     "recentActivity": "Atividade recente",
     "statistics": "Estatísticas",
-    "noData": "Sem dados disponíveis"
+    "noData": "Sem dados disponíveis",
+    "meta": {
+      "title": "Painel - Acme Inc.",
+      "description": "Visualize suas métricas de negócios, documentos e análises"
+    }
   },
   "profile": {
     "title": "Perfil",

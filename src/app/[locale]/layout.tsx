@@ -3,6 +3,7 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import type { ReactNode } from 'react'
 
+import { ThemeProvider } from '@/components/layout/theme-provider'
 import { locales } from '@/i18n/config'
 
 type Props = {
@@ -131,8 +132,14 @@ export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages({ locale })
 
   return (
-    <NextIntlClientProvider locale={locale} messages={messages}>
-      {children}
-    </NextIntlClientProvider>
+    <html lang={locale} suppressHydrationWarning>
+      <body className='antialiased'>
+        <NextIntlClientProvider locale={locale} messages={messages}>
+          <ThemeProvider attribute='class' defaultTheme='light' enableSystem disableTransitionOnChange>
+            {children}
+          </ThemeProvider>
+        </NextIntlClientProvider>
+      </body>
+    </html>
   )
 }

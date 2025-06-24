@@ -659,6 +659,53 @@ This is a greenfield project with a comprehensive Product Requirements Document
 - **TypeScript Strict Compliance**: Maintained zero `any` types throughout
   complex component variant implementations
 
+##### Tailwind CSS v4 & shadcn/ui Integration
+
+**Critical Issue Resolved**: shadcn/ui styles not rendering due to Tailwind CSS v4 misconfiguration
+
+**Root Causes Identified**:
+1. Missing `@tailwindcss/postcss` package (v4 requires this specific PostCSS plugin)
+2. Incorrect PostCSS configuration using `tailwindcss: {}` instead of `'@tailwindcss/postcss': {}`
+3. Mismatch between installed Tailwind version (v3) and configuration (v4)
+4. Missing `@theme` directive for custom color definitions in v4
+
+**Solution Applied**:
+1. Install required package: `pnpm add -D @tailwindcss/postcss`
+2. Update `postcss.config.mjs`:
+   ```js
+   export default {
+     plugins: {
+       '@tailwindcss/postcss': {},
+       autoprefixer: {},
+     }
+   }
+   ```
+3. Run upgrade tool: `npx @tailwindcss/upgrade --force`
+4. Update `globals.css` to use `@theme` directive:
+   ```css
+   @import 'tailwindcss';
+   
+   @theme {
+     --color-background: hsl(0 0% 100%);
+     --color-primary: hsl(221.2 83.2% 53.3%);
+     /* ... other colors ... */
+   }
+   ```
+
+**Key Learnings for Tailwind CSS v4**:
+- v4 uses `@import 'tailwindcss'` instead of `@tailwind base/components/utilities`
+- Custom colors must be defined in `@theme` block with `--color-` prefix
+- PostCSS requires `@tailwindcss/postcss` plugin, not the legacy `tailwindcss` plugin
+- The upgrade tool (`npx @tailwindcss/upgrade`) automates most migration tasks
+- Theme variables in `@theme` automatically generate utility classes (e.g., `--color-primary` → `bg-primary`)
+
+**Debugging Steps for Future CSS Issues**:
+1. Verify CSS is loading: Check browser DevTools Network tab
+2. Check if classes exist in compiled CSS: `curl [css-url] | grep "\.bg-primary"`
+3. Use Playwright to verify classes are in DOM and computed styles are applied
+4. Ensure PostCSS is configured correctly for Tailwind v4
+5. Verify `@theme` directive is used for custom design tokens
+
 ##### Git Workflow and Commit Standards
 
 - **Conventional Commits**: Project uses strict conventional commit format with

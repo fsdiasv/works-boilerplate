@@ -23,6 +23,24 @@ A mobile-first, production-ready SaaS starter kit built with Next.js 15, React
 
 ## 🏃‍♂️ Quick Start
 
+### For Claude Code Users
+
+If you're using Claude Code with MCP servers:
+
+```bash
+# Set up MCP environment
+cp .env.mcp.example .env.mcp
+# Edit .env.mcp with your API keys
+
+# Start Claude Code with MCP servers
+./scripts/claude-start.sh  # Linux/macOS
+./scripts/claude-start.ps1 # Windows PowerShell
+```
+
+See [MCP Setup Guide](docs/MCP_SETUP.md) for detailed instructions.
+
+### Standard Setup
+
 1. **Clone and install dependencies**
 
    ```bash

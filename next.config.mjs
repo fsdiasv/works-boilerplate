@@ -1,6 +1,6 @@
-import withPWAInit from 'next-pwa'
-import createNextIntlPlugin from 'next-intl/plugin'
 import withBundleAnalyzerInit from '@next/bundle-analyzer'
+import createNextIntlPlugin from 'next-intl/plugin'
+import withPWAInit from 'next-pwa'
 
 const withNextIntl = createNextIntlPlugin('./src/i18n.ts')
 
@@ -124,13 +124,6 @@ const nextConfig = {
       maxAssetSize: 300000, // 300KB - temporary limit for boilerplate
       maxEntrypointSize: 300000, // Will optimize to 150KB as we build features
       hints: 'warning', // Warnings for now, will change to 'error' later
-    }
-
-    // Tree shaking optimizations
-    config.optimization = {
-      ...config.optimization,
-      usedExports: true,
-      sideEffects: false,
     }
 
     // SVG handling
