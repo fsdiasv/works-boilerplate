@@ -3,7 +3,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowLeft, MoreVertical } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -35,12 +35,17 @@ export function SmartHeader({
 }: SmartHeaderProps) {
   const router = useRouter()
   const [isVisible, setIsVisible] = useState(true)
-  const [lastScrollY, setLastScrollY] = useState(0)
+  const lastScrollYRef = useRef(0)
   const { scrollY } = useScroll()
 
-  // Transform values for blur effect
-  const opacity = useTransform(scrollY, [0, 100], [0, 1])
-  const backdropBlur = useTransform(scrollY, [0, 50], [0, 20])
+  // Transform values for blur effect - create complete CSS values
+  const backgroundOpacity = useTransform(scrollY, [0, 100], [0, 1])
+  const backdropBlurValue = useTransform(scrollY, [0, 50], [`blur(0px)`, `blur(50px)`])
+  const backgroundColorValue = useTransform(
+    backgroundOpacity,
+    [0, 1],
+    [`rgba(var(--background), 0)`, `rgba(var(--background), 1)`]
+  )
 
   // Handle scroll behavior
   useEffect(() => {
@@ -48,7 +53,7 @@ export function SmartHeader({
 
     const handleScroll = () => {
       const currentScrollY = window.scrollY
-      const scrollDelta = currentScrollY - lastScrollY
+      const scrollDelta = currentScrollY - lastScrollYRef.current
 
       // Hide header when scrolling down, show when scrolling up
       if (scrollDelta > 10 && currentScrollY > 100) {
@@ -57,12 +62,12 @@ export function SmartHeader({
         setIsVisible(true)
       }
 
-      setLastScrollY(currentScrollY)
+      lastScrollYRef.current = currentScrollY
     }
 
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
-  }, [lastScrollY, behavior])
+  }, [behavior])
 
   const handleBackClick = () => {
     if (onBackClick) {
@@ -102,8 +107,8 @@ export function SmartHeader({
       )}
       style={{
         ...(variant === 'blurred' && {
-          backgroundColor: `rgba(var(--background), ${opacity.get()})`,
-          backdropFilter: `blur(${backdropBlur.get()}px)`,
+          backgroundColor: backgroundColorValue,
+          backdropFilter: backdropBlurValue,
         }),
       }}
     >
