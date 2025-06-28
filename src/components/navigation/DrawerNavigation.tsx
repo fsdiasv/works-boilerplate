@@ -3,6 +3,7 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
+import type React from 'react'
 import { useGesture } from 'react-use-gesture'
 
 import { Button } from '@/components/ui/button'

@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { ArrowDown, RefreshCw } from 'lucide-react'
+import type React from 'react'
 
 import { usePullToRefresh } from '@/hooks/useGestureNavigation'
 import { cn } from 'src/lib/utils'

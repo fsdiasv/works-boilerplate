@@ -1,10 +1,11 @@
 'use client'
 
-import { forwardRef } from 'react'
+import type React from 'react'
+import { forwardRef, type HTMLAttributes } from 'react'
 
 import { cn } from '@/lib/utils'
 
-interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
+interface ContainerProps extends HTMLAttributes<HTMLDivElement> {
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full'
   centerContent?: boolean
   enableQueries?: boolean

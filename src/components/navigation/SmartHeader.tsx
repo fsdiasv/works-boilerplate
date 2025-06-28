@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowLeft, MoreVertical } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useEffect, useRef, useState } from 'react'
+import type React from 'react'
 
 import { Button } from '@/components/ui/button'
 import { cn } from 'src/lib/utils'

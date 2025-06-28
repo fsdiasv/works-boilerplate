@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
+import type React from 'react'
 
 type BackButtonProps = {
   children: React.ReactNode

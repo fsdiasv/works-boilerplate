@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useLocale } from 'next-intl'
 import { useEffect, useState } from 'react'
+import type React from 'react'
 
 import { cn } from 'src/lib/utils'
 

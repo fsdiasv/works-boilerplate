@@ -1,5 +1,7 @@
 'use client'
 
+import type React from 'react'
+
 import { useWebVitals, useLayoutShiftMonitoring } from '@/hooks/useWebVitals'
 
 interface PerformanceMonitorProps {
