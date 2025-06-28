@@ -8,8 +8,13 @@ export default getRequestConfig(async ({ locale }) => {
   const validLocale =
     locale != null && locale.length > 0 && isValidLocale(locale) ? locale : defaultLocale
 
+  // Import with proper typing
+  const messages = (await import(`../messages/${validLocale}.json`)) as {
+    default: Record<string, unknown>
+  }
+
   return {
     locale: validLocale,
-    messages: (await import(`../messages/${validLocale}.json`)).default,
+    messages: messages.default,
   }
 })

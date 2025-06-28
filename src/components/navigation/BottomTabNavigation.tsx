@@ -94,8 +94,8 @@ export function BottomTabNavigation({
   useEffect(() => {
     // Remove locale prefix from pathname for comparison
     const pathSegments = pathname.split('/')
-    const pathnameWithoutLocale = '/' + pathSegments.slice(2).join('/') || '/'
-    
+    const pathnameWithoutLocale = `/${pathSegments.slice(2).join('/')}` || '/'
+
     const activeTabItem = tabs.find(tab => {
       if (tab.href === '/') {
         return pathnameWithoutLocale === '/'

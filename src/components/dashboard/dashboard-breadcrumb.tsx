@@ -38,7 +38,7 @@ export function DashboardBreadcrumb() {
 
   // Remove locale prefix from pathname for route lookup
   const pathSegments = pathname.split('/')
-  const pathnameWithoutLocale = '/' + pathSegments.slice(2).join('/') || '/'
+  const pathnameWithoutLocale = `/${pathSegments.slice(2).join('/')}` || '/'
 
   // Get breadcrumb items for current path, fallback to Dashboard if not found
   const breadcrumbItems = routeMap[pathnameWithoutLocale] ?? [{ title: 'Dashboard' }]
@@ -51,7 +51,10 @@ export function DashboardBreadcrumb() {
           {breadcrumbItems.map((item, index) => {
             const isLast = index === breadcrumbItems.length - 1
             // Add locale prefix to href
-            const href = item.href ? `/${locale}${item.href === '/' ? '/dashboard' : item.href}` : undefined
+            const href =
+              item.href != null
+                ? `/${locale}${item.href === '/' ? '/dashboard' : item.href}`
+                : undefined
 
             return (
               <div key={index} className='flex items-center'>

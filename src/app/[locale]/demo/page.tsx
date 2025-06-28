@@ -3,9 +3,10 @@
 import { Bell, Heart, Home, Menu, Plus, Search, Settings, User } from 'lucide-react'
 import { useState } from 'react'
 
-import { CoreFeaturesSection } from '@/components/demo/CoreFeaturesSection'
-import { FluidTypographySection } from '@/components/demo/FluidTypographySection'
-import { UiComponentsSection } from '@/components/demo/UiComponentsSection'
+// TODO: Create these demo components
+// import { CoreFeaturesSection } from '@/components/demo/CoreFeaturesSection'
+// import { FluidTypographySection } from '@/components/demo/FluidTypographySection'
+// import { UiComponentsSection } from '@/components/demo/UiComponentsSection'
 import { Typography } from '@/components/layout'
 import { PerformanceMonitor } from '@/components/monitoring/PerformanceMonitor'
 import { BottomTabNavigation } from '@/components/navigation/BottomTabNavigation'
@@ -77,11 +78,12 @@ export default function DemoPage() {
               </Typography>
             </section>
 
-            <CoreFeaturesSection />
+            {/* TODO: Uncomment when demo components are created */}
+            {/* <CoreFeaturesSection /> */}
             <Separator className='my-8' />
-            <UiComponentsSection onOpenDrawer={() => setIsDrawerOpen(true)} />
+            {/* <UiComponentsSection onOpenDrawer={() => setIsDrawerOpen(true)} /> */}
             <Separator className='my-8' />
-            <FluidTypographySection />
+            {/* <FluidTypographySection /> */}
           </div>
         </main>
 

@@ -14,8 +14,8 @@ import {
   Check,
 } from 'lucide-react'
 import Link from 'next/link'
-import { useTheme } from 'next-themes'
 import { useLocale } from 'next-intl'
+import { useTheme } from 'next-themes'
 import * as React from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'

@@ -747,11 +747,14 @@ v4 misconfiguration
 
 ##### Tailwind CSS v4 Custom Colors and Utility Classes
 
-**Issue Resolved**: Custom utility classes with prefixes (e.g., `bg-sw-content-background`) not being generated
+**Issue Resolved**: Custom utility classes with prefixes (e.g.,
+`bg-sw-content-background`) not being generated
 
-**Root Cause**: In Tailwind CSS v4, defining CSS custom properties alone doesn't generate utility classes. Colors must be registered in the `@theme` directive.
+**Root Cause**: In Tailwind CSS v4, defining CSS custom properties alone doesn't
+generate utility classes. Colors must be registered in the `@theme` directive.
 
 **Solution Applied**: Add custom colors to `@theme` directive in `globals.css`:
+
 ```css
 @theme {
   /* Dashboard-specific colors */
@@ -763,13 +766,16 @@ v4 misconfiguration
 ```
 
 **Key Learnings**:
+
 - Tailwind v4 requires colors in `@theme` directive to generate utility classes
-- CSS custom properties (`:root { --sw-var: value }`) alone won't create utilities
+- CSS custom properties (`:root { --sw-var: value }`) alone won't create
+  utilities
 - The `--color-` prefix in `@theme` is required for color utilities
 - Custom prefixes work perfectly when properly registered
 - Verify utility generation by checking compiled CSS output
 
 **Debugging Approach**:
+
 1. Check if classes exist in compiled CSS: `curl [css-url] | grep "\.bg-sw-"`
 2. Test with a simple component to isolate the issue
 3. Verify @theme directive syntax matches Tailwind v4 requirements
@@ -777,7 +783,8 @@ v4 misconfiguration
 
 ##### ICU MessageFormat Currency Formatting
 
-- **Correct Syntax**: Use ICU skeleton syntax `{amount, number, ::currency/CODE}` for currency formatting
+- **Correct Syntax**: Use ICU skeleton syntax
+  `{amount, number, ::currency/CODE}` for currency formatting
 - **Currency Codes**: Must use ISO-4217 currency codes (USD, BRL, EUR, etc.)
 - **Common Mistakes**:
   - ❌ `{amount, number, currency}` - Missing currency code specification
@@ -787,17 +794,24 @@ v4 misconfiguration
   - ✅ `{amount, number, ::currency/USD}` - Formats as $1,234.56 in en-US
   - ✅ `{amount, number, ::currency/BRL}` - Formats as R$ 1.234,56 in pt-BR
   - ✅ `{amount, number, ::currency/EUR}` - Formats as 1.234,56 € in es-ES
-- **Benefits**: Automatic locale-aware formatting with correct symbols, decimal separators, and thousand separators
-- **Dynamic Currency**: For multi-currency support, pass currency as parameter: `{amount, number, ::currency/{currency}}`
-- **Next-intl Integration**: Works seamlessly with next-intl's `formatNumber` function
+- **Benefits**: Automatic locale-aware formatting with correct symbols, decimal
+  separators, and thousand separators
+- **Dynamic Currency**: For multi-currency support, pass currency as parameter:
+  `{amount, number, ::currency/{currency}}`
+- **Next-intl Integration**: Works seamlessly with next-intl's `formatNumber`
+  function
 
 ##### Locale-Aware Navigation Components
 
-- **Issue**: Navigation components using hardcoded paths fail with internationalized routing
-- **Root Cause**: Direct paths like `/dashboard` don't match actual routes like `/pt/dashboard`
-- **Solution Applied**: All navigation components now handle locale-aware routing:
+- **Issue**: Navigation components using hardcoded paths fail with
+  internationalized routing
+- **Root Cause**: Direct paths like `/dashboard` don't match actual routes like
+  `/pt/dashboard`
+- **Solution Applied**: All navigation components now handle locale-aware
+  routing:
   1. Extract current locale with `useLocale()` hook
-  2. Strip locale from pathname for route matching: `pathnameWithoutLocale = '/' + pathSegments.slice(2).join('/') || '/'`
+  2. Strip locale from pathname for route matching:
+     `pathnameWithoutLocale = '/' + pathSegments.slice(2).join('/') || '/'`
   3. Prefix all hrefs with locale: `href={`/${locale}${path}`}`
 - **Components Fixed**:
   - `dashboard-breadcrumb.tsx`: Route lookup and href generation
@@ -808,13 +822,67 @@ v4 misconfiguration
   ```tsx
   const locale = useLocale()
   const pathname = usePathname()
-  const pathnameWithoutLocale = '/' + pathname.split('/').slice(2).join('/') || '/'
+  const pathnameWithoutLocale =
+    '/' + pathname.split('/').slice(2).join('/') || '/'
   // Use pathnameWithoutLocale for comparisons
   // Use `/${locale}/path` for all Link hrefs
   ```
 - **Special Cases**:
   - Root path: Use `/${locale}` or `/${locale}/dashboard`, not just `/`
   - Dynamic paths: Always include locale prefix before parameters
+
+##### Dynamic Navigation Active States with Internationalization
+
+**Issue Resolved**: Sidebar navigation items had hardcoded `active` states that
+never updated based on current route
+
+**Root Cause**: Static boolean values in navigation arrays instead of dynamic
+route detection
+
+**Solution Applied**:
+
+1. Remove `active` property from navigation arrays
+2. Add `usePathname` hook from `next/navigation`
+3. Create `isActive` function that:
+   - Strips locale prefix using regex: `/^\/[a-z]{2}(-[A-Z]{2})?/`
+   - Handles home page edge case explicitly
+   - Uses `startsWith` for nested route support
+4. Apply dynamic active state check in render logic
+
+**Implementation Pattern**:
+
+```typescript
+const pathname = usePathname()
+
+const isActive = (href: string) => {
+  const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(-[A-Z]{2})?/, '')
+
+  if (href === '/') {
+    return pathWithoutLocale === '' || pathWithoutLocale === '/'
+  }
+
+  return pathWithoutLocale.startsWith(href)
+}
+
+// In render:
+const active = isActive(item.href)
+```
+
+**Key Learnings**:
+
+- Always use dynamic route detection for navigation active states
+- Consider internationalization when comparing routes (strip locale prefixes)
+- Use `startsWith` for hierarchical route matching (e.g., `/projects` matches
+  `/projects/123`)
+- Apply same logic consistently across all navigation sections
+- Next.js `usePathname` returns the full path including locale prefix
+
+**Common Pitfalls to Avoid**:
+
+- Don't hardcode active states in navigation arrays
+- Don't forget to handle the home page (`/`) as a special case
+- Don't use exact matching for routes that may have nested paths
+- Remember that internationalized routes include locale prefix
 
 ### Development Workflow
 

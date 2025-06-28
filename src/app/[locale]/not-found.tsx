@@ -3,7 +3,7 @@ import { useTranslations } from 'next-intl'
 
 export default function NotFound() {
   const t = useTranslations('error')
-  
+
   return (
     <div className='flex min-h-screen items-center justify-center px-4 sm:px-6 lg:px-8'>
       <div className='w-full max-w-md space-y-8 text-center'>
@@ -12,9 +12,7 @@ export default function NotFound() {
           <h2 className='mt-4 text-2xl font-bold text-gray-900 dark:text-gray-100'>
             {t('pageNotFound')}
           </h2>
-          <p className='mt-2 text-gray-600 dark:text-gray-400'>
-            {t('pageNotFoundDescription')}
-          </p>
+          <p className='mt-2 text-gray-600 dark:text-gray-400'>{t('pageNotFoundDescription')}</p>
         </div>
 
         <div className='space-y-4'>

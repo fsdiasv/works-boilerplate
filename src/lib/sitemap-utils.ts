@@ -19,7 +19,7 @@ async function getRouteModificationTime(route: string): Promise<Date | null> {
   }
 
   const filePath = routeToPath[route]
-  if (!filePath) {
+  if (filePath == null) {
     return null
   }
 
@@ -48,7 +48,7 @@ export async function getRouteModificationTimes(
       const lastModified = await getRouteModificationTime(route)
       return {
         route,
-        lastModified: lastModified || defaultDate,
+        lastModified: lastModified ?? defaultDate,
       }
     })
   )
@@ -59,9 +59,13 @@ export async function getRouteModificationTimes(
 /**
  * Determine change frequency based on how recently the file was modified
  */
-export function getChangeFrequency(lastModified: Date): 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never' {
+export function getChangeFrequency(
+  lastModified: Date
+): 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never' {
   const now = new Date()
-  const daysSinceModified = Math.floor((now.getTime() - lastModified.getTime()) / (1000 * 60 * 60 * 24))
+  const daysSinceModified = Math.floor(
+    (now.getTime() - lastModified.getTime()) / (1000 * 60 * 60 * 24)
+  )
 
   if (daysSinceModified < 1) return 'hourly'
   if (daysSinceModified < 7) return 'daily'

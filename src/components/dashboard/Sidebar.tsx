@@ -11,7 +11,9 @@ import {
   MoreHorizontal,
   ChevronDown,
 } from 'lucide-react'
+import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useLocale } from 'next-intl'
 import { useState } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -27,7 +29,7 @@ import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
 const navigation = [
-  { name: 'Home', icon: Home, href: '/' },
+  { name: 'Home', icon: Home, href: '/dashboard' },
   { name: 'Dashboard', icon: BarChart3, href: '/dashboard' },
   { name: 'Lifecycle', icon: FileText, href: '/lifecycle' },
   { name: 'Analytics', icon: BarChart3, href: '/analytics' },
@@ -45,6 +47,7 @@ const documents = [
 export function Sidebar() {
   const [isDocumentsOpen, setIsDocumentsOpen] = useState(true)
   const pathname = usePathname()
+  const locale = useLocale()
 
   // Function to check if a navigation item is active
   const isActive = (href: string) => {
@@ -99,10 +102,10 @@ export function Sidebar() {
               )}
               asChild
             >
-              <a href={item.href}>
+              <Link href={`/${locale}${item.href}`}>
                 <item.icon className='mr-3 h-4 w-4' />
                 {item.name}
-              </a>
+              </Link>
             </Button>
           )
         })}
@@ -136,10 +139,10 @@ export function Sidebar() {
                     )}
                     asChild
                   >
-                    <a href={item.href}>
+                    <Link href={`/${locale}${item.href}`}>
                       <item.icon className='mr-3 h-4 w-4' />
                       {item.name}
-                    </a>
+                    </Link>
                   </Button>
                 )
               })}

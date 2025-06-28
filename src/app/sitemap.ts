@@ -17,7 +17,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   // Generate sitemap entries for each locale and route
   routes.forEach(route => {
-    const lastModified = modTimeMap.get(route) || new Date('2024-01-01')
+    const lastModified = modTimeMap.get(route) ?? new Date('2024-01-01')
     const changeFrequency = getChangeFrequency(lastModified)
 
     locales.forEach(locale => {

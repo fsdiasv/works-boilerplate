@@ -27,7 +27,7 @@
 
   /* Non-color design tokens */
   --radius: 0.5rem;
-  
+
   /* Dashboard-specific colors */
   --color-sw-content-background: var(--background-color);
   --color-sw-text-primary: var(--foreground-color);
@@ -139,16 +139,16 @@
     --sw-sidebar-active-background: hsl(var(--sidebar-accent));
     --sw-sidebar-active-foreground: hsl(var(--sidebar-accent-foreground));
     --sw-sidebar-muted-foreground: hsl(var(--muted-foreground));
-    
+
     /* Text hierarchy */
     --sw-text-primary: hsl(var(--foreground));
     --sw-text-secondary: hsl(var(--muted-foreground));
     --sw-text-tertiary: hsl(var(--muted-foreground) / 0.7);
-    
+
     /* Accent colors */
     --sw-accent-purple: hsl(var(--primary));
     --sw-accent-green: 142 71% 45%;
-    
+
     /* Component specific */
     --sw-badge-green-background: 142 71% 45% / 0.1;
     --sw-button-primary: hsl(var(--primary));

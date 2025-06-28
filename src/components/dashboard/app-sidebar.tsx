@@ -55,7 +55,7 @@ export function AppSidebar() {
 
   // Remove locale prefix from pathname for comparison
   const pathSegments = pathname.split('/')
-  const pathnameWithoutLocale = '/' + pathSegments.slice(2).join('/') || '/dashboard'
+  const pathnameWithoutLocale = `/${pathSegments.slice(2).join('/')}` || '/dashboard'
 
   const renderMenuItems = (items: typeof menuPrincipal) => {
     return items.map(item => {
