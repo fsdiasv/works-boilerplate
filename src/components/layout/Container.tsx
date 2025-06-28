@@ -33,7 +33,7 @@ export const Container = forwardRef<HTMLDivElement, ContainerProps>(
           },
           // Container queries support
           {
-            '@container/content': enableQueries,
+            'container-queries': enableQueries,
           },
           className
         )}

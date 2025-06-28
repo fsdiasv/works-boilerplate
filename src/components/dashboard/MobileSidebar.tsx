@@ -93,9 +93,8 @@ export function MobileSidebar({ onClose }: MobileSidebarProps) {
                 : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'
             )}
             asChild
-            onClick={onClose}
           >
-            <a href={item.href}>
+            <a href={item.href} onClick={onClose}>
               <item.icon className='mr-3 h-5 w-5' />
               {item.name}
             </a>
@@ -123,9 +122,8 @@ export function MobileSidebar({ onClose }: MobileSidebarProps) {
                   variant='ghost'
                   className='h-12 w-full justify-start px-6 text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'
                   asChild
-                  onClick={onClose}
                 >
-                  <a href={item.href}>
+                  <a href={item.href} onClick={onClose}>
                     <item.icon className='mr-3 h-5 w-5' />
                     {item.name}
                   </a>

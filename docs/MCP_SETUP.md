@@ -2,7 +2,9 @@
 
 ## Overview
 
-This project uses MCP servers to enhance Claude Code capabilities. The configuration is stored in `.mcp.json` with environment variables for sensitive API keys.
+This project uses MCP servers to enhance Claude Code capabilities. The
+configuration is stored in `.mcp.json` with environment variables for sensitive
+API keys.
 
 ## Setup Instructions for Team Members
 
@@ -14,7 +16,8 @@ cp .env.mcp.example .env.mcp
 
 ### 2. Get API Keys from Team Vault
 
-Contact your team lead or check your password manager for the following API keys:
+Contact your team lead or check your password manager for the following API
+keys:
 
 - **TAVILY_API_KEY** - Tavily search service
 - **FIRECRAWL_API_KEY** - Web scraping service
@@ -49,6 +52,7 @@ Use the provided starter scripts that automatically load the `.env.mcp` file:
 ```
 
 The script will:
+
 - Check if `.env.mcp` exists (creates from template if missing)
 - Load all environment variables
 - Validate that API keys are configured
@@ -64,10 +68,10 @@ export $(cat .env.mcp | xargs)
 claude .
 
 # On Windows (PowerShell)
-Get-Content .env.mcp | ForEach-Object { 
-    if ($_ -match '^([^=]+)=(.*)$') { 
-        [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2]) 
-    } 
+Get-Content .env.mcp | ForEach-Object {
+    if ($_ -match '^([^=]+)=(.*)$') {
+        [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2])
+    }
 }
 claude .
 ```
@@ -113,4 +117,5 @@ For production environments, consider using:
 - **Vault** - HashiCorp Vault integration
 - **AWS Secrets Manager** - For AWS deployments
 
-These tools can automatically inject secrets without manual environment variable management.
+These tools can automatically inject secrets without manual environment variable
+management.

@@ -3,8 +3,24 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import type { ReactNode } from 'react'
 
-import { ThemeProvider } from '@/components/layout/theme-provider'
 import { locales } from '@/i18n/config'
+
+/**
+ * Maps internal locale codes to standard OpenGraph locale codes
+ * @param locale - Internal locale code ('pt', 'en', 'es')
+ * @returns Standard locale code ('pt_BR', 'en_US', 'es_ES')
+ */
+function mapToStandardLocale(locale: string): string {
+  switch (locale) {
+    case 'pt':
+      return 'pt_BR'
+    case 'es':
+      return 'es_ES'
+    case 'en':
+    default:
+      return 'en_US'
+  }
+}
 
 type Props = {
   children: ReactNode
@@ -45,10 +61,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return typeof value === 'string' ? value : key
   }
 
-  const ogLocale = locale === 'pt' ? 'pt_BR' : locale === 'es' ? 'es_ES' : 'en_US'
-  const alternateLocales = locales
-    .filter(l => l !== locale)
-    .map(l => (l === 'pt' ? 'pt_BR' : l === 'es' ? 'es_ES' : 'en_US'))
+  const ogLocale = mapToStandardLocale(locale)
+  const alternateLocales = locales.filter(l => l !== locale).map(l => mapToStandardLocale(l))
 
   return {
     title: {
@@ -132,14 +146,8 @@ export default async function LocaleLayout({ children, params }: Props) {
   const messages = await getMessages({ locale })
 
   return (
-    <html lang={locale} suppressHydrationWarning>
-      <body className='antialiased'>
-        <NextIntlClientProvider locale={locale} messages={messages}>
-          <ThemeProvider attribute='class' defaultTheme='light' enableSystem disableTransitionOnChange>
-            {children}
-          </ThemeProvider>
-        </NextIntlClientProvider>
-      </body>
-    </html>
+    <NextIntlClientProvider locale={locale} messages={messages}>
+      {children}
+    </NextIntlClientProvider>
   )
 }

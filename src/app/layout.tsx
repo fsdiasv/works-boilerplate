@@ -1,10 +1,20 @@
-import { ReactNode } from 'react'
+import { Inter } from 'next/font/google'
+import type React from 'react'
+
 import './globals.css'
 
-type RootLayoutProps = {
-  children: ReactNode
-}
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 
-export default function RootLayout({ children }: RootLayoutProps) {
-  return children
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode
+}>) {
+  return (
+    <html suppressHydrationWarning className={inter.variable}>
+      <body className='font-sans antialiased' suppressHydrationWarning>
+        {children}
+      </body>
+    </html>
+  )
 }

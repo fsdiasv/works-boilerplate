@@ -1,34 +1,38 @@
 @import 'tailwindcss';
 
+@custom-variant dark (&:is(.dark *));
+
 /* Theme configuration for Tailwind CSS v4 */
 @theme {
-  /* Color system */
-  --color-background: hsl(0 0% 100%);
-  --color-foreground: hsl(222.2 84% 4.9%);
-  --color-card: hsl(0 0% 100%);
-  --color-card-foreground: hsl(222.2 84% 4.9%);
-  --color-popover: hsl(0 0% 100%);
-  --color-popover-foreground: hsl(222.2 84% 4.9%);
-  --color-primary: hsl(221.2 83.2% 53.3%);
-  --color-primary-foreground: hsl(210 40% 98%);
-  --color-secondary: hsl(210 40% 96%);
-  --color-secondary-foreground: hsl(222.2 84% 4.9%);
-  --color-muted: hsl(210 40% 96%);
-  --color-muted-foreground: hsl(215.4 16.3% 46.9%);
-  --color-accent: hsl(210 40% 96%);
-  --color-accent-foreground: hsl(222.2 84% 4.9%);
-  --color-destructive: hsl(0 84.2% 60.2%);
-  --color-destructive-foreground: hsl(210 40% 98%);
-  --color-border: hsl(214.3 31.8% 91.4%);
-  --color-input: hsl(214.3 31.8% 91.4%);
-  --color-ring: hsl(221.2 83.2% 53.3%);
+  /* Dynamic color system - references CSS variables for theme switching */
+  --color-background: var(--background-color);
+  --color-foreground: var(--foreground-color);
+  --color-card: var(--card-color);
+  --color-card-foreground: var(--card-foreground-color);
+  --color-popover: var(--popover-color);
+  --color-popover-foreground: var(--popover-foreground-color);
+  --color-primary: var(--primary-color);
+  --color-primary-foreground: var(--primary-foreground-color);
+  --color-secondary: var(--secondary-color);
+  --color-secondary-foreground: var(--secondary-foreground-color);
+  --color-muted: var(--muted-color);
+  --color-muted-foreground: var(--muted-foreground-color);
+  --color-accent: var(--accent-color);
+  --color-accent-foreground: var(--accent-foreground-color);
+  --color-destructive: var(--destructive-color);
+  --color-destructive-foreground: var(--destructive-foreground-color);
+  --color-border: var(--border-color);
+  --color-input: var(--input-color);
+  --color-ring: var(--ring-color);
+
+  /* Non-color design tokens */
   --radius: 0.5rem;
 }
 
 /* CSS Custom Properties for Theme System */
 @layer base {
   :root {
-    /* Color system */
+    /* Color system for light theme */
     --background: 0 0% 100%;
     --foreground: 222.2 84% 4.9%;
     --card: 0 0% 100%;
@@ -48,7 +52,27 @@
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
     --ring: 221.2 83.2% 53.3%;
-    --radius: 0.5rem;
+
+    /* Theme bridge variables for @theme directive */
+    --background-color: hsl(var(--background));
+    --foreground-color: hsl(var(--foreground));
+    --card-color: hsl(var(--card));
+    --card-foreground-color: hsl(var(--card-foreground));
+    --popover-color: hsl(var(--popover));
+    --popover-foreground-color: hsl(var(--popover-foreground));
+    --primary-color: hsl(var(--primary));
+    --primary-foreground-color: hsl(var(--primary-foreground));
+    --secondary-color: hsl(var(--secondary));
+    --secondary-foreground-color: hsl(var(--secondary-foreground));
+    --muted-color: hsl(var(--muted));
+    --muted-foreground-color: hsl(var(--muted-foreground));
+    --accent-color: hsl(var(--accent));
+    --accent-foreground-color: hsl(var(--accent-foreground));
+    --destructive-color: hsl(var(--destructive));
+    --destructive-foreground-color: hsl(var(--destructive-foreground));
+    --border-color: hsl(var(--border));
+    --input-color: hsl(var(--input));
+    --ring-color: hsl(var(--ring));
 
     /* Font system */
     --font-sans:
@@ -65,6 +89,7 @@
   }
 
   .dark {
+    /* Color system for dark theme */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
     --card: 222.2 84% 4.9%;
@@ -84,6 +109,8 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 224.3 76.3% 94.1%;
+
+    /* Theme bridge variables automatically inherit dark values */
   }
 }
 
@@ -230,6 +257,12 @@
     padding-bottom: var(--safe-area-inset-bottom);
     padding-left: var(--safe-area-inset-left);
   }
+
+  /* Container queries support */
+  .container-queries {
+    container-type: inline-size;
+    container-name: content;
+  }
 }
 
 /* Utility layer for mobile-specific utilities */
@@ -285,6 +318,15 @@
     animation: slideUp 0.3s ease-out;
   }
 
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
   @keyframes slideUp {
     from {
       transform: translateY(10px);
@@ -306,5 +348,47 @@
   * {
     color: black !important;
     background: white !important;
+  }
+}
+
+:root {
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+.dark {
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+@theme inline {
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
   }
 }

@@ -1,6 +1,6 @@
 import { Metadata } from 'next'
-import { getTranslations } from 'next-intl/server'
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 
 import { Dashboard } from '@/components/dashboard/Dashboard'
 
@@ -13,8 +13,8 @@ export async function generateMetadata({ params }: DashboardPageProps): Promise<
   const t = await getTranslations({ locale, namespace: 'dashboard' })
 
   return {
-    title: t('meta.title'),
-    description: t('meta.description'),
+    title: t('title'),
+    description: t('overview'),
   }
 }
 
