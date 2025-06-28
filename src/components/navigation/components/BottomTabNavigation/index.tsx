@@ -4,91 +4,76 @@ import { motion } from 'framer-motion'
 import { Heart, Home, Plus, Search, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useLocale } from 'next-intl'
-import { useEffect, useState } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
+import { useEffect, useState, useMemo } from 'react'
+import type React from 'react'
 
-import { cn } from 'src/lib/utils'
+import { cn } from '@/lib/utils'
 
-interface TabItem {
-  id: string
-  label: string
-  icon: React.ComponentType<{ className?: string }>
-  href: string
-  badge?: number
-  isSpecial?: boolean
-}
+import { useScrollVisibility, useSafeAreaInsets } from '../../hooks'
+import type { NavigationItem } from '../../types'
+import { triggerHapticFeedback, renderNavigationBadge } from '../../utils'
 
 interface BottomTabNavigationProps {
-  tabs?: TabItem[]
+  tabs?: NavigationItem[]
   className?: string
   onTabChange?: (tabId: string) => void
+  hideOnScroll?: boolean
 }
 
-const defaultTabs: TabItem[] = [
-  {
-    id: 'home',
-    label: 'Home',
-    icon: Home,
-    href: '/',
-  },
-  {
-    id: 'search',
-    label: 'Search',
-    icon: Search,
-    href: '/search',
-  },
-  {
-    id: 'create',
-    label: 'Create',
-    icon: Plus,
-    href: '/create',
-    isSpecial: true,
-  },
-  {
-    id: 'favorites',
-    label: 'Favorites',
-    icon: Heart,
-    href: '/favorites',
-    badge: 3,
-  },
-  {
-    id: 'profile',
-    label: 'Profile',
-    icon: User,
-    href: '/profile',
-  },
-]
-
 export function BottomTabNavigation({
-  tabs = defaultTabs,
+  tabs,
   className,
   onTabChange,
+  hideOnScroll = true,
 }: BottomTabNavigationProps) {
   const pathname = usePathname()
   const locale = useLocale()
+  const t = useTranslations('common.navigation')
   const [activeTab, setActiveTab] = useState<string>('')
-  const [isVisible, setIsVisible] = useState(true)
-  const [lastScrollY, setLastScrollY] = useState(0)
+  const { isVisible } = useScrollVisibility({ hideOnScroll })
+  const { paddingClasses } = useSafeAreaInsets()
 
-  // Handle scroll to hide/show navigation
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      const scrollDelta = currentScrollY - lastScrollY
+  // Default tabs with translations
+  const defaultTabs = useMemo<NavigationItem[]>(
+    () => [
+      {
+        id: 'home',
+        label: t('home'),
+        icon: Home,
+        href: '/',
+      },
+      {
+        id: 'search',
+        label: t('search'),
+        icon: Search,
+        href: '/search',
+      },
+      {
+        id: 'create',
+        label: t('create'),
+        icon: Plus,
+        href: '/create',
+        isSpecial: true,
+      },
+      {
+        id: 'favorites',
+        label: t('favorites'),
+        icon: Heart,
+        href: '/favorites',
+        badge: 3,
+      },
+      {
+        id: 'profile',
+        label: t('profile'),
+        icon: User,
+        href: '/profile',
+      },
+    ],
+    [t]
+  )
 
-      // Only hide if scrolling down and past threshold
-      if (scrollDelta > 10 && currentScrollY > 100) {
-        setIsVisible(false)
-      } else if (scrollDelta < -10) {
-        setIsVisible(true)
-      }
-
-      setLastScrollY(currentScrollY)
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [lastScrollY])
+  const navigationTabs = tabs ?? defaultTabs
 
   // Set active tab based on pathname
   useEffect(() => {
@@ -96,7 +81,7 @@ export function BottomTabNavigation({
     const pathSegments = pathname.split('/')
     const pathnameWithoutLocale = `/${pathSegments.slice(2).join('/')}` || '/'
 
-    const activeTabItem = tabs.find(tab => {
+    const activeTabItem = navigationTabs.find(tab => {
       if (tab.href === '/') {
         return pathnameWithoutLocale === '/'
       }
@@ -105,16 +90,12 @@ export function BottomTabNavigation({
     if (activeTabItem) {
       setActiveTab(activeTabItem.id)
     }
-  }, [pathname, tabs])
+  }, [pathname, navigationTabs])
 
   const handleTabClick = (tabId: string) => {
     setActiveTab(tabId)
     onTabChange?.(tabId)
-
-    // Haptic feedback if available
-    if (typeof window !== 'undefined' && 'vibrate' in navigator) {
-      navigator.vibrate(10)
-    }
+    triggerHapticFeedback('selection')
   }
 
   return (
@@ -124,10 +105,9 @@ export function BottomTabNavigation({
       transition={{ duration: 0.3, ease: 'easeInOut' }}
       className={cn(
         'fixed right-0 bottom-0 left-0 z-50',
-        // PWA safe area support
-        'pb-[max(8px,env(safe-area-inset-bottom))]',
-        'pl-[max(0px,env(safe-area-inset-left))]',
-        'pr-[max(0px,env(safe-area-inset-right))]',
+        paddingClasses.bottom,
+        paddingClasses.left,
+        paddingClasses.right,
         className
       )}
     >
@@ -140,7 +120,7 @@ export function BottomTabNavigation({
             'py-2'
           )}
         >
-          {tabs.map(tab => {
+          {navigationTabs.map(tab => {
             const Icon = tab.icon
             const isActive = activeTab === tab.id
 
@@ -188,19 +168,7 @@ export function BottomTabNavigation({
                   />
 
                   {/* Badge */}
-                  {tab.badge != null && tab.badge > 0 && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className={cn(
-                        'absolute -top-2 -right-2',
-                        'flex h-5 min-w-[20px] items-center justify-center',
-                        'bg-destructive text-destructive-foreground rounded-full px-1.5 text-xs font-medium'
-                      )}
-                    >
-                      {tab.badge > 99 ? '99+' : tab.badge}
-                    </motion.div>
-                  )}
+                  {renderNavigationBadge(tab.badge, 'absolute -top-2 -right-2')}
                 </div>
 
                 {/* Label */}

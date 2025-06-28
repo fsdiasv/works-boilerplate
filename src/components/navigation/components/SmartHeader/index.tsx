@@ -3,12 +3,18 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { ArrowLeft, MoreVertical } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
+import type React from 'react'
 
 import { Button } from '@/components/ui/button'
-import { cn } from 'src/lib/utils'
+import { cn } from '@/lib/utils'
 
-interface SmartHeaderProps {
+import { useSafeAreaInsets } from '../../hooks/useSafeAreaInsets'
+import { useScrollVisibility } from '../../hooks/useScrollVisibility'
+import type { NavigationBehavior } from '../../types'
+import { triggerHapticFeedback } from '../../utils/haptics'
+
+interface SmartHeaderProps extends Partial<NavigationBehavior> {
   title?: string
   subtitle?: string
   showBackButton?: boolean
@@ -32,11 +38,22 @@ export function SmartHeader({
   behavior = 'sticky',
   className,
   children,
+  hideOnScroll,
+  scrollThreshold,
+  animationDuration,
+  enableHapticFeedback = true,
 }: SmartHeaderProps) {
   const router = useRouter()
-  const [isVisible, setIsVisible] = useState(true)
-  const lastScrollYRef = useRef(0)
   const { scrollY } = useScroll()
+  const { paddingClasses } = useSafeAreaInsets({ includePadding: true })
+
+  // Use the shared scroll visibility hook
+  const { isVisible } = useScrollVisibility({
+    hideOnScroll: hideOnScroll ?? behavior === 'hide-on-scroll',
+    scrollThreshold: scrollThreshold ?? 10,
+    animationDuration: animationDuration ?? 300,
+    initialVisible: true,
+  })
 
   // Transform values for blur effect - create complete CSS values
   const backgroundOpacity = useTransform(scrollY, [0, 100], [0, 1])
@@ -47,29 +64,12 @@ export function SmartHeader({
     [`rgba(var(--background), 0)`, `rgba(var(--background), 1)`]
   )
 
-  // Handle scroll behavior
-  useEffect(() => {
-    if (behavior !== 'hide-on-scroll') return
-
-    const handleScroll = () => {
-      const currentScrollY = window.scrollY
-      const scrollDelta = currentScrollY - lastScrollYRef.current
-
-      // Hide header when scrolling down, show when scrolling up
-      if (scrollDelta > 10 && currentScrollY > 100) {
-        setIsVisible(false)
-      } else if (scrollDelta < -10 || currentScrollY < 50) {
-        setIsVisible(true)
-      }
-
-      lastScrollYRef.current = currentScrollY
-    }
-
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [behavior])
+  // Remove the manual scroll behavior as it's handled by useScrollVisibility hook
 
   const handleBackClick = () => {
+    if (enableHapticFeedback) {
+      triggerHapticFeedback('selection')
+    }
     if (onBackClick) {
       onBackClick()
     } else {
@@ -97,10 +97,12 @@ export function SmartHeader({
       transition={{ duration: 0.3, ease: 'easeInOut' }}
       className={cn(
         'flex h-16 items-center justify-between px-4',
-        // PWA safe area support
-        'pt-[max(0px,env(safe-area-inset-top))]',
-        'pl-[max(16px,env(safe-area-inset-left))]',
-        'pr-[max(16px,env(safe-area-inset-right))]',
+        // PWA safe area support using the hook
+        paddingClasses.top,
+        'pl-4', // Base padding, safe area is added by the hook
+        'pr-4', // Base padding, safe area is added by the hook
+        paddingClasses.left,
+        paddingClasses.right,
         behaviorStyles[behavior],
         variantStyles[variant],
         className

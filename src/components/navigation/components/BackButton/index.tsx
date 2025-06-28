@@ -2,6 +2,9 @@
 
 import { useRouter } from 'next/navigation'
 import { useCallback } from 'react'
+import type React from 'react'
+
+import { triggerHapticFeedback } from '../../utils/haptics'
 
 type BackButtonProps = {
   children: React.ReactNode
@@ -9,6 +12,7 @@ type BackButtonProps = {
   fallbackUrl?: string
   ariaLabel?: string
   onClick?: () => void
+  enableHapticFeedback?: boolean
 }
 
 export default function BackButton({
@@ -17,10 +21,16 @@ export default function BackButton({
   fallbackUrl,
   ariaLabel,
   onClick,
+  enableHapticFeedback = true,
 }: BackButtonProps) {
   const router = useRouter()
 
   const handleClick = useCallback(() => {
+    // Trigger haptic feedback
+    if (enableHapticFeedback) {
+      triggerHapticFeedback('selection')
+    }
+
     // Custom onClick takes precedence
     if (onClick) {
       onClick()
@@ -40,7 +50,7 @@ export default function BackButton({
     } else {
       window.history.back()
     }
-  }, [onClick, fallbackUrl, router])
+  }, [onClick, fallbackUrl, router, enableHapticFeedback])
 
   return (
     <button

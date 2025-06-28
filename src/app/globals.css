@@ -30,6 +30,7 @@
 
   /* Dashboard-specific colors */
   --color-sw-content-background: var(--background-color);
+  --color-sw-surface-background: var(--card-color);
   --color-sw-text-primary: var(--foreground-color);
   --color-sw-text-secondary: var(--muted-foreground-color);
   --color-sw-text-tertiary: var(--muted-foreground-color);
@@ -134,10 +135,11 @@
   :root {
     /* Content and layout */
     --sw-content-background: hsl(var(--background));
-    --sw-sidebar-background: hsl(var(--sidebar));
-    --sw-sidebar-foreground: hsl(var(--sidebar-foreground));
-    --sw-sidebar-active-background: hsl(var(--sidebar-accent));
-    --sw-sidebar-active-foreground: hsl(var(--sidebar-accent-foreground));
+    --sw-surface-background: hsl(var(--card));
+    --sw-sidebar-background: hsl(0 0% 98%);
+    --sw-sidebar-foreground: hsl(240 5.3% 26.1%);
+    --sw-sidebar-active-background: hsl(240 4.8% 95.9%);
+    --sw-sidebar-active-foreground: hsl(240 5.9% 10%);
     --sw-sidebar-muted-foreground: hsl(var(--muted-foreground));
 
     /* Text hierarchy */
@@ -154,6 +156,14 @@
     --sw-button-primary: hsl(var(--primary));
     --sw-button-link: hsl(var(--primary));
     --sw-card: hsl(var(--card));
+  }
+
+  /* Dark theme overrides for dashboard variables */
+  .dark {
+    --sw-sidebar-background: hsl(222.2 84% 4.9%);
+    --sw-sidebar-foreground: hsl(210 40% 98%);
+    --sw-sidebar-active-background: hsl(217.2 32.6% 17.5%);
+    --sw-sidebar-active-foreground: hsl(210 40% 98%);
   }
 }
 

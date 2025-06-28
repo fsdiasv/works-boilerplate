@@ -20,7 +20,10 @@
       "pricing": "Preços",
       "documentation": "Documentação",
       "community": "Comunidade",
-      "feedback": "Feedback"
+      "feedback": "Feedback",
+      "search": "Buscar",
+      "create": "Criar",
+      "favorites": "Favoritos"
     },
     "actions": {
       "save": "Salvar",
@@ -129,6 +132,170 @@
     "pageNotFound": "Página Não Encontrada",
     "pageNotFoundDescription": "A página que você procura não existe.",
     "goHome": "Ir para Início"
+  },
+  "landing": {
+    "nav": {
+      "features": "Recursos",
+      "pricing": "Preços",
+      "testimonials": "Depoimentos",
+      "faq": "FAQ",
+      "signin": "Entrar",
+      "getStarted": "Começar Grátis"
+    },
+    "hero": {
+      "badge": "🚀 Lançamento da versão 2.0",
+      "title": "Construa seu SaaS em dias, não meses",
+      "subtitle": "Kit inicial completo com autenticação, pagamentos, multi-tenancy e tudo que você precisa para lançar rapidamente.",
+      "cta": {
+        "primary": "Começar Gratuitamente",
+        "secondary": "Ver Demo"
+      }
+    },
+    "features": {
+      "title": "Tudo que você precisa para construir um SaaS moderno",
+      "subtitle": "Recursos prontos para produção que aceleram seu desenvolvimento",
+      "mobile": {
+        "title": "Mobile-First PWA",
+        "description": "Progressive Web App otimizada para dispositivos móveis com suporte offline e instalação nativa."
+      },
+      "i18n": {
+        "title": "Internacionalização",
+        "description": "Suporte completo para múltiplos idiomas com traduções automáticas e formatação regional."
+      },
+      "security": {
+        "title": "Segurança Empresarial",
+        "description": "Autenticação robusta, RLS (Row Level Security) e proteção contra vulnerabilidades comuns."
+      },
+      "performance": {
+        "title": "Performance Otimizada",
+        "description": "Carregamento rápido, SEO otimizado e métricas Core Web Vitals excelentes."
+      },
+      "multitenancy": {
+        "title": "Multi-Tenancy",
+        "description": "Arquitetura pronta para múltiplos clientes com isolamento de dados e personalização."
+      },
+      "analytics": {
+        "title": "Analytics Integrado",
+        "description": "Métricas e dashboards prontos para acompanhar o crescimento do seu negócio."
+      }
+    },
+    "pricing": {
+      "title": "Preços simples e transparentes",
+      "subtitle": "Escolha o plano ideal para o seu negócio",
+      "free": {
+        "title": "Gratuito",
+        "description": "Perfeito para começar",
+        "price": "R$ 0",
+        "period": "mês",
+        "cta": "Começar Grátis",
+        "features": {
+          "feature1": "Até 3 usuários",
+          "feature2": "1GB de armazenamento",
+          "feature3": "Suporte por email"
+        }
+      },
+      "pro": {
+        "title": "Pro",
+        "description": "Para empresas em crescimento",
+        "price": "R$ 49",
+        "period": "mês",
+        "badge": "Mais Popular",
+        "cta": "Começar Teste Grátis",
+        "features": {
+          "feature1": "Usuários ilimitados",
+          "feature2": "100GB de armazenamento",
+          "feature3": "Suporte prioritário",
+          "feature4": "API completa",
+          "feature5": "Integrações avançadas"
+        }
+      },
+      "enterprise": {
+        "title": "Enterprise",
+        "description": "Para grandes empresas",
+        "price": "Personalizado",
+        "cta": "Falar com Vendas",
+        "features": {
+          "feature1": "Tudo do plano Pro",
+          "feature2": "Armazenamento ilimitado",
+          "feature3": "SLA garantido",
+          "feature4": "Gerente de conta dedicado"
+        }
+      }
+    },
+    "testimonials": {
+      "title": "Amado por desenvolvedores em todo o mundo",
+      "subtitle": "Veja o que nossos clientes têm a dizer",
+      "items": {
+        "1": {
+          "quote": "Este boilerplate me economizou meses de trabalho. A configuração é impecável e a documentação é excelente.",
+          "author": "João Silva",
+          "role": "CTO, TechStartup"
+        },
+        "2": {
+          "quote": "A melhor decisão que tomei foi usar este template. Lancei meu SaaS em 2 semanas!",
+          "author": "Maria Santos",
+          "role": "Fundadora, SaaSify"
+        },
+        "3": {
+          "quote": "Código limpo, bem estruturado e com todas as features que precisava. Recomendo fortemente!",
+          "author": "Pedro Oliveira",
+          "role": "Dev Full Stack"
+        }
+      }
+    },
+    "faq": {
+      "title": "Perguntas Frequentes",
+      "subtitle": "Tudo que você precisa saber",
+      "items": {
+        "1": {
+          "question": "Posso usar este template para projetos comerciais?",
+          "answer": "Sim! Este template vem com licença MIT, permitindo uso comercial sem restrições."
+        },
+        "2": {
+          "question": "Quanto tempo leva para configurar?",
+          "answer": "Com nossa documentação detalhada, você pode ter o ambiente configurado em menos de 30 minutos."
+        },
+        "3": {
+          "question": "Vocês oferecem suporte?",
+          "answer": "Sim, oferecemos suporte via Discord e GitHub. Clientes Pro têm acesso a suporte prioritário."
+        },
+        "4": {
+          "question": "Posso cancelar a qualquer momento?",
+          "answer": "Absolutamente! Não há contratos ou taxas de cancelamento. Você pode cancelar quando quiser."
+        },
+        "5": {
+          "question": "Quais formas de pagamento aceitam?",
+          "answer": "Aceitamos cartões de crédito, débito, PIX e boleto bancário para clientes brasileiros."
+        }
+      }
+    },
+    "cta": {
+      "title": "Pronto para construir algo incrível?",
+      "subtitle": "Junte-se a milhares de desenvolvedores que já estão construindo com Works",
+      "primaryButton": "Começar Gratuitamente",
+      "secondaryButton": "Agendar Demo"
+    },
+    "footer": {
+      "description": "O kit inicial SaaS mais completo para desenvolvedores modernos.",
+      "product": {
+        "title": "Produto",
+        "features": "Recursos",
+        "pricing": "Preços",
+        "documentation": "Documentação"
+      },
+      "company": {
+        "title": "Empresa",
+        "about": "Sobre",
+        "blog": "Blog",
+        "careers": "Carreiras"
+      },
+      "legal": {
+        "title": "Legal",
+        "privacy": "Privacidade",
+        "terms": "Termos"
+      },
+      "copyright": "© {year} Works. Todos os direitos reservados."
+    }
   },
   "UserSettingsMenu": {
     "nav": {

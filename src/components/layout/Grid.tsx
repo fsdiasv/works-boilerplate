@@ -1,10 +1,11 @@
 'use client'
 
-import { forwardRef } from 'react'
+import type React from 'react'
+import { forwardRef, type HTMLAttributes } from 'react'
 
 import { cn } from '@/lib/utils'
 
-interface GridProps extends React.HTMLAttributes<HTMLDivElement> {
+interface GridProps extends HTMLAttributes<HTMLDivElement> {
   cols?: 1 | 2 | 3 | 4 | 6 | 12 | 'auto'
   gap?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl'
   responsive?: boolean
@@ -94,7 +95,7 @@ export const Grid = forwardRef<HTMLDivElement, GridProps>(
 Grid.displayName = 'Grid'
 
 // Grid item component for better control
-interface GridItemProps extends React.HTMLAttributes<HTMLDivElement> {
+interface GridItemProps extends HTMLAttributes<HTMLDivElement> {
   span?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 'full'
   start?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13
   end?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13
@@ -155,9 +156,9 @@ export const GridItem = forwardRef<HTMLDivElement, GridItemProps>(
       <div
         ref={ref}
         className={cn(
-          span && colSpanClasses[span],
-          start && colStartClasses[start],
-          end && colEndClasses[end],
+          span !== undefined && colSpanClasses[span],
+          start !== undefined && colStartClasses[start],
+          end !== undefined && colEndClasses[end],
           className
         )}
         {...props}

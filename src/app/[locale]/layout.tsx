@@ -3,7 +3,9 @@ import { NextIntlClientProvider } from 'next-intl'
 import { getMessages } from 'next-intl/server'
 import type { ReactNode } from 'react'
 
+import { Toaster } from '@/components/ui/toaster'
 import { locales } from '@/i18n/config'
+import { ThemeProvider } from '@/lib/theme-provider'
 
 /**
  * Maps internal locale codes to standard OpenGraph locale codes
@@ -147,7 +149,10 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      {children}
+      <ThemeProvider>
+        {children}
+        <Toaster />
+      </ThemeProvider>
     </NextIntlClientProvider>
   )
 }

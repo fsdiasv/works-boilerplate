@@ -162,8 +162,8 @@ src/
   are not critical for the initial render (e.g., charts, complex editors). This
   is mandatory for libraries like `recharts`.
   ```tsx
-  import dynamic from 'next/dynamic';
-  const VisitorsChart = dynamic(() => import('./VisitorsChart'), { ssr: false });
+  import dynamic from 'next/dynamic'
+  const VisitorsChart = dynamic(() => import('./VisitorsChart'), { ssr: false })
   ```
 
 ## 7\. Git Workflow and Versioning

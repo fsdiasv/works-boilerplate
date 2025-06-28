@@ -3,12 +3,18 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
+import type React from 'react'
 import { useGesture } from 'react-use-gesture'
 
 import { Button } from '@/components/ui/button'
-import { cn } from 'src/lib/utils'
+import { cn } from '@/lib/utils'
 
-interface DrawerNavigationProps {
+import { useSafeAreaInsets } from '../../hooks/useSafeAreaInsets'
+import type { NavigationItem, NavigationGestures } from '../../types'
+import { renderNavigationBadge } from '../../utils/badge'
+import { triggerHapticFeedback } from '../../utils/haptics'
+
+interface DrawerNavigationProps extends Partial<NavigationGestures> {
   isOpen: boolean
   onClose: () => void
   side?: 'left' | 'right'
@@ -18,6 +24,7 @@ interface DrawerNavigationProps {
   width?: number
   enableSwipeToClose?: boolean
   closeOnOverlayClick?: boolean
+  enableHapticFeedback?: boolean
 }
 
 export function DrawerNavigation({
@@ -30,9 +37,11 @@ export function DrawerNavigation({
   width = 280,
   enableSwipeToClose = true,
   closeOnOverlayClick = true,
+  enableHapticFeedback = true,
 }: DrawerNavigationProps) {
   const [dragOffset, setDragOffset] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
+  const { paddingClasses } = useSafeAreaInsets({ includePadding: true })
 
   // Close drawer on escape key
   useEffect(() => {
@@ -99,13 +108,16 @@ export function DrawerNavigation({
         (side === 'right' && (mx > threshold || vx > velocityThreshold))
 
       if (shouldClose) {
+        if (enableHapticFeedback) {
+          triggerHapticFeedback('light')
+        }
         onClose()
       }
 
       setDragOffset(0)
       setIsDragging(false)
     },
-    [enableSwipeToClose, onClose, side, width]
+    [enableSwipeToClose, onClose, side, width, enableHapticFeedback]
   )
 
   const bind = useGesture(
@@ -195,12 +207,10 @@ export function DrawerNavigation({
             className={cn(
               'bg-background fixed top-0 z-50 h-full shadow-xl',
               side === 'left' ? 'left-0' : 'right-0',
-              // PWA safe area support
-              'pt-[max(0px,env(safe-area-inset-top))]',
-              'pb-[max(0px,env(safe-area-inset-bottom))]',
-              side === 'left'
-                ? 'pl-[max(0px,env(safe-area-inset-left))]'
-                : 'pr-[max(0px,env(safe-area-inset-right))]',
+              // PWA safe area support using the hook
+              paddingClasses.top,
+              paddingClasses.bottom,
+              side === 'left' ? paddingClasses.left : paddingClasses.right,
               className
             )}
           >
@@ -239,24 +249,22 @@ export function DrawerNavigation({
   )
 }
 
-// Navigation items component for the drawer
-export interface NavItem {
-  id: string
-  label: string
-  icon?: React.ComponentType<{ className?: string }>
-  href?: string
-  onClick?: () => void
-  badge?: number
-  disabled?: boolean
-}
+// Re-export NavigationItem type for backward compatibility
+export type NavItem = NavigationItem
 
 interface DrawerNavItemsProps {
-  items: NavItem[]
-  onItemClick?: (item: NavItem) => void
+  items: NavigationItem[]
+  onItemClick?: (item: NavigationItem) => void
   className?: string
+  enableHapticFeedback?: boolean
 }
 
-export function DrawerNavItems({ items, onItemClick, className }: DrawerNavItemsProps) {
+export function DrawerNavItems({
+  items,
+  onItemClick,
+  className,
+  enableHapticFeedback = true,
+}: DrawerNavItemsProps) {
   return (
     <nav className={cn('p-4', className)}>
       <ul className='space-y-2'>
@@ -267,29 +275,27 @@ export function DrawerNavItems({ items, onItemClick, className }: DrawerNavItems
             <li key={item.id}>
               <button
                 onClick={() => {
-                  if (item.onClick) {
-                    item.onClick()
-                  } else if (onItemClick) {
+                  if (enableHapticFeedback && item.isDisabled !== true) {
+                    triggerHapticFeedback('selection')
+                  }
+                  if (onItemClick) {
                     onItemClick(item)
                   }
                 }}
-                disabled={item.disabled}
+                disabled={item.isDisabled === true}
                 className={cn(
                   'flex w-full items-center gap-3 rounded-lg px-3 py-3',
                   'text-left transition-colors',
                   'min-h-[44px] touch-manipulation',
-                  item.disabled === true
+                  item.isDisabled === true
                     ? 'cursor-not-allowed opacity-50'
-                    : 'hover:bg-muted focus:bg-muted focus:outline-none'
+                    : 'hover:bg-muted focus:bg-muted focus:outline-none',
+                  item.isActive === true && 'bg-muted'
                 )}
               >
-                {Icon && <Icon className='h-5 w-5 shrink-0' />}
+                <Icon className='h-5 w-5 shrink-0' />
                 <span className='flex-1 font-medium'>{item.label}</span>
-                {item.badge != null && item.badge > 0 && (
-                  <span className='bg-destructive text-destructive-foreground flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-xs font-medium'>
-                    {item.badge > 99 ? '99+' : item.badge}
-                  </span>
-                )}
+                {renderNavigationBadge(item.badge, 'ml-2')}
               </button>
             </li>
           )
