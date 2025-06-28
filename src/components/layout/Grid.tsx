@@ -155,9 +155,9 @@ export const GridItem = forwardRef<HTMLDivElement, GridItemProps>(
       <div
         ref={ref}
         className={cn(
-          span && colSpanClasses[span],
-          start && colStartClasses[start],
-          end && colEndClasses[end],
+          span !== undefined && colSpanClasses[span],
+          start !== undefined && colStartClasses[start],
+          end !== undefined && colEndClasses[end],
           className
         )}
         {...props}

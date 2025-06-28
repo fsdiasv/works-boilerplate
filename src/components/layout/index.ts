@@ -1,5 +1,4 @@
 // Layout Components
-export { AppLayout } from './AppLayout'
 export { Container } from './Container'
 export { Grid, GridItem } from './Grid'
 export { Typography, Heading, Text } from './Typography'
