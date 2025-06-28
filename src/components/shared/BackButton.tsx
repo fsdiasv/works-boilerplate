@@ -11,43 +11,43 @@ type BackButtonProps = {
   onClick?: () => void
 }
 
-export default function BackButton({ 
-  children, 
+export default function BackButton({
+  children,
   className,
   fallbackUrl,
   ariaLabel,
-  onClick
+  onClick,
 }: BackButtonProps) {
   const router = useRouter()
-  
+
   const handleClick = useCallback(() => {
     // Custom onClick takes precedence
     if (onClick) {
       onClick()
       return
     }
-    
+
     // Check if we're in a browser environment (not SSR)
     if (typeof window === 'undefined') {
       return
     }
-    
+
     // Try to go back, but use fallback if no history
     // Note: We can't reliably detect if history.back() will work,
     // so we provide a fallback option for better UX
-    if (fallbackUrl && window.history.length <= 1) {
+    if (fallbackUrl !== undefined && fallbackUrl !== '' && window.history.length <= 1) {
       router.push(fallbackUrl)
     } else {
       window.history.back()
     }
   }, [onClick, fallbackUrl, router])
-  
+
   return (
-    <button 
-      type="button"
-      onClick={handleClick} 
+    <button
+      type='button'
+      onClick={handleClick}
       className={className}
-      aria-label={ariaLabel || 'Go back'}
+      aria-label={ariaLabel ?? 'Go back'}
     >
       {children}
     </button>

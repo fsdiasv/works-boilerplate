@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { Home, Search, Heart, User, Plus } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useLocale } from 'next-intl'
 import { useState, useEffect } from 'react'
 
 import { cn } from '@/lib/utils'
@@ -64,6 +65,7 @@ export function BottomTabNavigation({
   onTabChange,
 }: BottomTabNavigationProps) {
   const pathname = usePathname()
+  const locale = useLocale()
   const [activeTab, setActiveTab] = useState<string>('')
   const [isVisible, setIsVisible] = useState(true)
   const [lastScrollY, setLastScrollY] = useState(0)
@@ -90,11 +92,15 @@ export function BottomTabNavigation({
 
   // Set active tab based on pathname
   useEffect(() => {
+    // Remove locale prefix from pathname for comparison
+    const pathSegments = pathname.split('/')
+    const pathnameWithoutLocale = '/' + pathSegments.slice(2).join('/') || '/'
+    
     const activeTabItem = tabs.find(tab => {
       if (tab.href === '/') {
-        return pathname === tab.href
+        return pathnameWithoutLocale === '/'
       }
-      return pathname.startsWith(tab.href)
+      return pathnameWithoutLocale.startsWith(tab.href)
     })
     if (activeTabItem) {
       setActiveTab(activeTabItem.id)
@@ -141,7 +147,7 @@ export function BottomTabNavigation({
             return (
               <Link
                 key={tab.id}
-                href={tab.href}
+                href={`/${locale}${tab.href === '/' ? '' : tab.href}`}
                 onClick={() => handleTabClick(tab.id)}
                 className={cn(
                   'relative flex flex-col items-center justify-center',

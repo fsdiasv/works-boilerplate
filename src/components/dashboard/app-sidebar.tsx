@@ -12,6 +12,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useLocale } from 'next-intl'
 
 import {
   Sidebar,
@@ -33,7 +34,7 @@ import { cn } from '@/lib/utils'
 import { DesktopSidebarToggle } from './desktop-sidebar-toggle'
 
 const menuPrincipal = [
-  { href: '/', icon: Home, label: 'Dashboard' },
+  { href: '/dashboard', icon: Home, label: 'Dashboard' },
   { href: '/radar', icon: Search, label: 'Radar de Conteúdo' },
   { href: '/criar-post', icon: Edit3, label: 'Criar Post' },
   { href: '/calendario', icon: Calendar, label: 'Calendário' },
@@ -48,12 +49,17 @@ const configuracoes = [
 
 export function AppSidebar() {
   const pathname = usePathname()
+  const locale = useLocale()
   const { state, isMobile } = useSidebar()
   const isCollapsed = state === 'collapsed' && !isMobile
 
+  // Remove locale prefix from pathname for comparison
+  const pathSegments = pathname.split('/')
+  const pathnameWithoutLocale = '/' + pathSegments.slice(2).join('/') || '/dashboard'
+
   const renderMenuItems = (items: typeof menuPrincipal) => {
     return items.map(item => {
-      const isActive = pathname === item.href
+      const isActive = pathnameWithoutLocale === item.href
       return (
         <SidebarMenuItem key={item.label}>
           <SidebarMenuButton
@@ -77,7 +83,7 @@ export function AppSidebar() {
               hidden: !isCollapsed || isMobile,
             }}
           >
-            <Link href={item.href} className='flex items-center gap-3'>
+            <Link href={`/${locale}${item.href}`} className='flex items-center gap-3'>
               <item.icon
                 className={cn('h-5 w-5 flex-shrink-0', isActive && 'text-sw-accent-purple')}
               />
@@ -112,14 +118,14 @@ export function AppSidebar() {
       >
         {isCollapsed ? (
           // Only show logo when collapsed
-          <Link href='/' className='flex items-center justify-center'>
+          <Link href={`/${locale}/dashboard`} className='flex items-center justify-center'>
             <div className='bg-sw-accent-purple flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg'>
               <Zap className='text-primary-foreground h-5 w-5' />
             </div>
           </Link>
         ) : (
           // Show logo + text when expanded
-          <Link href='/' className='flex items-center gap-2 overflow-hidden'>
+          <Link href={`/${locale}/dashboard`} className='flex items-center gap-2 overflow-hidden'>
             <div className='bg-sw-accent-purple flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg'>
               <Zap className='text-primary-foreground h-5 w-5' />
             </div>

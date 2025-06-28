@@ -745,6 +745,77 @@ v4 misconfiguration
   Co-Authored-By lines in commits. Keep commit messages professional and
   project-focused only.
 
+##### Tailwind CSS v4 Custom Colors and Utility Classes
+
+**Issue Resolved**: Custom utility classes with prefixes (e.g., `bg-sw-content-background`) not being generated
+
+**Root Cause**: In Tailwind CSS v4, defining CSS custom properties alone doesn't generate utility classes. Colors must be registered in the `@theme` directive.
+
+**Solution Applied**: Add custom colors to `@theme` directive in `globals.css`:
+```css
+@theme {
+  /* Dashboard-specific colors */
+  --color-sw-content-background: var(--background-color);
+  --color-sw-text-primary: var(--foreground-color);
+  --color-sw-text-secondary: var(--muted-foreground-color);
+  /* ... other sw- prefixed colors ... */
+}
+```
+
+**Key Learnings**:
+- Tailwind v4 requires colors in `@theme` directive to generate utility classes
+- CSS custom properties (`:root { --sw-var: value }`) alone won't create utilities
+- The `--color-` prefix in `@theme` is required for color utilities
+- Custom prefixes work perfectly when properly registered
+- Verify utility generation by checking compiled CSS output
+
+**Debugging Approach**:
+1. Check if classes exist in compiled CSS: `curl [css-url] | grep "\.bg-sw-"`
+2. Test with a simple component to isolate the issue
+3. Verify @theme directive syntax matches Tailwind v4 requirements
+4. Ensure PostCSS pipeline is correctly configured for v4
+
+##### ICU MessageFormat Currency Formatting
+
+- **Correct Syntax**: Use ICU skeleton syntax `{amount, number, ::currency/CODE}` for currency formatting
+- **Currency Codes**: Must use ISO-4217 currency codes (USD, BRL, EUR, etc.)
+- **Common Mistakes**:
+  - ❌ `{amount, number, currency}` - Missing currency code specification
+  - ❌ `R$ {amount, number, currency}` - Don't hardcode currency symbols
+  - ❌ `€{amount, number, currency}` - Let ICU handle symbol placement
+- **Correct Examples**:
+  - ✅ `{amount, number, ::currency/USD}` - Formats as $1,234.56 in en-US
+  - ✅ `{amount, number, ::currency/BRL}` - Formats as R$ 1.234,56 in pt-BR
+  - ✅ `{amount, number, ::currency/EUR}` - Formats as 1.234,56 € in es-ES
+- **Benefits**: Automatic locale-aware formatting with correct symbols, decimal separators, and thousand separators
+- **Dynamic Currency**: For multi-currency support, pass currency as parameter: `{amount, number, ::currency/{currency}}`
+- **Next-intl Integration**: Works seamlessly with next-intl's `formatNumber` function
+
+##### Locale-Aware Navigation Components
+
+- **Issue**: Navigation components using hardcoded paths fail with internationalized routing
+- **Root Cause**: Direct paths like `/dashboard` don't match actual routes like `/pt/dashboard`
+- **Solution Applied**: All navigation components now handle locale-aware routing:
+  1. Extract current locale with `useLocale()` hook
+  2. Strip locale from pathname for route matching: `pathnameWithoutLocale = '/' + pathSegments.slice(2).join('/') || '/'`
+  3. Prefix all hrefs with locale: `href={`/${locale}${path}`}`
+- **Components Fixed**:
+  - `dashboard-breadcrumb.tsx`: Route lookup and href generation
+  - `app-sidebar.tsx`: Menu items and logo links
+  - `user-settings-menu.tsx`: All navigation links
+  - `BottomTabNavigation.tsx`: Mobile tab navigation
+- **Pattern for Future Components**:
+  ```tsx
+  const locale = useLocale()
+  const pathname = usePathname()
+  const pathnameWithoutLocale = '/' + pathname.split('/').slice(2).join('/') || '/'
+  // Use pathnameWithoutLocale for comparisons
+  // Use `/${locale}/path` for all Link hrefs
+  ```
+- **Special Cases**:
+  - Root path: Use `/${locale}` or `/${locale}/dashboard`, not just `/`
+  - Dynamic paths: Always include locale prefix before parameters
+
 ### Development Workflow
 
 #### Before Writing Code

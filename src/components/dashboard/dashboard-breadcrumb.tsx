@@ -3,6 +3,7 @@
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useLocale } from 'next-intl'
 
 import {
   Breadcrumb,
@@ -13,9 +14,10 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 
-// Mapping of routes to breadcrumb information
+// Mapping of routes to breadcrumb information (without locale prefix)
 const routeMap: Record<string, { title: string; href?: string }[]> = {
   '/': [{ title: 'Dashboard' }],
+  '/dashboard': [{ title: 'Dashboard' }],
   '/faturamento': [{ title: 'Dashboard', href: '/' }, { title: 'Faturamento' }],
   '/radar': [{ title: 'Dashboard', href: '/' }, { title: 'Radar de Conteúdo' }],
   '/criar-post': [{ title: 'Dashboard', href: '/' }, { title: 'Criar Post' }],
@@ -32,9 +34,14 @@ const routeMap: Record<string, { title: string; href?: string }[]> = {
 
 export function DashboardBreadcrumb() {
   const pathname = usePathname()
+  const locale = useLocale()
+
+  // Remove locale prefix from pathname for route lookup
+  const pathSegments = pathname.split('/')
+  const pathnameWithoutLocale = '/' + pathSegments.slice(2).join('/') || '/'
 
   // Get breadcrumb items for current path, fallback to Dashboard if not found
-  const breadcrumbItems = routeMap[pathname] ?? [{ title: 'Dashboard' }]
+  const breadcrumbItems = routeMap[pathnameWithoutLocale] ?? [{ title: 'Dashboard' }]
 
   // Don't show breadcrumb on mobile to save space
   return (
@@ -43,6 +50,8 @@ export function DashboardBreadcrumb() {
         <BreadcrumbList>
           {breadcrumbItems.map((item, index) => {
             const isLast = index === breadcrumbItems.length - 1
+            // Add locale prefix to href
+            const href = item.href ? `/${locale}${item.href === '/' ? '/dashboard' : item.href}` : undefined
 
             return (
               <div key={index} className='flex items-center'>
@@ -54,7 +63,7 @@ export function DashboardBreadcrumb() {
                   ) : (
                     <BreadcrumbLink asChild>
                       <Link
-                        href={item.href ?? '/'}
+                        href={href ?? `/${locale}/dashboard`}
                         className='text-sw-text-tertiary hover:text-sw-text-primary transition-colors'
                       >
                         {item.title}

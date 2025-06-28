@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
+import { useLocale } from 'next-intl'
 import * as React from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -65,6 +66,7 @@ function getUserInitials(name: string): string {
 export function UserSettingsMenu() {
   const { theme, setTheme } = useTheme()
   const { toast } = useToast()
+  const locale = useLocale()
   const [currentLanguage, setCurrentLanguage] = React.useState('English')
 
   const handleLanguageChange = (lang: string) => {
@@ -112,7 +114,7 @@ export function UserSettingsMenu() {
         <DropdownMenuGroup>
           {navLinks.map(link => (
             <DropdownMenuItem key={link.label} asChild>
-              <Link href={link.href} className='flex items-center'>
+              <Link href={`/${locale}${link.href}`} className='flex items-center'>
                 <link.icon className='text-muted-foreground mr-2 h-4 w-4' />
                 <span>{link.label}</span>
               </Link>
@@ -134,7 +136,7 @@ export function UserSettingsMenu() {
         <div className='mx-2 my-1.5 rounded-md bg-amber-50 p-2.5 text-xs text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'>
           Your monthly credits will reset in {user.creditsResetInDays} days.{' '}
           <Link
-            href='#'
+            href={`/${locale}/pricing`}
             className='font-medium underline hover:text-amber-800 dark:hover:text-amber-300'
           >
             Buy more credits
@@ -188,7 +190,7 @@ export function UserSettingsMenu() {
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <Link
-            href='/logout'
+            href={`/${locale}/logout`}
             className='flex items-center text-red-600 hover:!text-red-700 dark:text-red-500 dark:hover:!text-red-400'
           >
             <LogOut className='mr-2 h-4 w-4' />
