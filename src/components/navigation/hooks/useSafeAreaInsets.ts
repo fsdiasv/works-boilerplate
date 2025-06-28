@@ -24,22 +24,43 @@ export function useSafeAreaInsets(options: UseSafeAreaInsetsOptions = {}) {
 
   useEffect(() => {
     const computeInsets = () => {
-      const computedStyle = window.getComputedStyle(document.documentElement)
+      try {
+        // Check if window is available (for SSR safety)
+        if (typeof window === 'undefined') {
+          return
+        }
 
-      const getInsetValue = (property: string, fallback: number = 0): number => {
-        const value = computedStyle.getPropertyValue(property)
-        if (!value || value === 'none' || value === '0px') return fallback
+        const computedStyle = window.getComputedStyle(document.documentElement)
 
-        const numericValue = parseFloat(value)
-        return isNaN(numericValue) ? fallback : numericValue
+        const getInsetValue = (property: string, fallback: number = 0): number => {
+          try {
+            const value = computedStyle.getPropertyValue(property)
+            if (!value || value === 'none' || value === '0px') return fallback
+
+            const numericValue = parseFloat(value)
+            return isNaN(numericValue) ? fallback : numericValue
+          } catch {
+            // Return fallback if getPropertyValue fails
+            return fallback
+          }
+        }
+
+        setInsets({
+          top: getInsetValue('--sat', fallbackInsets.top ?? 0),
+          right: getInsetValue('--sar', fallbackInsets.right ?? 0),
+          bottom: getInsetValue('--sab', fallbackInsets.bottom ?? 0),
+          left: getInsetValue('--sal', fallbackInsets.left ?? 0),
+        })
+      } catch (error) {
+        // If any error occurs, use fallback values
+        console.warn('Failed to compute safe area insets:', error)
+        setInsets({
+          top: fallbackInsets.top ?? 0,
+          right: fallbackInsets.right ?? 0,
+          bottom: fallbackInsets.bottom ?? 0,
+          left: fallbackInsets.left ?? 0,
+        })
       }
-
-      setInsets({
-        top: getInsetValue('--sat', fallbackInsets.top ?? 0),
-        right: getInsetValue('--sar', fallbackInsets.right ?? 0),
-        bottom: getInsetValue('--sab', fallbackInsets.bottom ?? 0),
-        left: getInsetValue('--sal', fallbackInsets.left ?? 0),
-      })
     }
 
     // Compute initial values
@@ -77,21 +98,22 @@ export function useSafeAreaInsets(options: UseSafeAreaInsetsOptions = {}) {
   const paddingClasses = useMemo(() => {
     if (!includePadding) return {}
 
+    // Use static Tailwind safe-area utility classes
     return {
-      top: insets.top > 0 ? `pt-[${cssInsets.top}]` : '',
-      right: insets.right > 0 ? `pr-[${cssInsets.right}]` : '',
-      bottom: insets.bottom > 0 ? `pb-[${cssInsets.bottom}]` : '',
-      left: insets.left > 0 ? `pl-[${cssInsets.left}]` : '',
+      top: insets.top > 0 ? 'pt-safe-top' : '',
+      right: insets.right > 0 ? 'pr-safe-right' : '',
+      bottom: insets.bottom > 0 ? 'pb-safe-bottom' : '',
+      left: insets.left > 0 ? 'pl-safe-left' : '',
       all: [
-        insets.top > 0 ? `pt-[${cssInsets.top}]` : '',
-        insets.right > 0 ? `pr-[${cssInsets.right}]` : '',
-        insets.bottom > 0 ? `pb-[${cssInsets.bottom}]` : '',
-        insets.left > 0 ? `pl-[${cssInsets.left}]` : '',
+        insets.top > 0 ? 'pt-safe-top' : '',
+        insets.right > 0 ? 'pr-safe-right' : '',
+        insets.bottom > 0 ? 'pb-safe-bottom' : '',
+        insets.left > 0 ? 'pl-safe-left' : '',
       ]
         .filter(Boolean)
         .join(' '),
     }
-  }, [insets, cssInsets, includePadding])
+  }, [insets, includePadding])
 
   // CSS custom properties style object
   const style = useMemo(
