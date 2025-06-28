@@ -15,7 +15,6 @@ interface PWAFeatures {
   installPrompt: BeforeInstallPromptEvent | null
 }
 
-
 export function usePWAFeatures() {
   const [features, setFeatures] = useState<PWAFeatures>({
     isStandalone: false,
@@ -31,7 +30,7 @@ export function usePWAFeatures() {
   const detectStandaloneMode = useCallback(() => {
     const isStandalone =
       window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator.standalone === true) ||
+      window.navigator.standalone === true ||
       document.referrer.includes('android-app://') ||
       window.location.href.includes('mode=standalone')
 
@@ -110,7 +109,9 @@ export function usePWAFeatures() {
               await navigator.clearAppBadge()
             }
           } else {
-            await navigator.setAppBadge?.(count)
+            if ('setAppBadge' in navigator) {
+              await navigator.setAppBadge(count)
+            }
           }
           return true
         } catch (error) {

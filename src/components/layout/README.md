@@ -1,6 +1,8 @@
 # Responsive Layout System Documentation
 
-This comprehensive responsive layout system provides mobile-first, performance-optimized components with container queries, adaptive loading, and PWA support.
+This comprehensive responsive layout system provides mobile-first,
+performance-optimized components with container queries, adaptive loading, and
+PWA support.
 
 ## Core Components
 
@@ -94,10 +96,10 @@ import { Typography, Heading, Text } from '@/components/layout/Typography'
 </Typography>
 
 // Custom styling
-<Typography 
-  variant="body" 
-  size="lg" 
-  weight="semibold" 
+<Typography
+  variant="body"
+  size="lg"
+  weight="semibold"
   color="primary"
 >
   Styled text
@@ -179,7 +181,7 @@ const columns = useResponsiveValue({
   base: 1,
   sm: 2,
   lg: 3,
-  xl: 4
+  xl: 4,
 })
 ```
 
@@ -214,10 +216,9 @@ Dynamic imports with loading strategies:
 
 ```tsx
 import { DynamicComponent } from '@/components/layout/AdaptiveLoader'
-
-<DynamicComponent
+;<DynamicComponent
   loader={() => import('./Chart')}
-  loadOn="visible"
+  loadOn='visible'
   fallback={<ChartSkeleton />}
 />
 ```
@@ -235,7 +236,7 @@ import { WebVitals } from '@/components/layout/WebVitals'
 <WebVitals showIndicator={true} />
 
 // Production monitoring
-<WebVitals 
+<WebVitals
   showIndicator={false}
   onReport={(metrics) => {
     // Send to analytics
@@ -270,12 +271,7 @@ PWA-optimized layout with safe areas:
 
 ```tsx
 import { PWALayout } from '@/components/layout/PWALayout'
-
-<PWALayout 
-  safeArea="all"
-  preventPullToRefresh
-  showInstallPrompt
->
+;<PWALayout safeArea='all' preventPullToRefresh showInstallPrompt>
   <App />
 </PWALayout>
 ```
@@ -302,7 +298,7 @@ Visual debugging tools for development:
 import { LayoutDebugger } from '@/components/layout/LayoutDebugger'
 
 // Add to app during development
-<LayoutDebugger
+;<LayoutDebugger
   showGrid
   showBreakpoints
   showTouchTargets
@@ -340,8 +336,8 @@ Press `Ctrl+Shift+D` to toggle the debugger.
 Enable container queries on any element:
 
 ```tsx
-<div className="@container">
-  <div className="@sm:grid-cols-2 @lg:grid-cols-3">
+<div className='@container'>
+  <div className='@sm:grid-cols-2 @lg:grid-cols-3'>
     Responsive to container size
   </div>
 </div>

@@ -104,7 +104,7 @@
     --safe-area-inset-right: env(safe-area-inset-right, 0px);
     --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
     --safe-area-inset-left: env(safe-area-inset-left, 0px);
-    
+
     /* Shorthand variables for safe area insets */
     --sat: var(--safe-area-inset-top);
     --sar: var(--safe-area-inset-right);
@@ -483,10 +483,10 @@
   footer,
   .btn-touch,
   .glass,
-  [role="navigation"],
-  [role="banner"]:not(.print-header),
-  [aria-label*="menu"],
-  [aria-label*="navigation"] {
+  [role='navigation'],
+  [role='banner']:not(.print-header),
+  [aria-label*='menu'],
+  [aria-label*='navigation'] {
     display: none !important;
   }
 
@@ -506,17 +506,33 @@
   }
 
   /* Headings */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     color: black !important;
     page-break-after: avoid;
     page-break-inside: avoid;
   }
 
-  h1 { font-size: 20pt; }
-  h2 { font-size: 18pt; }
-  h3 { font-size: 16pt; }
-  h4 { font-size: 14pt; }
-  h5, h6 { font-size: 12pt; }
+  h1 {
+    font-size: 20pt;
+  }
+  h2 {
+    font-size: 18pt;
+  }
+  h3 {
+    font-size: 16pt;
+  }
+  h4 {
+    font-size: 14pt;
+  }
+  h5,
+  h6 {
+    font-size: 12pt;
+  }
 
   /* Links */
   a {
@@ -525,8 +541,8 @@
   }
 
   /* Show link URLs */
-  a[href^="http"]:after {
-    content: " (" attr(href) ")";
+  a[href^='http']:after {
+    content: ' (' attr(href) ')';
     font-size: 0.8em;
     color: #666;
   }
@@ -543,11 +559,14 @@
     width: 100%;
   }
 
-  table, th, td {
+  table,
+  th,
+  td {
     border: 1px solid #ddd !important;
   }
 
-  th, td {
+  th,
+  td {
     padding: 8px !important;
   }
 
@@ -599,13 +618,15 @@
   }
 
   /* Typography adjustments */
-  p, li {
+  p,
+  li {
     orphans: 3;
     widows: 3;
   }
 
   /* Code blocks */
-  pre, code {
+  pre,
+  code {
     border: 1px solid #ddd;
     page-break-inside: avoid;
     font-family: monospace;

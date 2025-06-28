@@ -1,6 +1,7 @@
 'use client'
 
 import { forwardRef, InputHTMLAttributes } from 'react'
+
 import { cn } from '@/lib/utils'
 
 export interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -11,12 +12,9 @@ export interface FormInputProps extends InputHTMLAttributes<HTMLInputElement> {
 const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
   ({ className, label, error, id, ...props }, ref) => {
     return (
-      <div className="w-full">
-        {label && (
-          <label
-            htmlFor={id}
-            className="block text-sm font-medium text-slate-800 mb-1"
-          >
+      <div className='w-full'>
+        {label != null && label !== '' && (
+          <label htmlFor={id} className='mb-1 block text-sm font-medium text-slate-800'>
             {label}
           </label>
         )}
@@ -24,19 +22,21 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
           ref={ref}
           id={id}
           className={cn(
-            'w-full px-3 py-2 text-sm rounded-md border border-slate-300',
+            'w-full rounded-md border border-slate-300 px-3 py-2 text-sm',
             'placeholder:text-slate-500',
-            'focus:outline-none focus:ring-2 focus:ring-blue-600 focus:border-blue-600',
+            'focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none',
             'disabled:cursor-not-allowed disabled:opacity-50',
-            error && 'border-red-500 focus:ring-red-500 focus:border-red-500',
+            error != null &&
+              error !== '' &&
+              'border-red-500 focus:border-red-500 focus:ring-red-500',
             className
           )}
-          aria-invalid={!!error}
-          aria-describedby={error ? `${id}-error` : undefined}
+          aria-invalid={error != null && error !== ''}
+          aria-describedby={error != null && error !== '' ? `${id}-error` : undefined}
           {...props}
         />
-        {error && (
-          <p id={`${id}-error`} className="mt-1 text-sm text-red-600">
+        {error != null && error !== '' && (
+          <p id={`${id}-error`} className='mt-1 text-sm text-red-600'>
             {error}
           </p>
         )}

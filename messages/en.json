@@ -72,7 +72,52 @@
     "passwordRequired": "Password is required",
     "invalidCredentials": "Invalid credentials",
     "accountCreated": "Account created successfully",
-    "welcomeBack": "Welcome back!"
+    "welcomeBack": "Welcome back!",
+    "signupPage": {
+      "title": "Sign up to Copy UI.",
+      "subtitle": "Already have an account?",
+      "subtitleLink": "Sign in",
+      "nameLabel": "Name",
+      "namePlaceholder": "Your name",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "Enter email to get started",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "submitButton": "Sign up",
+      "divider": "Or continue with",
+      "legalText": "By creating an account you agree with our",
+      "termsOfService": "Terms of Service",
+      "and": "and our",
+      "privacyPolicy": "Privacy Policy"
+    },
+    "loginPage": {
+      "title": "Welcome back!",
+      "subtitle": "Don't have an account?",
+      "subtitleLink": "Sign up",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "Enter your email",
+      "passwordLabel": "Password",
+      "passwordPlaceholder": "Enter your password",
+      "forgotPasswordLink": "Forgot your password?",
+      "submitButton": "Sign in",
+      "divider": "Or continue with"
+    },
+    "forgotPasswordPage": {
+      "title": "Forgot your password?",
+      "description": "No worries. Enter your email address below and we'll send you a link to reset it.",
+      "emailLabel": "Email address",
+      "emailPlaceholder": "your.email@example.com",
+      "submitButton": "Send reset link",
+      "backToLogin": "Back to",
+      "backToLoginLink": "Sign in"
+    },
+    "testimonial": {
+      "author": {
+        "name": "Peter Mick",
+        "title": "Founder of Copytime and Tweetsiu"
+      },
+      "quote": "CopyUI has been a <highlight>game-changer</highlight> for me! It's incredibly intuitive and has transformed the way I approach design. I can't imagine working without it. 🚀"
+    }
   },
   "dashboard": {
     "title": "Dashboard",

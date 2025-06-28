@@ -72,7 +72,52 @@
     "passwordRequired": "La contraseña es obligatoria",
     "invalidCredentials": "Credenciales inválidas",
     "accountCreated": "Cuenta creada exitosamente",
-    "welcomeBack": "¡Bienvenido de vuelta!"
+    "welcomeBack": "¡Bienvenido de vuelta!",
+    "signupPage": {
+      "title": "Regístrate en Copy UI.",
+      "subtitle": "¿Ya tienes una cuenta?",
+      "subtitleLink": "Iniciar sesión",
+      "nameLabel": "Nombre",
+      "namePlaceholder": "Tu nombre",
+      "emailLabel": "Dirección de correo electrónico",
+      "emailPlaceholder": "Ingresa tu correo para comenzar",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Ingresa tu contraseña",
+      "submitButton": "Registrarse",
+      "divider": "O continúa con",
+      "legalText": "Al crear una cuenta aceptas nuestros",
+      "termsOfService": "Términos de Servicio",
+      "and": "y nuestra",
+      "privacyPolicy": "Política de Privacidad"
+    },
+    "loginPage": {
+      "title": "¡Bienvenido de vuelta!",
+      "subtitle": "¿No tienes una cuenta?",
+      "subtitleLink": "Regístrate",
+      "emailLabel": "Dirección de correo electrónico",
+      "emailPlaceholder": "Ingresa tu correo",
+      "passwordLabel": "Contraseña",
+      "passwordPlaceholder": "Ingresa tu contraseña",
+      "forgotPasswordLink": "¿Olvidaste tu contraseña?",
+      "submitButton": "Iniciar sesión",
+      "divider": "O continúa con"
+    },
+    "forgotPasswordPage": {
+      "title": "¿Olvidaste tu contraseña?",
+      "description": "No te preocupes. Ingresa tu dirección de correo electrónico a continuación y te enviaremos un enlace para restablecerla.",
+      "emailLabel": "Dirección de correo electrónico",
+      "emailPlaceholder": "tu.correo@ejemplo.com",
+      "submitButton": "Enviar enlace de restablecimiento",
+      "backToLogin": "Volver a",
+      "backToLoginLink": "Iniciar sesión"
+    },
+    "testimonial": {
+      "author": {
+        "name": "Peter Mick",
+        "title": "Fundador de Copytime y Tweetsiu"
+      },
+      "quote": "¡CopyUI ha sido un <highlight>cambio radical</highlight> para mí! Es increíblemente intuitivo y ha transformado la forma en que abordo el diseño. No puedo imaginar trabajar sin él. 🚀"
+    }
   },
   "dashboard": {
     "title": "Panel",
