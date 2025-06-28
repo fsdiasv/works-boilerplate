@@ -3,7 +3,7 @@
 import { ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import {
   Breadcrumb,
@@ -14,34 +14,35 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 
-// Mapping of routes to breadcrumb information (without locale prefix)
-const routeMap: Record<string, { title: string; href?: string }[]> = {
-  '/': [{ title: 'Dashboard' }],
-  '/dashboard': [{ title: 'Dashboard' }],
-  '/faturamento': [{ title: 'Dashboard', href: '/' }, { title: 'Faturamento' }],
-  '/radar': [{ title: 'Dashboard', href: '/' }, { title: 'Radar de Conteúdo' }],
-  '/criar-post': [{ title: 'Dashboard', href: '/' }, { title: 'Criar Post' }],
-  '/calendario': [{ title: 'Dashboard', href: '/' }, { title: 'Calendário' }],
-  '/perfil': [{ title: 'Dashboard', href: '/' }, { title: 'Perfil' }],
-  '/contas-sociais': [{ title: 'Dashboard', href: '/' }, { title: 'Contas Sociais' }],
-  '/chaves-api': [{ title: 'Dashboard', href: '/' }, { title: 'Chaves de API' }],
-  '/settings': [{ title: 'Dashboard', href: '/' }, { title: 'Configurações' }],
-  '/pricing': [{ title: 'Dashboard', href: '/' }, { title: 'Preços' }],
-  '/documentation': [{ title: 'Dashboard', href: '/' }, { title: 'Documentação' }],
-  '/community': [{ title: 'Dashboard', href: '/' }, { title: 'Comunidade' }],
-  '/feedback': [{ title: 'Dashboard', href: '/' }, { title: 'Feedback' }],
+// Mapping of routes to translation keys (without locale prefix)
+const routeMap: Record<string, { titleKey: string; href?: string }[]> = {
+  '/': [{ titleKey: 'dashboard' }],
+  '/dashboard': [{ titleKey: 'dashboard' }],
+  '/faturamento': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'billing' }],
+  '/radar': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'contentRadar' }],
+  '/criar-post': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'createPost' }],
+  '/calendario': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'calendar' }],
+  '/perfil': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'profile' }],
+  '/contas-sociais': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'socialAccounts' }],
+  '/chaves-api': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'apiKeys' }],
+  '/settings': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'settings' }],
+  '/pricing': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'pricing' }],
+  '/documentation': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'documentation' }],
+  '/community': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'community' }],
+  '/feedback': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'feedback' }],
 }
 
 export function DashboardBreadcrumb() {
   const pathname = usePathname()
   const locale = useLocale()
+  const t = useTranslations('common.navigation')
 
   // Remove locale prefix from pathname for route lookup
   const pathSegments = pathname.split('/')
   const pathnameWithoutLocale = `/${pathSegments.slice(2).join('/')}` || '/'
 
   // Get breadcrumb items for current path, fallback to Dashboard if not found
-  const breadcrumbItems = routeMap[pathnameWithoutLocale] ?? [{ title: 'Dashboard' }]
+  const breadcrumbItems = routeMap[pathnameWithoutLocale] ?? [{ titleKey: 'dashboard' }]
 
   // Don't show breadcrumb on mobile to save space
   return (
@@ -61,7 +62,7 @@ export function DashboardBreadcrumb() {
                 <BreadcrumbItem>
                   {isLast ? (
                     <BreadcrumbPage className='text-sw-text-primary font-medium'>
-                      {item.title}
+                      {t(item.titleKey)}
                     </BreadcrumbPage>
                   ) : (
                     <BreadcrumbLink asChild>
@@ -69,7 +70,7 @@ export function DashboardBreadcrumb() {
                         href={href ?? `/${locale}/dashboard`}
                         className='text-sw-text-tertiary hover:text-sw-text-primary transition-colors'
                       >
-                        {item.title}
+                        {t(item.titleKey)}
                       </Link>
                     </BreadcrumbLink>
                   )}

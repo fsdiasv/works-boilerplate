@@ -2,9 +2,9 @@
 
 import { motion } from 'framer-motion'
 import { Heart, Home, Plus, Search, User } from 'lucide-react'
-import { useLocale } from 'next-intl'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useLocale } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { cn } from 'src/lib/utils'

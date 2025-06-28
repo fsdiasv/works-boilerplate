@@ -10,7 +10,17 @@
       "settings": "Configuración",
       "profile": "Perfil",
       "home": "Inicio",
-      "mainMenu": "Menú Principal"
+      "mainMenu": "Menú Principal",
+      "billing": "Facturación",
+      "contentRadar": "Radar de Contenido",
+      "createPost": "Crear Publicación",
+      "calendar": "Calendario",
+      "socialAccounts": "Cuentas Sociales",
+      "apiKeys": "Claves de API",
+      "pricing": "Precios",
+      "documentation": "Documentación",
+      "community": "Comunidad",
+      "feedback": "Comentarios"
     },
     "actions": {
       "save": "Guardar",
@@ -119,5 +129,34 @@
     "pageNotFound": "Página No Encontrada",
     "pageNotFoundDescription": "La página que buscas no existe.",
     "goHome": "Ir al Inicio"
+  },
+  "UserSettingsMenu": {
+    "nav": {
+      "settings": "Configuración",
+      "pricing": "Precios",
+      "documentation": "Documentación",
+      "community": "Foro de la Comunidad",
+      "feedback": "Comentarios"
+    },
+    "accessibility": {
+      "openUserSettings": "Abrir configuración de usuario"
+    },
+    "creditBalance": {
+      "title": "Saldo de Créditos",
+      "monthlyCredits": "Créditos mensuales",
+      "purchasedCredits": "Créditos comprados",
+      "resetMessage": "Tus créditos mensuales se restablecerán en {days} días.",
+      "buyMoreCredits": "Comprar más créditos"
+    },
+    "preferences": {
+      "title": "Preferencias",
+      "theme": "Tema",
+      "language": "Idioma"
+    },
+    "toast": {
+      "languageChanged": "Idioma Cambiado",
+      "languageChangedDescription": "Idioma cambiado a {language}."
+    },
+    "signOut": "Cerrar Sesión"
   }
 }

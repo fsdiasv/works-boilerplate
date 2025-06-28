@@ -15,7 +15,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
 import * as React from 'react'
 
@@ -47,13 +47,7 @@ const user = {
   creditsResetInDays: 29,
 }
 
-const navLinks = [
-  { href: '/settings', icon: Settings, label: 'Settings' },
-  { href: '/pricing', icon: CircleDollarSign, label: 'Pricing' },
-  { href: '/documentation', icon: BookOpen, label: 'Documentation' },
-  { href: '/community', icon: Users, label: 'Community Forum' },
-  { href: '/feedback', icon: MessageSquare, label: 'Feedback' },
-]
+// navLinks moved inside component to use translations
 
 // Helper function to get user initials for avatar fallback
 function getUserInitials(name: string): string {
@@ -72,6 +66,15 @@ export function UserSettingsMenu() {
   const router = useRouter()
   const pathname = usePathname()
   const [isPending, startTransition] = React.useTransition()
+  const t = useTranslations('UserSettingsMenu')
+
+  const navLinks = [
+    { href: '/settings', icon: Settings, label: t('nav.settings') },
+    { href: '/pricing', icon: CircleDollarSign, label: t('nav.pricing') },
+    { href: '/documentation', icon: BookOpen, label: t('nav.documentation') },
+    { href: '/community', icon: Users, label: t('nav.community') },
+    { href: '/feedback', icon: MessageSquare, label: t('nav.feedback') },
+  ]
 
   const handleLanguageChange = (newLocale: Locale) => {
     startTransition(() => {
@@ -86,8 +89,8 @@ export function UserSettingsMenu() {
       router.push(newPath)
 
       toast({
-        title: 'Language Changed',
-        description: `Language switched to ${localeNames[newLocale]}.`,
+        title: t('toast.languageChanged'),
+        description: t('toast.languageChangedDescription', { language: localeNames[newLocale] }),
       })
     })
   }
@@ -107,7 +110,7 @@ export function UserSettingsMenu() {
           className='text-sw-text-secondary hover:text-sw-text-primary'
         >
           <Settings className='h-[1.2rem] w-[1.2rem]' />
-          <span className='sr-only'>Open user settings</span>
+          <span className='sr-only'>{t('accessibility.openUserSettings')}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent className='w-72 md:w-80' align='end' forceMount>
@@ -138,29 +141,29 @@ export function UserSettingsMenu() {
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <div className='px-2 py-1.5'>
-          <p className='text-foreground mb-1 text-xs font-semibold'>Credit Balance</p>
+          <p className='text-foreground mb-1 text-xs font-semibold'>{t('creditBalance.title')}</p>
           <div className='text-muted-foreground mb-0.5 flex justify-between text-xs'>
-            <span>Monthly credits</span>
+            <span>{t('creditBalance.monthlyCredits')}</span>
             <span>{user.monthlyCredits.toFixed(2)}</span>
           </div>
           <div className='text-muted-foreground flex justify-between text-xs'>
-            <span>Purchased credits</span>
+            <span>{t('creditBalance.purchasedCredits')}</span>
             <span>{user.purchasedCredits.toFixed(2)}</span>
           </div>
         </div>
         <div className='mx-2 my-1.5 rounded-md bg-amber-50 p-2.5 text-xs text-amber-700 dark:bg-amber-900/20 dark:text-amber-400'>
-          Your monthly credits will reset in {user.creditsResetInDays} days.{' '}
+          {t('creditBalance.resetMessage', { days: user.creditsResetInDays })}{' '}
           <Link
             href={`/${locale}/pricing`}
             className='font-medium underline hover:text-amber-800 dark:hover:text-amber-300'
           >
-            Buy more credits
+            {t('creditBalance.buyMoreCredits')}
           </Link>
         </div>
         <div className='px-2 py-1.5'>
-          <p className='text-foreground mb-2 text-xs font-semibold'>Preferences</p>
+          <p className='text-foreground mb-2 text-xs font-semibold'>{t('preferences.title')}</p>
           <div className='mb-2 flex items-center justify-between'>
-            <span className='text-muted-foreground text-sm'>Theme</span>
+            <span className='text-muted-foreground text-sm'>{t('preferences.theme')}</span>
             <div className='flex items-center gap-1'>
               {[
                 { value: 'light', icon: Sun },
@@ -180,7 +183,7 @@ export function UserSettingsMenu() {
             </div>
           </div>
           <div className='flex items-center justify-between'>
-            <span className='text-muted-foreground text-sm'>Language</span>
+            <span className='text-muted-foreground text-sm'>{t('preferences.language')}</span>
             <DropdownMenuSub>
               <DropdownMenuSubTrigger className='h-8 px-2 py-1 text-xs' disabled={isPending}>
                 <span>{localeNames[locale]}</span>
@@ -210,7 +213,7 @@ export function UserSettingsMenu() {
             className='flex items-center text-red-600 hover:!text-red-700 dark:text-red-500 dark:hover:!text-red-400'
           >
             <LogOut className='mr-2 h-4 w-4' />
-            <span>Sign Out</span>
+            <span>{t('signOut')}</span>
           </Link>
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -10,7 +10,17 @@
       "settings": "Settings",
       "profile": "Profile",
       "home": "Home",
-      "mainMenu": "Main Menu"
+      "mainMenu": "Main Menu",
+      "billing": "Billing",
+      "contentRadar": "Content Radar",
+      "createPost": "Create Post",
+      "calendar": "Calendar",
+      "socialAccounts": "Social Accounts",
+      "apiKeys": "API Keys",
+      "pricing": "Pricing",
+      "documentation": "Documentation",
+      "community": "Community",
+      "feedback": "Feedback"
     },
     "actions": {
       "save": "Save",
@@ -119,5 +129,34 @@
     "pageNotFound": "Page Not Found",
     "pageNotFoundDescription": "The page you're looking for doesn't exist.",
     "goHome": "Go Home"
+  },
+  "UserSettingsMenu": {
+    "nav": {
+      "settings": "Settings",
+      "pricing": "Pricing",
+      "documentation": "Documentation",
+      "community": "Community Forum",
+      "feedback": "Feedback"
+    },
+    "accessibility": {
+      "openUserSettings": "Open user settings"
+    },
+    "creditBalance": {
+      "title": "Credit Balance",
+      "monthlyCredits": "Monthly credits",
+      "purchasedCredits": "Purchased credits",
+      "resetMessage": "Your monthly credits will reset in {days} days.",
+      "buyMoreCredits": "Buy more credits"
+    },
+    "preferences": {
+      "title": "Preferences",
+      "theme": "Theme",
+      "language": "Language"
+    },
+    "toast": {
+      "languageChanged": "Language Changed",
+      "languageChangedDescription": "Language switched to {language}."
+    },
+    "signOut": "Sign Out"
   }
 }
