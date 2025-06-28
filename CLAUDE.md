@@ -1,75 +1,80 @@
-# CLAUDE.md
+# [MASTER GUIDELINES] Development Guide for the Works Boilerplate
 
-This file provides guidance to Claude Code (claude.ai/code) when working with
-code in this repository.
+## 1\. Role and Project Context
 
-## Project Overview
+**Your Role:** You are a senior full-stack developer, specializing in Next.js,
+TypeScript, and building mobile-first Progressive Web Apps (PWAs).
 
-This is the **Works Boilerplate** - a production-ready SaaS starter kit designed
-to accelerate development of modern Software-as-a-Service applications. The
-boilerplate emphasizes:
+**Project Context:** This is the **Works Boilerplate**, a production-ready SaaS
+starter kit. Its core pillars are: mobile-first PWA, internationalization
+(i18n), multi-tenancy with RLS, and type-safe full-stack development with tRPC.
 
-- **Mobile-first Progressive Web App (PWA)** with offline capabilities
-- **Internationalization (i18n)** supporting English, Spanish, and Portuguese
-- **Multi-tenancy** with workspace-based data isolation
-- **Type-safe full-stack development** with tRPC
-- **Security-first approach** with authentication, RLS, and security headers
-
-## Core Technology Stack
+## 2\. Core Technology Stack
 
 - **Frontend**: Next.js 15 (App Router), React 19, TypeScript (strict mode)
-- **Styling**: Tailwind CSS v4 (mobile-first), shadcn/ui components
+- **Styling**: Tailwind CSS v4, shadcn/ui
 - **Backend**: tRPC on Next.js API Routes, Prisma ORM
 - **Database**: PostgreSQL (Supabase)
-- **Authentication**: Supabase Auth (JWT-based)
-- **Internationalization**: next-intl
-- **PWA**: next-pwa with Workbox
-- **Deployment**: Vercel
+- **Authentication**: Supabase Auth (JWT)
+- **i18n**: `next-intl`
+- **PWA**: `next-pwa` with Workbox
 - **Testing**: Vitest, Playwright, React Testing Library
-- **External Services**: Stripe, Resend, Sentry, PostHog, Inngest
+- **Package Manager**: `pnpm` (use `pnpm` commands exclusively)
 
-## Development Commands
+### Quality & Workflow Tooling
 
-Since this is a new project without implementation yet, here are the expected
-commands once the boilerplate is set up:
+- **Git Hooks:** `Husky` for managing Git hooks.
+- **Pre-commit Checks:** `lint-staged` to run linters on staged files.
+- **Commit Formatting:** `Commitizen` (`git-cz`) for creating standardized
+  commits.
+- **Dependency Validation:** `Knip` to detect unused dependencies and files.
+- **Environment Variables:** `@t3-oss/env-nextjs` for type-safe environment
+  variables.
 
-```bash
-# Install dependencies
-pnpm install
+## 3\. Essential Commands
 
-# Development server
-pnpm dev
+### Development
 
-# Build for production
-pnpm build
+- `pnpm dev`: Start the development server.
+- `pnpm build`: Build the application for production.
+- `pnpm start`: Start the production server.
+- `pnpm analyze`: Analyze the production bundle size.
+- `pnpm clean`: Remove build artifacts and caches.
 
-# Start production server
-pnpm start
+### Code Quality
 
-# Type checking
-pnpm typecheck
+- `pnpm validate`: **(Primary)** Run all checks (TypeScript, ESLint, Prettier).
+- `pnpm format`: Format all code with Prettier.
+- `pnpm lint`: Run ESLint.
+- `pnpm lint:fix`: Attempt to auto-fix ESLint errors.
+- `pnpm typecheck`: Run the TypeScript compiler to check for type errors.
+- `pnpm check:deps`: Validate for unused dependencies with `Knip`.
 
-# Linting
-pnpm lint
+### Internationalization (i18n)
 
-# Run tests
-pnpm test
-pnpm test:unit
-pnpm test:e2e
+- `pnpm i18n:validate`: Validate the consistency of translation files.
 
-# Database operations
-pnpm db:push        # Push schema changes
-pnpm db:migrate     # Run migrations
-pnpm db:studio      # Open Prisma Studio
-```
+### Database (Prisma)
 
-## Architecture & Structure
+- `pnpm db:push`: Push the schema to the DB (development).
+- `pnpm db:migrate`: Create and apply a new migration (development).
+- `pnpm db:migrate:deploy`: Apply pending migrations (production).
+- `pnpm db:studio`: Open the Prisma Studio UI.
+- `pnpm db:seed`: Seed the database with test data.
+- `pnpm db:generate`: (Re)generate the Prisma client.
 
-### Directory Layout
+### Testing
+
+- `pnpm test`: Run unit tests with Vitest.
+- `pnpm test:ui`: Run unit tests with the Vitest UI.
+- `pnpm test:coverage`: Generate a test coverage report.
+- `pnpm test:e2e`: Run end-to-end tests with Playwright.
+
+## 4\. Architecture and Directory Structure
 
 ```
 src/
-├── app/[locale]/          # Internationalized routes
+├── app/[locale]/         # Internationalized routes
 │   ├── (auth)/           # Auth pages (login, signup, etc.)
 │   ├── (dashboard)/      # Protected dashboard routes
 │   └── (marketing)/      # Public marketing pages
@@ -77,1017 +82,139 @@ src/
 │   ├── ui/               # shadcn/ui components
 │   ├── mobile/           # Mobile-specific components
 │   └── shared/           # Shared components
-├── server/               # Backend code
-│   ├── api/             # tRPC routers
-│   └── db/              # Database client
-└── lib/                 # Utilities and helpers
+├── server/               # Backend code (tRPC, Prisma)
+│   ├── api/              # tRPC routers
+│   └── db/               # Database client
+└── lib/                  # Utilities and helpers
 ```
 
-### Key Architectural Decisions
-
-1. **Mobile-First PWA**: All features must work on mobile devices with touch
-   interactions. The app should be installable and work offline for critical
-   features.
-
-2. **Internationalization**: Every user-facing string must be externalized. Use
-   the `useTranslations` hook from next-intl. Routes include locale prefix
-   (e.g., `/en/dashboard`).
-
-3. **Multi-Tenancy**: Data isolation is enforced at the database level using Row
-   Level Security (RLS). Users can only access data within their authorized
-   workspace.
-
-4. **Type Safety**: The entire stack is type-safe from database to frontend.
-   tRPC procedures share types automatically. All inputs are validated with Zod.
-
-5. **Component Library**: All UI components are based on shadcn/ui and must be
-   mobile-optimized with minimum 44x44px touch targets.
-
-## Development Guidelines
-
-### Core Principles
-
-1. **Mobile-First Always**: Every feature must work perfectly on mobile before
-   desktop
-2. **Zero Hardcoded Strings**: All text must use next-intl translations
-3. **TypeScript Strict Mode**: No `any` types, full type safety end-to-end
-4. **Security by Default**: All inputs validated with Zod, RLS enforced
-5. **Progressive Enhancement**: Core features work offline, enhanced features
-   online
-
-### Code Organization Standards
-
-#### File Structure Rules
-
-- Components: `ComponentName.tsx` with co-located tests and styles
-- Pages: Use Next.js 15 App Router structure with `page.tsx`
-- API Routes: Use `route.ts` files in app directory
-- Types: Keep close to usage, use Zod for runtime validation
-- Utilities: Group by domain in `lib/` directory
-
-#### Component Architecture
-
-- **Server Components First**: Use server components by default
-- **Client Components**: Only when interactivity is required (use "use client")
-- **Atomic Design**: Organize as atoms → molecules → organisms
-- **shadcn/ui Base**: Build on shadcn/ui primitives
-- **Mobile Touch Targets**: Minimum 44x44px for all interactive elements
-
-### Development Workflow
-
-#### Before Writing Code
-
-1. Check existing patterns in the codebase
-2. Verify mobile-first approach
-3. Ensure translations are externalized
-4. Plan for offline scenarios
-
-#### Code Quality Requirements
-
-- **ESLint**: No warnings allowed
-- **Prettier**: Auto-format on save
-- **TypeScript**: Strict mode, no errors
-- **Tests**: Write before or during development
-- **Performance**: Profile on slow 3G networks
-
-### Testing Strategy
-
-#### Required Test Types
-
-- **Unit Tests**: Vitest for utilities, hooks, and pure functions
-- **Component Tests**: React Testing Library for UI components
-- **Integration Tests**: API endpoints and database operations
-- **E2E Tests**: Playwright for critical user flows
-- **Mobile Tests**: Touch interactions and responsive behavior
-- **PWA Tests**: Offline functionality and installation
-
-#### Test Organization
-
-- Co-locate tests with components: `Component.test.tsx`
-- API tests in `__tests__/api/` directories
-- E2E tests in dedicated `tests/e2e/` directory
-- Maintain >80% coverage for all new code
-
-### Performance Standards
-
-#### Mobile Performance Targets
-
-- **Lighthouse Score**: >95 in all categories on mobile
-- **Time to Interactive**: <3 seconds on 3G
-- **Bundle Size**: <150KB initial load
-- **PWA Score**: 100% in Lighthouse
-- **Core Web Vitals**: Green scores for LCP, FID, CLS
-
-#### Optimization Techniques
-
-- Use `next/image` for all images
-- Implement lazy loading for non-critical components
-- Code splitting at route and component level
-- Optimize fonts with `next/font`
-- Cache strategies via service worker
-
-### Security Implementation
-
-#### Input Validation
-
-- **All Inputs**: Validate with Zod schemas on client and server
-- **API Endpoints**: Use tRPC with Zod for automatic validation
-- **File Uploads**: Validate type, size, and content
-- **URL Parameters**: Sanitize and validate all route parameters
-
-#### Authentication & Authorization
-
-- **Supabase Auth**: Use for all authentication flows
-- **JWT Tokens**: Secure session management with HTTP-only cookies
-- **RLS Policies**: Enforce data isolation at database level
-- **API Protection**: Secure all tRPC procedures with auth checks
-
-#### Security Headers
-
-- **CSP**: Content Security Policy configured
-- **CORS**: Properly configured for production
-- **Rate Limiting**: Implement on auth endpoints and APIs
-- **HTTPS**: Enforced in production environments
-
-### Internationalization Best Practices
-
-#### Translation Management
-
-- **File Structure**: Organize by namespace (auth, dashboard, common)
-- **Type Safety**: Generate types from translation keys
-- **Fallbacks**: Always provide fallback to English
-- **Dynamic Loading**: Load translations on demand for performance
-
-#### Locale Handling
-
-- **URL Structure**: Use `/[locale]/path` for all routes
-- **Detection**: Automatic locale detection with user preference
-- **Switching**: Smooth language switching without page reload
-- **SEO**: Proper hreflang tags and locale-specific meta
-
-### PWA Development
-
-#### Service Worker Implementation
-
-- **Caching Strategies**: Cache-first for assets, network-first for API calls
-- **Offline Support**: Critical features must work without internet
-- **Background Sync**: Queue actions when offline, sync when online
-- **Install Prompts**: Custom PWA installation experience
-
-#### Mobile Optimizations
-
-- **Touch Gestures**: Implement swipe, pinch, and long-press
-- **Viewport Handling**: Proper meta tags and safe area handling
-- **Performance**: Optimize for mobile CPUs and networks
-- **Native Features**: Prepare for push notifications and biometric auth
-
-### Documentation and Knowledge Strategy
-
-Documentation is not a task to be done at the end of a project; it is an ongoing
-product that ensures the health, maintainability, and scalability of our team
-and system, as well as clarity for other teams.
-
-#### Documentation Philosophy
-
-- **Document the "Why", not just the "What":** Code is self-explanatory about
-  _what_ it does. Quality documentation explains _why_ it was done that way,
-  what alternatives were considered, and what trade-offs were made.
-
-- **Documentation Lives Close to the Code:** To avoid it becoming outdated, we
-  prioritize documentation that can be versioned alongside the source code
-  (Markdown files in the repository, TSDoc in the comments), rather than relying
-  on external platforms like Confluence or Notion.
-
-#### The three layers of our documentation
-
-##### **The `README.md` (The Gateway)**
-
-- **Tool:** `README.md` in the root of the monorepo.
-- **Purpose:** To allow a new developer to set up the environment, install
-  dependencies, and run the project locally in the shortest possible time. It is
-  our "quick start guide".
-- **Responsibility:** It must be kept impeccably clear and up to date. It is the
-  first impression a new team member will have of our project. It should contain
-  the project vision, prerequisites, step-by-step setup guide, main commands
-  (`dev`, `test`, `build`), and a link to this complete Design Doc.
-
-##### **Architectural Documentation (The Constitution)**
-
-- **Tool:** This document (`DESIGN_DOC.md`) and a `/docs/adr` directory for new
-  Architecture Decision Records (ADRs).
-- **Purpose:** To explain the high-level decisions, trade-offs, system
-  structure, and rationale behind our technology choices. It is the "why"
-  record.
-- **Responsibility:** Technical leadership is the custodian of this document.
-  Significant new architectural decisions (e.g., adding a new microservice,
-  changing a database provider) **should** be documented with a new ADR, which
-  will be reviewed by the team.
-
-##### **Documentation in Code (The Immediate Context)**
-
-- **Tool:** Comments in **TSDoc** format.
-- **Purpose:** To explain the "why" of code snippets that are not immediately
-  obvious. We don't comment on the obvious. We do comment on:
-- Complex business logic.
-- The purpose of public functions and their parameters.
-- Temporary workarounds or "hacks", always with a `// TODO:` and a link to the
-  ticket that tracks their removal.
-- **Responsibility:** Each developer. The Code Review process should actively
-  look for complex code without proper documentation and request its addition.
-
-### Available Commands
-
-```bash
-# View current tasks
-task-master list
-
-# Get next available task
-task-master next
-
-# View task details
-task-master show <task-id>
-
-# Update task status
-task-master set-status -i <task-id> -s <status>
-
-# Analyze project complexity
-task-master analyze-complexity
-```
-
-## External Integrations
-
-### Required Service Accounts
-
-- **Supabase**: Database, auth, and file storage
-- **Stripe**: Payment processing and subscription management
-- **Resend**: Transactional email delivery
-- **Sentry**: Error tracking and performance monitoring
-- **PostHog**: Product analytics and feature flags
-- **Inngest**: Background job processing
-
-### Environment Variables
-
-Create `.env.local` with required API keys:
-
-```bash
-# Database
-DATABASE_URL="postgresql://..."
-DIRECT_URL="postgresql://..."
-
-# Authentication
-NEXT_PUBLIC_SUPABASE_URL="https://..."
-NEXT_PUBLIC_SUPABASE_ANON_KEY="..."
-SUPABASE_SERVICE_ROLE_KEY="..."
-
-# Payments
-STRIPE_SECRET_KEY="sk_..."
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_..."
-
-# Email
-RESEND_API_KEY="re_..."
-
-# Monitoring
-SENTRY_DSN="https://..."
-NEXT_PUBLIC_POSTHOG_KEY="phc_..."
-
-# Background Jobs
-INNGEST_EVENT_KEY="..."
-```
-
-## Definition of Done
-
-A feature is considered complete when:
-
-- ✅ **Mobile-first and fully responsive**
-- ✅ **All strings internationalized**
-- ✅ **Touch-friendly interactions (44x44px minimum)**
-- ✅ **Works offline when applicable**
-- ✅ **Type-safe from database to UI**
-- ✅ **Zod validation on all inputs**
-- ✅ **Tests written and passing (>80% coverage)**
-- ✅ **Performance validated on 3G**
-- ✅ **Accessibility verified (WCAG 2.1 AA)**
-- ✅ **Security review completed**
-- ✅ **Code review approved**
-- ✅ **No ESLint warnings or TypeScript errors**
-
-## Task Completion Workflow
-
-**IMPORTANT MEMORY**: When completing any task, you MUST:
-
-1. **Update the original task file** with completion status and learnings
-2. **Move the completed task** from `tasks/` to `tasks/completed/` directory
-3. **Mark all acceptance criteria** as completed with `[x]` checkboxes
-4. **Add implementation summary** at the end of the original task file
-5. **Document key learnings** for future reference
-6. **Update CLAUDE.md** with new implementation learnings section
-
-Example workflow:
-
-```bash
-# After completing task E2_T2.1
-mv tasks/E2_T2.1_Internationalization_Setup.md tasks/completed/
-# Edit the file to add completion status and mark criteria as done
-# Update CLAUDE.md with learnings
-```
-
-This ensures all completed work is properly documented and serves as reference
-for future development.
-
-## Current Status
-
-This is a greenfield project with a comprehensive Product Requirements Document
-(PRD) and detailed task breakdown. Implementation follows a 23-day roadmap:
-
-1. **Phase 1**: Foundation + Mobile (5 days)
-2. **Phase 2**: Core Features + Components (6 days)
-3. **Phase 3**: PWA + Offline (4 days)
-4. **Phase 4**: Integrations (5 days)
-5. **Phase 5**: Quality & Polish (3 days)
-
-### Project Resources
-
-- `prd.md` - Complete product requirements and specifications
-- `tasks/` - Detailed task breakdown with 39 implementation tasks
-- `.cursor/rules/` - Development standards and best practices
-- `.taskmaster/` - Task management configuration and reports
-
-### Implementation Status
-
-#### ✅ Completed Tasks
-
-- **E1_T1.1**: Next.js Project Setup (Next.js 15.3.3, React 19, TypeScript
-  strict mode)
-- **E1_T1.2**: Build System Configuration (Production build optimization, PWA
-  setup, bundle analysis)
-- **E1_T1.3**: PWA Foundation (Mobile-first PWA with offline capabilities,
-  service worker caching, iOS optimization)
-- **E1_T1.4**: Developer Environment Setup (ESLint, Prettier, Husky, VS Code
-  optimization, mobile-first development tools)
-- **E2_T2.1**: Internationalization Setup (next-intl with pt-BR, en-US, es-ES,
-  mobile-optimized locale switcher, type-safe translations)
-- **E2_T2.2**: Translation Management System (ICU syntax, pluralization,
-  validation system, mobile-optimized content, performance optimization)
-- **E2_T2.3**: Internationalized Routing (advanced SEO, localized error pages,
-  sitemap generation, mobile-optimized middleware, comprehensive metadata)
-- **E3_T3.1**: Tailwind CSS v4 Setup (mobile-first design system, fluid
-  typography, dark mode, touch optimization, component variants, PostCSS
-  pipeline)
-
-#### 🎯 Next Task Ready
-
-- **E3_T3.2**: Advanced Component Library Development - Building on the Tailwind
-  foundation
-
-#### 🎯 Key Implementation Learnings
-
-##### Tailwind CSS v4 Migration
-
-- **Issue**: Tailwind v4 requires separate PostCSS plugin
-- **Solution**: Install `@tailwindcss/postcss` and update config
-- **Commands**:
-  ```bash
-  pnpm add -D @tailwindcss/postcss autoprefixer
-  # Update postcss.config.mjs to use '@tailwindcss/postcss'
-  ```
-
-##### Package Dependencies for Next.js 15
-
-- **Critical**: Always install `autoprefixer` with Tailwind
-- **pnpm Config**: Add `.npmrc` with peer dependency settings
-- **Bundle Analyzer**: Conditional loading only when `ANALYZE=true`
-
-##### Mobile-First Setup Essentials
-
-- **Viewport Export**: Use Next.js 15's separate `viewport` export
-- **Meta Tags**: Include PWA preparation in root layout
-- **Touch Targets**: Plan for 44x44px minimum from start
-- **Bundle Target**: Monitor 150KB limit with `pnpm analyze`
-
-##### TypeScript Strict Mode
-
-- **Configuration**: Enable all strict flags in tsconfig.json
-- **Zero Tolerance**: No `any` types allowed in codebase
-- **Import Aliases**: Essential for clean mobile component organization
-
-##### Build System Configuration
-
-- **Next.js 15 Stability**: React 19 experimental features (ppr, reactCompiler)
-  require canary versions
-- **Bundle Size Management**: Started with 300KB limit, optimized to 102KB
-  actual size
-- **PWA Integration**: next-pwa automatically generates service worker and
-  manifest
-- **Webpack Configuration**: Bundle analyzer works with both static reports and
-  development integration
-- **Database Integration**: Prisma requires postinstall script for client
-  generation
-- **Development Scripts**: Complete test and database management commands ready
-  for future implementation
-
-##### Production Build Optimization
-
-- **Bundle Analysis**: Generates reports in `analyze/` and `.next/analyze/`
-  directories
-- **Mobile Performance**: 102KB bundle size is 32% under 150KB target
-- **Tree Shaking**: Configured for optimal dead code elimination
-- **SVG Support**: @svgr/webpack enables SVG-as-React-component imports
-- **Security Headers**: Production-ready CSP, XSS protection, and HSTS
-  configured
-
-##### PWA Foundation Implementation
-
-- **Service Worker Strategies**: NetworkFirst for APIs, CacheFirst for images,
-  StaleWhileRevalidate for assets
-- **next-pwa Configuration**: Advanced runtime caching with expiration policies
-  and cacheable response filtering
-- **iOS PWA Support**: Comprehensive Apple meta tags, splash screens, and touch
-  icons for native app experience
-- **Offline Experience**: Mobile-optimized glassmorphism design with connection
-  monitoring and auto-recovery
-- **PWA Manifest**: Complete with shortcuts, screenshots, protocol handlers, and
-  edge side panel support
-- **Mobile-First Design**: Portrait-primary orientation, touch-optimized
-  interactions, viewport handling
-
-##### PWA Development Best Practices
-
-- **Caching Strategy**: API routes (5min), images (30 days), static assets (7
-  days), pages (24 hours)
-- **Offline Fallback**: Elegant `/offline` page with connection status and retry
-  functionality
-- **TypeScript PWA Utilities**: Installation detection, service worker
-  management, network status monitoring
-- **Build Integration**: Service worker auto-generation with custom runtime
-  caching configuration
-- **Performance Optimization**: Bundle size maintained at 102KB with PWA
-  features included
-
-##### Developer Environment Setup Implementation
-
-- **ESLint v8 Compatibility**: ESLint v9 requires new config format, downgraded
-  to v8 for stability
-- **TypeScript Strict Rules**: Configured comprehensive type checking with
-  mobile-first accessibility rules
-- **Git Hooks Integration**: Husky + lint-staged for automated quality checks on
-  commit
-- **VS Code Optimization**: Complete workspace setup with mobile debugging
-  configurations and recommended extensions
-- **Mobile-First Validation**: Touch target compliance checking (44x44px
-  minimum) built into pre-commit hooks
-- **Conventional Commits**: Commitlint configuration with project-specific
-  scopes (mobile, pwa, ui, etc.)
-- **Code Quality Pipeline**: Zero-warning policy with auto-formatting and
-  comprehensive linting
-- **Performance Monitoring**: Bundle analysis integration with mobile network
-  optimization targets
-
-##### Internationalization Setup Implementation
-
-- **next-intl Integration**: Configured with Next.js 15 App Router using new
-  async params pattern
-- **Locale Routing**: All routes now use `/[locale]/` prefix with automatic
-  detection and persistence
-- **Type-Safe Translations**: Full TypeScript integration with autocomplete for
-  all translation keys
-- **Mobile-First Locale Switcher**: 44px touch targets, loading states, native
-  select for best mobile UX
-- **Dynamic Message Loading**: Translations loaded on-demand to minimize bundle
-  size impact
-- **SEO Optimization**: Proper hreflang tags, locale-specific meta tags, and
-  alternate URLs
-- **Build Configuration**: Migrated to ES modules (next.config.mjs) for
-  next-intl plugin support
-- **Middleware Setup**: Automatic browser language detection with fallback to
-  Portuguese (pt-BR)
-
-##### Translation Management System Implementation
-
-- **ICU Message Format**: Implemented comprehensive ICU syntax with
-  pluralization support for complex language rules
-- **Translation Validation**: Built automated validation system to detect
-  missing keys and ICU syntax errors
-- **Performance Optimization**: Bundle size maintained at 117KB with advanced
-  i18n features included
-- **Mobile Content Strategy**: Created mobile-specific translation content with
-  shorter labels and touch-friendly terminology
-- **Currency & Number Formatting**: Locale-specific formatting for currency
-  (R$,
-  $, €), dates, and numbers
-- **CI/CD Integration**: Added `pnpm i18n:validate` script for automated
-  translation validation
-- **Type Safety Enforcement**: Enhanced TypeScript integration with strict
-  validation and autocomplete
-- **Namespace Organization**: Structured translations by feature domains for
-  better maintainability
-
-##### Internationalized Routing & SEO Implementation
-
-- **Advanced Error Handling**: Created localized 404, error boundary, and
-  loading pages with mobile-optimized UX
-- **Comprehensive SEO Metadata**: Enhanced with Open Graph, Twitter cards,
-  canonical URLs, and hreflang tags
-- **Sitemap Generation**: Automated multi-language XML sitemap with alternate
-  URLs for all locales
-- **Mobile-Optimized Middleware**: Performance optimizations with static asset
-  bypassing and mobile detection
-- **SEO Best Practices**: Implemented robots.txt directives, Google
-  verification, and locale-specific metadata
-- **Accessibility Compliance**: ARIA labels, screen reader support, and keyboard
-  navigation for language switching
-- **Performance Monitoring**: Middleware overhead kept under 50ms for mobile
-  networks
-- **Progressive Enhancement**: Error pages work without JavaScript, fallback
-  strategies implemented
-
-##### shadcn/ui Component Library Integration
-
-- **Component Library Scale**: Successfully integrated 39 mobile-optimized
-  components with comprehensive coverage
-- **Mobile Touch Targets**: All interactive components meet 44x44px minimum
-  requirement with enhanced 48px variant for critical actions
-- **CLI Configuration**: Custom mobile-first configuration with proper aliases
-  and TypeScript integration
-- **Dark Mode Integration**: Seamless ThemeProvider integration with system
-  preference detection and persistence
-- **TypeScript Strict Mode**: Fixed all optional prop issues with proper null
-  coalescing patterns (`checked={checked ?? false}`)
-- **Component Organization**: Comprehensive index file for efficient imports and
-  tree-shaking optimization
-- **Performance Impact**: Maintained bundle size targets with tree-shaking and
-  component-level optimization
-- **Touch Optimization**: Enhanced components with `touch-manipulation` CSS and
-  active states for immediate feedback
-- **Accessibility Ready**: WCAG 2.1 AA compliance with focus indicators and
-  screen reader support built-in
-- **Development Experience**: Streamlined component installation patterns and
-  mobile-first development workflow
-
-##### Tailwind CSS v4 Advanced Implementation
-
-- **v4 Migration Strategy**: Successfully upgraded from v3 with PostCSS pipeline
-  optimization
-- **Mobile-First Breakpoint System**: Added touch-specific media queries
-  (`touch`, `no-touch`, `standalone`)
-- **Fluid Typography Implementation**: Complete clamp-based responsive scaling
-  with mobile-optimized line heights
-- **Touch Target Compliance**: 44px minimum with comprehensive spacing utilities
-  (`touch-sm`, `touch`, `touch-lg`)
-- **Dark Mode Architecture**: CSS custom properties system with smooth 200ms
-  transitions
-- **Component Variant System**: CVA integration with TypeScript for maintainable
-  component styling
-- **PostCSS Pipeline Enhancement**: Modern CSS features (nesting, preset-env,
-  cssnano) with build optimization
-- **Bundle Size Achievement**: 117KB total (22% under 150KB mobile target) with
-  advanced features included
-- **Safe Area Handling**: Complete PWA support for notched devices with `env()`
-  variables
-- **Performance Optimization**: Tree-shaking, critical CSS inlining, and mobile
-  network optimization
-
-##### Critical Bug Resolution During Implementation
-
-- **Layout Hierarchy Issues**: Fixed Next.js 15 hydration mismatches by
-  restructuring root/locale layout relationship
-- **Routing Loop Prevention**: Resolved infinite redirects by simplifying
-  middleware and removing problematic `notFound()` calls
-- **Translation Synchronization**: Achieved perfect server/client translation
-  sync with explicit locale parameter passing
-- **Build System Compatibility**: Resolved PostCSS v4 integration issues with
-  autoprefixer and optimization plugins
-- **TypeScript Strict Compliance**: Maintained zero `any` types throughout
-  complex component variant implementations
-
-##### Tailwind CSS v4 & shadcn/ui Integration
-
-**Critical Issue Resolved**: shadcn/ui styles not rendering due to Tailwind CSS
-v4 misconfiguration
-
-**Root Causes Identified**:
-
-1. Missing `@tailwindcss/postcss` package (v4 requires this specific PostCSS
-   plugin)
-2. Incorrect PostCSS configuration using `tailwindcss: {}` instead of
-   `'@tailwindcss/postcss': {}`
-3. Mismatch between installed Tailwind version (v3) and configuration (v4)
-4. Missing `@theme` directive for custom color definitions in v4
-
-**Solution Applied**:
-
-1. Install required package: `pnpm add -D @tailwindcss/postcss`
-2. Update `postcss.config.mjs`:
-   ```js
-   export default {
-     plugins: {
-       '@tailwindcss/postcss': {},
-       autoprefixer: {},
-     },
-   }
-   ```
-3. Run upgrade tool: `npx @tailwindcss/upgrade --force`
-4. Update `globals.css` to use `@theme` directive:
-
-   ```css
-   @import 'tailwindcss';
-
-   @theme {
-     --color-background: hsl(0 0% 100%);
-     --color-primary: hsl(221.2 83.2% 53.3%);
-     /* ... other colors ... */
-   }
-   ```
-
-**Key Learnings for Tailwind CSS v4**:
-
-- v4 uses `@import 'tailwindcss'` instead of
-  `@tailwind base/components/utilities`
-- Custom colors must be defined in `@theme` block with `--color-` prefix
-- PostCSS requires `@tailwindcss/postcss` plugin, not the legacy `tailwindcss`
-  plugin
-- The upgrade tool (`npx @tailwindcss/upgrade`) automates most migration tasks
-- Theme variables in `@theme` automatically generate utility classes (e.g.,
-  `--color-primary` → `bg-primary`)
-
-**Debugging Steps for Future CSS Issues**:
-
-1. Verify CSS is loading: Check browser DevTools Network tab
-2. Check if classes exist in compiled CSS:
-   `curl [css-url] | grep "\.bg-primary"`
-3. Use Playwright to verify classes are in DOM and computed styles are applied
-4. Ensure PostCSS is configured correctly for Tailwind v4
-5. Verify `@theme` directive is used for custom design tokens
-
-##### Git Workflow and Commit Standards
-
-- **Conventional Commits**: Project uses strict conventional commit format with
-  commitlint validation
-- **Sentence-Case Rule**: Commit subjects must be in sentence-case (only first
-  word capitalized)
-  - ✅ **Correct**:
-    `feat: Implement advanced tailwind design system with mobile optimization`
-  - ❌ **Incorrect**:
-    `feat: Implement Tailwind CSS v4 Mobile-First Design System`
-- **Subject Length**: Maximum 72 characters for commit subject line
-- **Body Formatting**: Maximum 100 characters per line in commit body
-- **Scope Validation**: Must use predefined scopes (mobile, pwa, ui, i18n, etc.)
-- **Type Validation**: Must use conventional types (feat, fix, docs, style,
-  etc.)
-- **Husky Hooks**: Updated to remove deprecated v10.0.0 incompatible lines
-- **Pre-commit Checks**: Automatic linting, TypeScript validation, mobile
-  compliance, and accessibility checks
-- **Package Manager**: Project uses pnpm exclusively (`.npmrc` contains
-  pnpm-specific configs)
-- **npm Warnings**: Normal to see npm warnings about pnpm configs - use `pnpm`
-  commands only
-- **IMPORTANT**: Always use sentence-case format to avoid commitlint failures
-- **🚫 NO CLAUDE ATTRIBUTION**: Never include Claude Code attribution or
-  Co-Authored-By lines in commits. Keep commit messages professional and
-  project-focused only.
-
-##### Tailwind CSS v4 Custom Colors and Utility Classes
-
-**Issue Resolved**: Custom utility classes with prefixes (e.g.,
-`bg-sw-content-background`) not being generated
-
-**Root Cause**: In Tailwind CSS v4, defining CSS custom properties alone doesn't
-generate utility classes. Colors must be registered in the `@theme` directive.
-
-**Solution Applied**: Add custom colors to `@theme` directive in `globals.css`:
-
-```css
-@theme {
-  /* Dashboard-specific colors */
-  --color-sw-content-background: var(--background-color);
-  --color-sw-text-primary: var(--foreground-color);
-  --color-sw-text-secondary: var(--muted-foreground-color);
-  /* ... other sw- prefixed colors ... */
-}
-```
-
-**Key Learnings**:
-
-- Tailwind v4 requires colors in `@theme` directive to generate utility classes
-- CSS custom properties (`:root { --sw-var: value }`) alone won't create
-  utilities
-- The `--color-` prefix in `@theme` is required for color utilities
-- Custom prefixes work perfectly when properly registered
-- Verify utility generation by checking compiled CSS output
-
-**Debugging Approach**:
-
-1. Check if classes exist in compiled CSS: `curl [css-url] | grep "\.bg-sw-"`
-2. Test with a simple component to isolate the issue
-3. Verify @theme directive syntax matches Tailwind v4 requirements
-4. Ensure PostCSS pipeline is correctly configured for v4
-
-##### ICU MessageFormat Currency Formatting
-
-- **Correct Syntax**: Use ICU skeleton syntax
-  `{amount, number, ::currency/CODE}` for currency formatting
-- **Currency Codes**: Must use ISO-4217 currency codes (USD, BRL, EUR, etc.)
-- **Common Mistakes**:
-  - ❌ `{amount, number, currency}` - Missing currency code specification
-  - ❌ `R$ {amount, number, currency}` - Don't hardcode currency symbols
-  - ❌ `€{amount, number, currency}` - Let ICU handle symbol placement
-- **Correct Examples**:
-  - ✅ `{amount, number, ::currency/USD}` - Formats as $1,234.56 in en-US
-  - ✅ `{amount, number, ::currency/BRL}` - Formats as R$ 1.234,56 in pt-BR
-  - ✅ `{amount, number, ::currency/EUR}` - Formats as 1.234,56 € in es-ES
-- **Benefits**: Automatic locale-aware formatting with correct symbols, decimal
-  separators, and thousand separators
-- **Dynamic Currency**: For multi-currency support, pass currency as parameter:
-  `{amount, number, ::currency/{currency}}`
-- **Next-intl Integration**: Works seamlessly with next-intl's `formatNumber`
-  function
-
-##### Locale-Aware Navigation Components
-
-- **Issue**: Navigation components using hardcoded paths fail with
-  internationalized routing
-- **Root Cause**: Direct paths like `/dashboard` don't match actual routes like
-  `/pt/dashboard`
-- **Solution Applied**: All navigation components now handle locale-aware
-  routing:
-  1. Extract current locale with `useLocale()` hook
-  2. Strip locale from pathname for route matching:
-     `pathnameWithoutLocale = '/' + pathSegments.slice(2).join('/') || '/'`
-  3. Prefix all hrefs with locale: `href={`/${locale}${path}`}`
-- **Components Fixed**:
-  - `dashboard-breadcrumb.tsx`: Route lookup and href generation
-  - `app-sidebar.tsx`: Menu items and logo links
-  - `user-settings-menu.tsx`: All navigation links
-  - `BottomTabNavigation.tsx`: Mobile tab navigation
-  - `Sidebar.tsx`: Main dashboard sidebar navigation
-- **Pattern for Future Components**:
-  ```tsx
-  const locale = useLocale()
-  const pathname = usePathname()
-  const pathnameWithoutLocale =
-    '/' + pathname.split('/').slice(2).join('/') || '/'
-  // Use pathnameWithoutLocale for comparisons
-  // Use `/${locale}/path` for all Link hrefs
-  ```
-- **Special Cases**:
-  - Root path: Use `/${locale}` or `/${locale}/dashboard`, not just `/`
-  - Dynamic paths: Always include locale prefix before parameters
-
-##### Dynamic Navigation Active States with Internationalization
-
-**Issue Resolved**: Sidebar navigation items had hardcoded `active` states that
-never updated based on current route
-
-**Root Cause**: Static boolean values in navigation arrays instead of dynamic
-route detection
-
-**Solution Applied**:
-
-1. Remove `active` property from navigation arrays
-2. Add `usePathname` hook from `next/navigation`
-3. Create `isActive` function that:
-   - Strips locale prefix using regex: `/^\/[a-z]{2}(-[A-Z]{2})?/`
-   - Handles home page edge case explicitly
-   - Uses `startsWith` for nested route support
-4. Apply dynamic active state check in render logic
-
-**Implementation Pattern**:
-
-```typescript
-const pathname = usePathname()
-
-const isActive = (href: string) => {
-  const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(-[A-Z]{2})?/, '')
-
-  if (href === '/') {
-    return pathWithoutLocale === '' || pathWithoutLocale === '/'
+## 5\. Fundamental Development Rules
+
+### General Principles
+
+- **Mobile-First ALWAYS:** Develop and validate in a mobile viewport first.
+- **Zero Hardcoded Strings:** ALL user-facing strings MUST use `next-intl`.
+- **TypeScript Strict Mode:** No `any` types are allowed. Adhere strictly to the
+  `tsconfig.json` rules.
+- **Security by Default:** All inputs are validated with Zod (client and
+  server). Data access is protected by RLS.
+- **Offline-First:** Critical features must work offline via the Service Worker.
+
+### UI & Components
+
+- **Server Components by Default:** Use Server Components. Only adopt
+  `"use client"` when interactivity is essential.
+- **Touch Targets:** All interactive elements MUST have a minimum touch target
+  area of **44x44px**.
+- **Component Variants:** Use the `class-variance-authority` (CVA) library to
+  create components with type-safe style variants. Combine it with `clsx` and
+  `tailwind-merge`.
+- **User Notifications (Toasts):** Use the `Sonner` library to display all
+  user-facing notifications.
+- **Theme Management (Dark Mode):** Theme switching is handled by `next-themes`.
+  Use its providers and hooks.
+- **Forms:** Build all forms with `react-hook-form`. Use `Zod` for schema
+  validation, integrated via `@hookform/resolvers`.
+- **Icons:** Use the `lucide-react` library for all icons.
+- **Animations:** Implement animations using `framer-motion`.
+- **SVG Imports:** SVGs can be imported directly as React components, thanks to
+  the `@svgr/webpack` configuration.
+- **In-Code Documentation:** Explain the "why" of complex logic using **TSDoc**
+  formatted comments.
+
+## 6\. Specific Patterns and Solutions (Consolidated Learnings)
+
+### Tailwind CSS v4 & shadcn/ui
+
+- **PostCSS Configuration:** Tailwind v4 requires the `@tailwindcss/postcss`
+  plugin. Your `postcss.config.mjs` must be:
+  ```js
+  export default {
+    plugins: {
+      '@tailwindcss/postcss': {},
+      autoprefixer: {},
+    },
   }
-
-  return pathWithoutLocale.startsWith(href)
-}
-
-// In render:
-const active = isActive(item.href)
-```
-
-**Key Learnings**:
-
-- Always use dynamic route detection for navigation active states
-- Consider internationalization when comparing routes (strip locale prefixes)
-- Use `startsWith` for hierarchical route matching (e.g., `/projects` matches
-  `/projects/123`)
-- Apply same logic consistently across all navigation sections
-- Next.js `usePathname` returns the full path including locale prefix
-
-**Common Pitfalls to Avoid**:
-
-- Don't hardcode active states in navigation arrays
-- Don't forget to handle the home page (`/`) as a special case
-- Don't use exact matching for routes that may have nested paths
-- Remember that internationalized routes include locale prefix
-
-##### Next.js Navigation Best Practices with Internationalization
-
-- **Always use Next.js Link component**: Replace all `<a>` tags with `<Link>` for client-side navigation
-- **Benefits of Link component**:
-  - Client-side navigation (no full page refreshes)
-  - Automatic route prefetching for better performance
-  - Maintains SPA experience
-  - Works seamlessly with Next.js App Router
-- **Implementation Pattern with shadcn/ui Button**:
-  ```tsx
-  import Link from 'next/link'
-  import { useLocale } from 'next-intl'
-  
-  // With Button component and asChild prop
-  <Button asChild>
-    <Link href={`/${locale}/dashboard`}>
-      <Icon className="mr-2 h-4 w-4" />
-      Dashboard
-    </Link>
-  </Button>
   ```
-- **Common Mistakes to Avoid**:
-  - Using `<a href="/path">` instead of `<Link href="/path">`
-  - Forgetting to add locale prefix in internationalized apps
-  - Not using `asChild` prop when wrapping Link with Button component
-- **Migration Checklist**:
-  1. Import Link from 'next/link'
-  2. Import useLocale from 'next-intl'
-  3. Replace `<a>` tags with `<Link>`
-  4. Add locale prefix to all hrefs
-  5. Test navigation doesn't cause full page refreshes
+- **Global CSS Syntax:** Use `@import 'tailwindcss';` and define custom colors
+  inside a `@theme` block in `globals.css`.
+  ```css
+  @theme {
+    --color-primary: hsl(221.2 83.2% 53.3%);
+    /* ... other colors ... */
+  }
+  ```
 
-##### Bundle Size Optimization for Mobile-First PWA
+### Internationalization (i18n)
 
-**Issue Encountered**: Build failures due to webpack bundle size limits (150KB) being exceeded by dashboard (1.19MB) and demo (710KB) pages
+- **Currency Formatting (ICU):** Use the `{value, number, ::currency/CODE}`
+  syntax. The currency code (e.g., `BRL`, `USD`) is mandatory.
+  - ✅ **Correct:** `{total, number, ::currency/BRL}`
+  - ❌ **Incorrect:** `R$ {total}`
+- **Locale-Aware Navigation:** ALWAYS use the Next.js `<Link>` component. All
+  `hrefs` must be prefixed with the current locale (e.g.,
+  `href={\`/${locale}/dashboard\`}`). Get the `locale`from the`useLocale()\`
+  hook.
 
-**Root Causes**:
-1. Heavy chart library (recharts) imported synchronously - adds ~378KB
-2. Framer Motion animations throughout components
-3. All shadcn/ui components imported in dashboard
+### Performance & Bundle Optimization
 
-**Solutions Applied**:
+- **Heavy Components:** Use dynamic imports (`next/dynamic`) for components that
+  are not critical for the initial render (e.g., charts, complex editors). This
+  is mandatory for libraries like `recharts`.
+  ```tsx
+  import dynamic from 'next/dynamic';
+  const VisitorsChart = dynamic(() => import('./VisitorsChart'), { ssr: false });
+  ```
 
-1. **Dynamic Imports for Heavy Components**:
-   ```tsx
-   // Instead of:
-   import { VisitorsChart } from './VisitorsChart'
-   
-   // Use dynamic import:
-   const VisitorsChart = dynamic(
-     () => import('./VisitorsChart').then(mod => ({ default: mod.VisitorsChart })),
-     {
-       ssr: false,
-       loading: () => (
-         <div className='flex h-full items-center justify-center'>
-           <div className='text-muted-foreground'>Loading chart...</div>
-         </div>
-       ),
-     }
-   )
-   ```
+## 7\. Git Workflow and Versioning
 
-2. **Temporary Bundle Limit Increase** (for development):
-   ```js
-   // next.config.mjs
-   config.performance = {
-     maxAssetSize: 300000, // 300KB limit (temporary)
-     maxEntrypointSize: 600000, // 600KB for entry points
-     hints: 'warning', // Changed from 'error' for development
-   }
-   ```
+- **Creating Commits:** **DO NOT use `git commit` directly.** All commits MUST
+  be created using the `pnpm commit` command. This will launch `Commitizen` to
+  guide you through creating a standardized Conventional Commit message.
+- **Automated Hooks:** `Husky` is configured to run `lint-staged` before each
+  commit. This automatically runs `pnpm validate` on your modified files,
+  ensuring code quality before it is committed.
+- **Auto-Formatting:** The `prettier-plugin-tailwindcss` is installed. It will
+  automatically sort your Tailwind CSS classes on save. Do not manually reorder
+  classes.
+- **Attribution:** **(Critical Reinforcement)** NEVER include "Co-authored-by"
+  or any AI attribution in commit messages. `pnpm commit` ensures a clean,
+  professional format.
 
-**Bundle Size Impact**:
-- Before: Dashboard page 1.19MB (793% over limit)
-- After: Dashboard page 851KB with dynamic imports
-- Chart chunk: Separated into 378KB lazy-loaded chunk
+## 8\. Definition of Done
 
-**Best Practices for Bundle Optimization**:
-1. Use `next/dynamic` for heavy components (charts, editors, maps)
-2. Lazy load components not visible on initial render
-3. Consider lighter alternatives (Chart.js vs recharts)
-4. Monitor with `pnpm analyze` during development
-5. Set strict limits for production builds
+A task is only considered complete when ALL of the following criteria are met:
 
-**Common Bundle Size Culprits**:
-- Chart libraries: recharts (378KB), Chart.js (200KB)
-- Animation libraries: framer-motion (150KB)
-- Editor components: Monaco Editor (2MB+)
-- Icon libraries: Importing all icons vs specific ones
-- Date libraries: moment.js (290KB) vs date-fns (75KB)
+- [ ] Mobile-first and fully responsive.
+- [ ] All strings are internationalized via `next-intl`.
+- [ ] Interactions are touch-friendly (44x44px minimum).
+- [ ] Critical features work offline.
+- [ ] Fully type-safe from the database to the UI.
+- [ ] Zod validation is implemented on all inputs.
+- [ ] Tests are written and passing (\>80% coverage).
+- [ ] Performance is validated on a slow 3G network (Lighthouse \>95).
+- [ ] Accessibility is verified (WCAG 2.1 AA).
+- [ ] Security review is completed.
+- [ ] Code review is approved.
+- [ ] No TypeScript errors or ESLint warnings (`pnpm validate` passes).
 
-**Recommended Alternatives for Mobile**:
-- Charts: `react-chartjs-2` with tree-shaking or custom SVG
-- Animations: CSS transitions or lighter libraries
-- Icons: Individual imports from `lucide-react`
-- Dates: `date-fns` with specific function imports
+## 9\. [CRITICAL WORKFLOW] Task Completion Process
 
-##### ESLint Strict Mode TypeScript Fixes
+Upon completing any task, you **MUST** follow these steps without exception:
 
-**Common Issues and Solutions**:
+1.  **Update the Original Task File:** Check off all acceptance criteria with
+    `[x]`, add an implementation summary, and document any key learnings.
+2.  **Move the Task File:** Move the completed task's file from the `tasks/`
+    directory to the `tasks/completed/` directory.
+3.  **Update This `CLAUDE.md`:** If the task resulted in a new, reusable pattern
+    or a rule that all developers should follow, add it to
+    `Section 6: Specific Patterns and Solutions`.
 
-1. **Nullable String Conditionals**:
-   ```tsx
-   // ❌ Error: Unexpected nullable string value
-   if (item.href) { }
-   
-   // ✅ Correct: Explicit null check
-   if (item.href != null) { }
-   ```
+## 10\. Configuration and Environment Variables
 
-2. **Prefer Nullish Coalescing**:
-   ```tsx
-   // ❌ Error: Use nullish coalescing
-   const value = modTimeMap.get(route) || defaultDate
-   
-   // ✅ Correct: Nullish coalescing operator
-   const value = modTimeMap.get(route) ?? defaultDate
-   ```
-
-3. **Type-Safe Dynamic Imports**:
-   ```tsx
-   // ❌ Error: Unsafe assignment of any
-   const messages = (await import(`../messages/${locale}.json`)).default
-   
-   // ✅ Correct: With type assertion
-   const messages = (await import(`../messages/${locale}.json`)) as {
-     default: Record<string, unknown>
-   }
-   ```
-
-4. **HTML Lang Attribute** (Accessibility):
-   ```tsx
-   // ❌ Error: html must have lang prop
-   <html suppressHydrationWarning>
-   
-   // ✅ Correct: Include lang attribute
-   <html suppressHydrationWarning lang='en'>
-   ```
-
-**TypeScript Strict Mode Benefits**:
-- Catches potential runtime errors at compile time
-- Forces explicit null/undefined handling
-- Prevents implicit any types
-- Improves code maintainability
-- Better IDE autocomplete support
-
-### Development Workflow
-
-#### Before Writing Code
-
-1. Check existing patterns in the codebase
-2. Verify mobile-first approach
-3. Ensure translations are externalized
-4. Plan for offline scenarios
-5. **NEW**: Run `pnpm check` for type safety and linting
-
-#### Enhanced Scripts Available
-
-```bash
-# Development
-pnpm dev              # Development server
-pnpm build            # Production build
-pnpm check            # TypeScript + ESLint check
-pnpm lint:fix         # Auto-fix linting issues
-pnpm analyze          # Bundle analysis with visualization
-pnpm clean            # Clean build artifacts
-
-# Code Quality (NEW)
-pnpm validate         # Complete validation (typecheck + lint + format check)
-pnpm format           # Format all files with Prettier
-pnpm format:check     # Check formatting without changes
-pnpm mobile:validate  # Mobile-specific compliance checks
-pnpm pre-commit       # Manual pre-commit checks
-
-# Internationalization (NEW)
-pnpm i18n:validate    # Validate translation files and ICU syntax
-pnpm i18n:check       # Alias for i18n:validate
-pnpm i18n:extract     # Extract translation keys (future implementation)
-
-# Database (Prisma)
-pnpm db:push          # Push schema changes
-pnpm db:migrate       # Run migrations
-pnpm db:studio        # Open Prisma Studio
-pnpm db:seed          # Seed database
-pnpm db:generate      # Generate Prisma client
-
-# Testing (Future Implementation)
-pnpm test             # Run unit tests
-pnpm test:ui          # Test with UI
-pnpm test:coverage    # Coverage reports
-pnpm test:e2e         # End-to-end tests
-```
-
-### Next Steps
-
-1. Run `task-master next` to see the next available task
-2. Review task details with `task-master show <task-id>`
-3. Follow mobile-first development principles
-4. Ensure all code meets the Definition of Done criteria
-5. **Use `pnpm validate` before every commit (replaces `pnpm check`)**
-6. **Use `pnpm analyze` to monitor bundle size during feature development**
-7. **Use `pnpm i18n:validate` to check translation consistency**
-8. **Database operations ready with Prisma scripts when schema is implemented**
-9. **NEW**: Git hooks automatically run quality checks on commit
-10. **NEW**: VS Code workspace optimized for mobile-first development
-11. **NEW**: Comprehensive internationalization system with 3 languages ready
+- **Type-Safe Validation:** This project uses `@t3-oss/env-nextjs` to validate
+  and provide type-safe access to environment variables.
+- **Definition:** Define all environment variables in `src/env.js`. Follow the
+  existing Zod schema to add new variables.
+- **Usage:** Import the `env` object from `src/env.js` in your code to access
+  variables safely. Do not use `process.env` directly in client-side components.
