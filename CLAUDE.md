@@ -818,6 +818,7 @@ generate utility classes. Colors must be registered in the `@theme` directive.
   - `app-sidebar.tsx`: Menu items and logo links
   - `user-settings-menu.tsx`: All navigation links
   - `BottomTabNavigation.tsx`: Mobile tab navigation
+  - `Sidebar.tsx`: Main dashboard sidebar navigation
 - **Pattern for Future Components**:
   ```tsx
   const locale = useLocale()
@@ -883,6 +884,38 @@ const active = isActive(item.href)
 - Don't forget to handle the home page (`/`) as a special case
 - Don't use exact matching for routes that may have nested paths
 - Remember that internationalized routes include locale prefix
+
+##### Next.js Navigation Best Practices with Internationalization
+
+- **Always use Next.js Link component**: Replace all `<a>` tags with `<Link>` for client-side navigation
+- **Benefits of Link component**:
+  - Client-side navigation (no full page refreshes)
+  - Automatic route prefetching for better performance
+  - Maintains SPA experience
+  - Works seamlessly with Next.js App Router
+- **Implementation Pattern with shadcn/ui Button**:
+  ```tsx
+  import Link from 'next/link'
+  import { useLocale } from 'next-intl'
+  
+  // With Button component and asChild prop
+  <Button asChild>
+    <Link href={`/${locale}/dashboard`}>
+      <Icon className="mr-2 h-4 w-4" />
+      Dashboard
+    </Link>
+  </Button>
+  ```
+- **Common Mistakes to Avoid**:
+  - Using `<a href="/path">` instead of `<Link href="/path">`
+  - Forgetting to add locale prefix in internationalized apps
+  - Not using `asChild` prop when wrapping Link with Button component
+- **Migration Checklist**:
+  1. Import Link from 'next/link'
+  2. Import useLocale from 'next-intl'
+  3. Replace `<a>` tags with `<Link>`
+  4. Add locale prefix to all hrefs
+  5. Test navigation doesn't cause full page refreshes
 
 ### Development Workflow
 
