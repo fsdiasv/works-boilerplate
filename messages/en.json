@@ -20,7 +20,10 @@
       "pricing": "Pricing",
       "documentation": "Documentation",
       "community": "Community",
-      "feedback": "Feedback"
+      "feedback": "Feedback",
+      "search": "Search",
+      "create": "Create",
+      "favorites": "Favorites"
     },
     "actions": {
       "save": "Save",
