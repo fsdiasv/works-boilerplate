@@ -11,6 +11,7 @@ import {
   MoreHorizontal,
   ChevronDown,
 } from 'lucide-react'
+import { usePathname } from 'next/navigation'
 import { useState } from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -26,23 +27,38 @@ import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
 const navigation = [
-  { name: 'Home', icon: Home, href: '/', active: false },
-  { name: 'Dashboard', icon: BarChart3, href: '/dashboard', active: true },
-  { name: 'Lifecycle', icon: FileText, href: '/lifecycle', active: false },
-  { name: 'Analytics', icon: BarChart3, href: '/analytics', active: false },
-  { name: 'Projects', icon: FileText, href: '/projects', active: false },
-  { name: 'Team', icon: Users, href: '/team', active: false },
+  { name: 'Home', icon: Home, href: '/' },
+  { name: 'Dashboard', icon: BarChart3, href: '/dashboard' },
+  { name: 'Lifecycle', icon: FileText, href: '/lifecycle' },
+  { name: 'Analytics', icon: BarChart3, href: '/analytics' },
+  { name: 'Projects', icon: FileText, href: '/projects' },
+  { name: 'Team', icon: Users, href: '/team' },
 ]
 
 const documents = [
-  { name: 'Data Library', icon: FileText, href: '/data-library', active: false },
-  { name: 'Reports', icon: FileText, href: '/reports', active: false },
-  { name: 'Word Assistant', icon: FileText, href: '/word-assistant', active: false },
-  { name: 'More', icon: MoreHorizontal, href: '/more', active: false },
+  { name: 'Data Library', icon: FileText, href: '/data-library' },
+  { name: 'Reports', icon: FileText, href: '/reports' },
+  { name: 'Word Assistant', icon: FileText, href: '/word-assistant' },
+  { name: 'More', icon: MoreHorizontal, href: '/more' },
 ]
 
 export function Sidebar() {
   const [isDocumentsOpen, setIsDocumentsOpen] = useState(true)
+  const pathname = usePathname()
+
+  // Function to check if a navigation item is active
+  const isActive = (href: string) => {
+    // Remove locale prefix from pathname for comparison
+    const pathWithoutLocale = pathname.replace(/^\/[a-z]{2}(-[A-Z]{2})?/, '')
+
+    // Special case for home page
+    if (href === '/') {
+      return pathWithoutLocale === '' || pathWithoutLocale === '/'
+    }
+
+    // For other routes, check if the path starts with the href
+    return pathWithoutLocale.startsWith(href)
+  }
 
   return (
     <div className='hidden border-r border-gray-200 bg-white lg:fixed lg:inset-y-0 lg:flex lg:w-64 lg:flex-col dark:border-gray-700 dark:bg-gray-900'>
@@ -69,24 +85,27 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className='flex-1 space-y-1 px-4'>
-        {navigation.map(item => (
-          <Button
-            key={item.name}
-            variant={item.active ? 'secondary' : 'ghost'}
-            className={cn(
-              'h-9 w-full justify-start px-3',
-              item.active
-                ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white'
-                : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'
-            )}
-            asChild
-          >
-            <a href={item.href}>
-              <item.icon className='mr-3 h-4 w-4' />
-              {item.name}
-            </a>
-          </Button>
-        ))}
+        {navigation.map(item => {
+          const active = isActive(item.href)
+          return (
+            <Button
+              key={item.name}
+              variant={active ? 'secondary' : 'ghost'}
+              className={cn(
+                'h-9 w-full justify-start px-3',
+                active
+                  ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white'
+                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'
+              )}
+              asChild
+            >
+              <a href={item.href}>
+                <item.icon className='mr-3 h-4 w-4' />
+                {item.name}
+              </a>
+            </Button>
+          )
+        })}
 
         {/* Documents Section */}
         <div className='pt-4'>
@@ -103,19 +122,27 @@ export function Sidebar() {
 
           {isDocumentsOpen && (
             <div className='mt-1 space-y-1'>
-              {documents.map(item => (
-                <Button
-                  key={item.name}
-                  variant='ghost'
-                  className='h-9 w-full justify-start px-6 text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'
-                  asChild
-                >
-                  <a href={item.href}>
-                    <item.icon className='mr-3 h-4 w-4' />
-                    {item.name}
-                  </a>
-                </Button>
-              ))}
+              {documents.map(item => {
+                const active = isActive(item.href)
+                return (
+                  <Button
+                    key={item.name}
+                    variant={active ? 'secondary' : 'ghost'}
+                    className={cn(
+                      'h-9 w-full justify-start px-6',
+                      active
+                        ? 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-white'
+                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-white'
+                    )}
+                    asChild
+                  >
+                    <a href={item.href}>
+                      <item.icon className='mr-3 h-4 w-4' />
+                      {item.name}
+                    </a>
+                  </Button>
+                )
+              })}
             </div>
           )}
         </div>
