@@ -13,9 +13,10 @@ import {
   Sun,
   Users,
 } from 'lucide-react'
+import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
 import { useLocale } from 'next-intl'
 import { useTheme } from 'next-themes'
-import Link from 'next/link'
 import * as React from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -34,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useToast } from '@/components/ui/use-toast'
+import { localeNames, type Locale } from '@/i18n/config'
 
 // Mock user data - replace with actual data source
 const user = {
@@ -66,21 +68,34 @@ function getUserInitials(name: string): string {
 export function UserSettingsMenu() {
   const { theme, setTheme } = useTheme()
   const { toast } = useToast()
-  const locale = useLocale()
-  const [currentLanguage, setCurrentLanguage] = React.useState('English')
+  const locale = useLocale() as Locale
+  const router = useRouter()
+  const pathname = usePathname()
+  const [isPending, startTransition] = React.useTransition()
 
-  const handleLanguageChange = (lang: string) => {
-    setCurrentLanguage(lang)
-    toast({
-      title: 'Language Changed',
-      description: `Language switched to ${lang}. (This is a demo, no actual change implemented).`,
+  const handleLanguageChange = (newLocale: Locale) => {
+    startTransition(() => {
+      // Get the pathname without the current locale
+      const pathSegments = pathname.split('/')
+      const pathWithoutLocale = `/${pathSegments.slice(2).join('/')}` || '/'
+
+      // Construct the new path with the new locale
+      const newPath = `/${newLocale}${pathWithoutLocale}`
+
+      // Navigate to the new path
+      router.push(newPath)
+
+      toast({
+        title: 'Language Changed',
+        description: `Language switched to ${localeNames[newLocale]}.`,
+      })
     })
   }
 
   const languages = [
-    { code: 'en', name: 'English' },
-    { code: 'es', name: 'Español' },
-    { code: 'pt', name: 'Português' },
+    { code: 'en' as Locale, name: 'English' },
+    { code: 'es' as Locale, name: 'Español' },
+    { code: 'pt' as Locale, name: 'Português' },
   ]
 
   return (
@@ -167,8 +182,8 @@ export function UserSettingsMenu() {
           <div className='flex items-center justify-between'>
             <span className='text-muted-foreground text-sm'>Language</span>
             <DropdownMenuSub>
-              <DropdownMenuSubTrigger className='h-8 px-2 py-1 text-xs'>
-                <span>{currentLanguage}</span>
+              <DropdownMenuSubTrigger className='h-8 px-2 py-1 text-xs' disabled={isPending}>
+                <span>{localeNames[locale]}</span>
                 <ChevronRight className='text-muted-foreground ml-2 h-3 w-3' />
               </DropdownMenuSubTrigger>
               <DropdownMenuPortal>
@@ -176,10 +191,11 @@ export function UserSettingsMenu() {
                   {languages.map(lang => (
                     <DropdownMenuItem
                       key={lang.code}
-                      onClick={() => handleLanguageChange(lang.name)}
+                      onClick={() => handleLanguageChange(lang.code)}
+                      disabled={isPending}
                     >
                       {lang.name}
-                      {currentLanguage === lang.name && <Check className='ml-auto h-4 w-4' />}
+                      {locale === lang.code && <Check className='ml-auto h-4 w-4' />}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuSubContent>

@@ -15,8 +15,15 @@ export function LocaleSwitcher() {
 
   const handleLocaleChange = (newLocale: Locale) => {
     startTransition(() => {
-      // Use next-intl's built-in locale switching
-      router.replace(pathname, { locale: newLocale })
+      // Get the pathname without the current locale
+      const pathSegments = pathname.split('/')
+      const pathWithoutLocale = `/${pathSegments.slice(2).join('/')}` || '/'
+
+      // Construct the new path with the new locale
+      const newPath = `/${newLocale}${pathWithoutLocale}`
+
+      // Navigate to the new path
+      router.replace(newPath)
     })
   }
 
