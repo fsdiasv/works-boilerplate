@@ -1,5 +1,5 @@
 'use client'
-import { Bell, PanelLeft } from 'lucide-react'
+import { Bell } from 'lucide-react'
 import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
@@ -14,16 +14,7 @@ export function TopNav() {
   return (
     <header className='border-border bg-sw-content-background sticky top-0 z-30 flex h-14 items-center gap-4 border-b px-4 sm:static sm:h-auto sm:border-0 sm:bg-transparent sm:px-6'>
       {isMobile && (
-        <SidebarTrigger asChild>
-          <Button
-            size='icon'
-            variant='ghost'
-            className='text-sw-text-secondary hover:text-sw-text-primary sm:hidden'
-          >
-            <PanelLeft className='h-5 w-5' />
-            <span className='sr-only'>Toggle Menu</span>
-          </Button>
-        </SidebarTrigger>
+        <SidebarTrigger className='text-sw-text-secondary hover:text-sw-text-primary sm:hidden' />
       )}
       {/* Breadcrumb on the left side */}
       <DashboardBreadcrumb />
