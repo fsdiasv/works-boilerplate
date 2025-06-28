@@ -22,7 +22,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
           ref={ref}
           id={id}
           className={cn(
-            'w-full rounded-md border border-slate-300 px-3 py-2 text-sm',
+            'w-full rounded-md border border-slate-300 px-3 py-2 text-sm sm:px-4 sm:py-3 sm:text-base',
             'placeholder:text-slate-500',
             'focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none',
             'disabled:cursor-not-allowed disabled:opacity-50',

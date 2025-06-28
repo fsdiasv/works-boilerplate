@@ -11,9 +11,9 @@ export function AuthLayout({ children, showTestimonial = true }: AuthLayoutProps
   return (
     <div className='flex min-h-screen'>
       <div
-        className={`flex flex-1 items-center justify-center p-8 ${showTestimonial ? 'lg:w-[60%]' : ''}`}
+        className={`flex flex-1 items-center justify-center p-4 sm:p-8 ${showTestimonial ? 'lg:w-[60%]' : ''}`}
       >
-        <div className='w-full max-w-md'>{children}</div>
+        <div className='w-full max-w-sm sm:max-w-md lg:max-w-lg'>{children}</div>
       </div>
       {showTestimonial && (
         <div className='hidden bg-slate-50 lg:block lg:w-[40%]'>

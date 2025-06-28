@@ -26,8 +26,10 @@ export default function SignUpPage() {
   return (
     <AuthLayout>
       <div className='w-full'>
-        <h1 className='mb-2 text-3xl font-bold text-slate-800'>{t('title')}</h1>
-        <p className='mb-8 text-sm text-slate-500'>
+        <h1 className='mb-2 text-3xl font-bold text-slate-800 sm:text-4xl lg:text-5xl'>
+          {t('title')}
+        </h1>
+        <p className='mb-8 text-sm text-slate-500 sm:text-base lg:text-lg'>
           {t('subtitle')}{' '}
           <Link
             href={`/${locale}/login`}

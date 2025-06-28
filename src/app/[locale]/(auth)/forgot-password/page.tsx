@@ -24,8 +24,10 @@ export default function ForgotPasswordPage() {
   return (
     <AuthLayout showTestimonial={false}>
       <div className='w-full text-center'>
-        <h1 className='mb-4 text-3xl font-bold text-slate-800'>{t('title')}</h1>
-        <p className='mb-8 text-sm text-slate-500'>{t('description')}</p>
+        <h1 className='mb-4 text-3xl font-bold text-slate-800 sm:text-4xl lg:text-5xl'>
+          {t('title')}
+        </h1>
+        <p className='mb-8 text-sm text-slate-500 sm:text-base lg:text-lg'>{t('description')}</p>
 
         <form onSubmit={e => void handleSubmit(e)} className='space-y-6'>
           <FormInput

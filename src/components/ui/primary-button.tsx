@@ -14,7 +14,7 @@ const PrimaryButton = forwardRef<HTMLButtonElement, PrimaryButtonProps>(
       <button
         ref={ref}
         className={cn(
-          'w-full rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white',
+          'w-full rounded-md bg-blue-600 px-3 py-2 text-sm font-semibold text-white sm:px-4 sm:py-3 sm:text-base',
           'hover:bg-blue-700 focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:outline-none',
           'disabled:cursor-not-allowed disabled:opacity-50',
           'transition-colors duration-200',
