@@ -23,7 +23,14 @@
       "feedback": "Comentarios",
       "search": "Buscar",
       "create": "Crear",
-      "favorites": "Favoritos"
+      "favorites": "Favoritos",
+      "notifications": "Notificaciones",
+      "menu": "Menú",
+      "main": "Principal",
+      "account": "Cuenta",
+      "support": "Soporte",
+      "help": "Ayuda",
+      "logout": "Cerrar sesión"
     },
     "actions": {
       "save": "Guardar",
@@ -48,6 +55,9 @@
       "warning": "Advertencia",
       "info": "Información"
     }
+  },
+  "app": {
+    "name": "Works"
   },
   "auth": {
     "signin": "Iniciar sesión",

@@ -17,15 +17,28 @@ interface TypographyProps {
 }
 
 const variantStyles = {
-  h1: 'scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl',
-  h2: 'scroll-m-20 border-b pb-2 text-3xl font-semibold tracking-tight first:mt-0',
-  h3: 'scroll-m-20 text-2xl font-semibold tracking-tight',
-  h4: 'scroll-m-20 text-xl font-semibold tracking-tight',
-  h5: 'scroll-m-20 text-lg font-semibold tracking-tight',
-  h6: 'scroll-m-20 text-base font-semibold tracking-tight',
+  h1: 'scroll-m-20 font-extrabold tracking-tight',
+  h2: 'scroll-m-20 border-b pb-2 font-semibold tracking-tight first:mt-0',
+  h3: 'scroll-m-20 font-semibold tracking-tight',
+  h4: 'scroll-m-20 font-semibold tracking-tight',
+  h5: 'scroll-m-20 font-semibold tracking-tight',
+  h6: 'scroll-m-20 font-semibold tracking-tight',
   body: 'leading-7',
   caption: 'text-sm text-muted-foreground',
   overline: 'text-xs font-medium uppercase tracking-wider text-muted-foreground',
+}
+
+// Fluid typography sizes based on variant
+const variantFluidSizes = {
+  h1: 'text-[clamp(2rem,1.5rem+2.5vw,4rem)]',
+  h2: 'text-[clamp(1.5rem,1.25rem+1.25vw,2.5rem)]',
+  h3: 'text-[clamp(1.25rem,1.125rem+0.625vw,1.875rem)]',
+  h4: 'text-[clamp(1.125rem,1rem+0.625vw,1.5rem)]',
+  h5: 'text-[clamp(1rem,0.95rem+0.25vw,1.25rem)]',
+  h6: 'text-[clamp(0.875rem,0.85rem+0.125vw,1rem)]',
+  body: 'text-[clamp(1rem,0.9rem+0.5vw,1.125rem)]',
+  caption: 'text-[clamp(0.75rem,0.7rem+0.25vw,0.875rem)]',
+  overline: 'text-[clamp(0.625rem,0.6rem+0.125vw,0.75rem)]',
 }
 
 const fluidSizes = {
@@ -88,8 +101,11 @@ export const Typography = forwardRef<HTMLElement, TypographyProps>(
     const commonClasses = cn(
       // Base variant styles
       variantStyles[variant],
-      // Size (responsive or static)
-      size && (responsive ? fluidSizes[size] || sizeStyles[size] : sizeStyles[size]),
+      // Fluid typography based on variant when responsive
+      responsive && variantFluidSizes[variant],
+      // Size (responsive or static) - only apply if not using variant fluid sizes
+      size && !responsive && sizeStyles[size],
+      size && responsive && fluidSizes[size],
       // Weight override
       weight && weightStyles[weight],
       // Color
@@ -97,7 +113,7 @@ export const Typography = forwardRef<HTMLElement, TypographyProps>(
       // Alignment
       alignStyles[align],
       // Responsive line height adjustments
-      responsive && 'leading-[1.4] @md/content:leading-normal @lg/content:leading-[1.6]',
+      responsive && 'leading-[1.4] @md:leading-normal @lg:leading-[1.6]',
       className
     )
 
