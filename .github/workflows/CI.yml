@@ -107,7 +107,7 @@ jobs:
       - name: Run unit tests
         uses: docker://mcr.microsoft.com/playwright:v1.53.1
         with:
-          args: pnpm test -- --coverage
+          args: sh -c "npm install -g pnpm@9.0.0 && pnpm test -- --coverage"
 
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v5
@@ -142,7 +142,7 @@ jobs:
       - name: Run storybook tests
         uses: docker://mcr.microsoft.com/playwright:v1.53.1
         with:
-          args: pnpm storybook:test
+          args: sh -c "npm install -g pnpm@9.0.0 && pnpm storybook:test"
 
   e2e:
     strategy:
@@ -174,7 +174,7 @@ jobs:
       - name: Run E2E tests
         uses: docker://mcr.microsoft.com/playwright:v1.53.1
         with:
-          args: sh -c "HOME=/root pnpm test:e2e" # Set HOME to /root to avoid Playwright error with Firebox
+          args: sh -c "HOME=/root npm install -g pnpm@9.0.0 && pnpm test:e2e" # Install pnpm and set HOME to /root to avoid Playwright error with Firefox
         env:
           CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY }}
 
