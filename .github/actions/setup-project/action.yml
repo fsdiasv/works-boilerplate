@@ -1,33 +1,33 @@
-name: Setup Node.js and dependencies
-description: Setup Node.js environment with pnpm dependencies
+# name: Setup Node.js and dependencies
+# description: Setup Node.js environment with pnpm dependencies
 
-inputs:
-  node-version:
-    description: Node.js version
-    required: true
+# inputs:
+#   node-version:
+#     description: Node.js version
+#     required: true
 
-runs:
-  using: composite
-  steps:
-    - name: Install pnpm
-      uses: pnpm/action-setup@v3
-      with:
-        version: 9.0.0
+# runs:
+#   using: composite
+#   steps:
+#     - name: Install pnpm
+#       uses: pnpm/action-setup@v3
+#       with:
+#         version: 9.0.0
 
-    - name: Use Node.js ${{ inputs.node-version }}
-      uses: actions/setup-node@v4
-      with:
-        node-version: ${{ inputs.node-version }}
-        cache: pnpm
+#     - name: Use Node.js ${{ inputs.node-version }}
+#       uses: actions/setup-node@v4
+#       with:
+#         node-version: ${{ inputs.node-version }}
+#         cache: pnpm
 
-    - name: Restore or cache node_modules
-      id: cache-node-modules
-      uses: actions/cache@v4
-      with:
-        path: node_modules
-        key: node-modules-${{ inputs.node-version }}-${{ hashFiles('pnpm-lock.yaml') }}
+#     - name: Restore or cache node_modules
+#       id: cache-node-modules
+#       uses: actions/cache@v4
+#       with:
+#         path: node_modules
+#         key: node-modules-${{ inputs.node-version }}-${{ hashFiles('pnpm-lock.yaml') }}
 
-    - name: Install dependencies
-      if: steps.cache-node-modules.outputs.cache-hit != 'true'
-      shell: bash
-      run: pnpm install --frozen-lockfile
+#     - name: Install dependencies
+#       if: steps.cache-node-modules.outputs.cache-hit != 'true'
+#       shell: bash
+#       run: pnpm install --frozen-lockfile

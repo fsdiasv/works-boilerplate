@@ -133,6 +133,170 @@
     "pageNotFoundDescription": "La página que buscas no existe.",
     "goHome": "Ir al Inicio"
   },
+  "landing": {
+    "nav": {
+      "features": "Características",
+      "pricing": "Precios",
+      "testimonials": "Testimonios",
+      "faq": "FAQ",
+      "signin": "Iniciar Sesión",
+      "getStarted": "Comenzar Gratis"
+    },
+    "hero": {
+      "badge": "🚀 Lanzamiento de la versión 2.0",
+      "title": "Construye tu SaaS en días, no meses",
+      "subtitle": "Kit inicial completo con autenticación, pagos, multi-tenancy y todo lo que necesitas para lanzar rápidamente.",
+      "cta": {
+        "primary": "Comenzar Gratis",
+        "secondary": "Ver Demo"
+      }
+    },
+    "features": {
+      "title": "Todo lo que necesitas para construir un SaaS moderno",
+      "subtitle": "Características listas para producción que aceleran tu desarrollo",
+      "mobile": {
+        "title": "PWA Mobile-First",
+        "description": "Progressive Web App optimizada para dispositivos móviles con soporte offline e instalación nativa."
+      },
+      "i18n": {
+        "title": "Internacionalización",
+        "description": "Soporte completo para múltiples idiomas con traducciones automáticas y formato regional."
+      },
+      "security": {
+        "title": "Seguridad Empresarial",
+        "description": "Autenticación robusta, RLS (Row Level Security) y protección contra vulnerabilidades comunes."
+      },
+      "performance": {
+        "title": "Rendimiento Optimizado",
+        "description": "Carga rápida, SEO optimizado y excelentes métricas Core Web Vitals."
+      },
+      "multitenancy": {
+        "title": "Multi-Tenancy",
+        "description": "Arquitectura lista para múltiples clientes con aislamiento de datos y personalización."
+      },
+      "analytics": {
+        "title": "Analytics Integrado",
+        "description": "Métricas y dashboards listos para usar para seguir el crecimiento de tu negocio."
+      }
+    },
+    "pricing": {
+      "title": "Precios simples y transparentes",
+      "subtitle": "Elige el plan ideal para tu negocio",
+      "free": {
+        "title": "Gratis",
+        "description": "Perfecto para empezar",
+        "price": "€0",
+        "period": "mes",
+        "cta": "Comenzar Gratis",
+        "features": {
+          "feature1": "Hasta 3 usuarios",
+          "feature2": "1GB de almacenamiento",
+          "feature3": "Soporte por email"
+        }
+      },
+      "pro": {
+        "title": "Pro",
+        "description": "Para empresas en crecimiento",
+        "price": "€49",
+        "period": "mes",
+        "badge": "Más Popular",
+        "cta": "Comenzar Prueba Gratuita",
+        "features": {
+          "feature1": "Usuarios ilimitados",
+          "feature2": "100GB de almacenamiento",
+          "feature3": "Soporte prioritario",
+          "feature4": "API completa",
+          "feature5": "Integraciones avanzadas"
+        }
+      },
+      "enterprise": {
+        "title": "Empresa",
+        "description": "Para grandes empresas",
+        "price": "Personalizado",
+        "cta": "Contactar Ventas",
+        "features": {
+          "feature1": "Todo en el plan Pro",
+          "feature2": "Almacenamiento ilimitado",
+          "feature3": "SLA garantizado",
+          "feature4": "Gerente de cuenta dedicado"
+        }
+      }
+    },
+    "testimonials": {
+      "title": "Amado por desarrolladores en todo el mundo",
+      "subtitle": "Mira lo que nuestros clientes tienen que decir",
+      "items": {
+        "1": {
+          "quote": "Este boilerplate me ahorró meses de trabajo. La configuración es impecable y la documentación es excelente.",
+          "author": "Carlos García",
+          "role": "CTO, TechStartup"
+        },
+        "2": {
+          "quote": "La mejor decisión que tomé fue usar esta plantilla. ¡Lancé mi SaaS en 2 semanas!",
+          "author": "Ana Rodríguez",
+          "role": "Fundadora, SaaSify"
+        },
+        "3": {
+          "quote": "Código limpio, bien estructurado y con todas las características que necesitaba. ¡Altamente recomendado!",
+          "author": "Miguel López",
+          "role": "Dev Full Stack"
+        }
+      }
+    },
+    "faq": {
+      "title": "Preguntas Frecuentes",
+      "subtitle": "Todo lo que necesitas saber",
+      "items": {
+        "1": {
+          "question": "¿Puedo usar esta plantilla para proyectos comerciales?",
+          "answer": "¡Sí! Esta plantilla viene con licencia MIT, permitiendo uso comercial sin restricciones."
+        },
+        "2": {
+          "question": "¿Cuánto tiempo lleva configurar?",
+          "answer": "Con nuestra documentación detallada, puedes tener el entorno configurado en menos de 30 minutos."
+        },
+        "3": {
+          "question": "¿Ofrecen soporte?",
+          "answer": "Sí, ofrecemos soporte a través de Discord y GitHub. Los clientes Pro tienen acceso a soporte prioritario."
+        },
+        "4": {
+          "question": "¿Puedo cancelar en cualquier momento?",
+          "answer": "¡Absolutamente! No hay contratos ni tarifas de cancelación. Puedes cancelar cuando quieras."
+        },
+        "5": {
+          "question": "¿Qué métodos de pago aceptan?",
+          "answer": "Aceptamos tarjetas de crédito, débito y métodos de pago internacionales."
+        }
+      }
+    },
+    "cta": {
+      "title": "¿Listo para construir algo increíble?",
+      "subtitle": "Únete a miles de desarrolladores que ya están construyendo con Works",
+      "primaryButton": "Comenzar Gratis",
+      "secondaryButton": "Programar Demo"
+    },
+    "footer": {
+      "description": "El kit inicial SaaS más completo para desarrolladores modernos.",
+      "product": {
+        "title": "Producto",
+        "features": "Características",
+        "pricing": "Precios",
+        "documentation": "Documentación"
+      },
+      "company": {
+        "title": "Empresa",
+        "about": "Acerca de",
+        "blog": "Blog",
+        "careers": "Carreras"
+      },
+      "legal": {
+        "title": "Legal",
+        "privacy": "Privacidad",
+        "terms": "Términos"
+      },
+      "copyright": "© {year} Works. Todos los derechos reservados."
+    }
+  },
   "UserSettingsMenu": {
     "nav": {
       "settings": "Configuración",

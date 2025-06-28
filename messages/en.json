@@ -133,6 +133,170 @@
     "pageNotFoundDescription": "The page you're looking for doesn't exist.",
     "goHome": "Go Home"
   },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "pricing": "Pricing",
+      "testimonials": "Testimonials",
+      "faq": "FAQ",
+      "signin": "Sign In",
+      "getStarted": "Get Started"
+    },
+    "hero": {
+      "badge": "🚀 Version 2.0 Launch",
+      "title": "Build your SaaS in days, not months",
+      "subtitle": "Complete starter kit with authentication, payments, multi-tenancy and everything you need to launch quickly.",
+      "cta": {
+        "primary": "Start Free",
+        "secondary": "View Demo"
+      }
+    },
+    "features": {
+      "title": "Everything you need to build a modern SaaS",
+      "subtitle": "Production-ready features that accelerate your development",
+      "mobile": {
+        "title": "Mobile-First PWA",
+        "description": "Progressive Web App optimized for mobile devices with offline support and native installation."
+      },
+      "i18n": {
+        "title": "Internationalization",
+        "description": "Complete support for multiple languages with automatic translations and regional formatting."
+      },
+      "security": {
+        "title": "Enterprise Security",
+        "description": "Robust authentication, RLS (Row Level Security) and protection against common vulnerabilities."
+      },
+      "performance": {
+        "title": "Optimized Performance",
+        "description": "Fast loading, optimized SEO and excellent Core Web Vitals metrics."
+      },
+      "multitenancy": {
+        "title": "Multi-Tenancy",
+        "description": "Architecture ready for multiple customers with data isolation and customization."
+      },
+      "analytics": {
+        "title": "Integrated Analytics",
+        "description": "Ready-to-use metrics and dashboards to track your business growth."
+      }
+    },
+    "pricing": {
+      "title": "Simple and transparent pricing",
+      "subtitle": "Choose the ideal plan for your business",
+      "free": {
+        "title": "Free",
+        "description": "Perfect to get started",
+        "price": "$0",
+        "period": "month",
+        "cta": "Start Free",
+        "features": {
+          "feature1": "Up to 3 users",
+          "feature2": "1GB storage",
+          "feature3": "Email support"
+        }
+      },
+      "pro": {
+        "title": "Pro",
+        "description": "For growing businesses",
+        "price": "$49",
+        "period": "month",
+        "badge": "Most Popular",
+        "cta": "Start Free Trial",
+        "features": {
+          "feature1": "Unlimited users",
+          "feature2": "100GB storage",
+          "feature3": "Priority support",
+          "feature4": "Full API access",
+          "feature5": "Advanced integrations"
+        }
+      },
+      "enterprise": {
+        "title": "Enterprise",
+        "description": "For large companies",
+        "price": "Custom",
+        "cta": "Contact Sales",
+        "features": {
+          "feature1": "Everything in Pro",
+          "feature2": "Unlimited storage",
+          "feature3": "Guaranteed SLA",
+          "feature4": "Dedicated account manager"
+        }
+      }
+    },
+    "testimonials": {
+      "title": "Loved by developers worldwide",
+      "subtitle": "See what our customers have to say",
+      "items": {
+        "1": {
+          "quote": "This boilerplate saved me months of work. The setup is impeccable and the documentation is excellent.",
+          "author": "John Smith",
+          "role": "CTO, TechStartup"
+        },
+        "2": {
+          "quote": "The best decision I made was to use this template. I launched my SaaS in 2 weeks!",
+          "author": "Sarah Johnson",
+          "role": "Founder, SaaSify"
+        },
+        "3": {
+          "quote": "Clean, well-structured code with all the features I needed. Highly recommend!",
+          "author": "Mike Chen",
+          "role": "Full Stack Dev"
+        }
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "subtitle": "Everything you need to know",
+      "items": {
+        "1": {
+          "question": "Can I use this template for commercial projects?",
+          "answer": "Yes! This template comes with an MIT license, allowing commercial use without restrictions."
+        },
+        "2": {
+          "question": "How long does it take to set up?",
+          "answer": "With our detailed documentation, you can have the environment set up in less than 30 minutes."
+        },
+        "3": {
+          "question": "Do you offer support?",
+          "answer": "Yes, we offer support via Discord and GitHub. Pro customers have access to priority support."
+        },
+        "4": {
+          "question": "Can I cancel anytime?",
+          "answer": "Absolutely! There are no contracts or cancellation fees. You can cancel whenever you want."
+        },
+        "5": {
+          "question": "What payment methods do you accept?",
+          "answer": "We accept credit cards, debit cards, and international payment methods."
+        }
+      }
+    },
+    "cta": {
+      "title": "Ready to build something amazing?",
+      "subtitle": "Join thousands of developers already building with Works",
+      "primaryButton": "Start Free",
+      "secondaryButton": "Schedule Demo"
+    },
+    "footer": {
+      "description": "The most complete SaaS starter kit for modern developers.",
+      "product": {
+        "title": "Product",
+        "features": "Features",
+        "pricing": "Pricing",
+        "documentation": "Documentation"
+      },
+      "company": {
+        "title": "Company",
+        "about": "About",
+        "blog": "Blog",
+        "careers": "Careers"
+      },
+      "legal": {
+        "title": "Legal",
+        "privacy": "Privacy",
+        "terms": "Terms"
+      },
+      "copyright": "© {year} Works. All rights reserved."
+    }
+  },
   "UserSettingsMenu": {
     "nav": {
       "settings": "Settings",
