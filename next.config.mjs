@@ -121,9 +121,9 @@ const nextConfig = {
   webpack: (config, { isServer }) => {
     // Mobile bundle size limits
     config.performance = {
-      maxAssetSize: 300000, // 300KB - temporary limit for boilerplate
-      maxEntrypointSize: 300000, // Will optimize to 150KB as we build features
-      hints: 'warning', // Warnings for now, will change to 'error' later
+      maxAssetSize: 150000, // 150KB mobile limit
+      maxEntrypointSize: 150000, // 150KB mobile limit
+      hints: 'error', // Enforce in CI/CD
     }
 
     // SVG handling
@@ -140,8 +140,8 @@ const nextConfig = {
   // Compression for mobile networks
   compress: true,
 
-  // Source maps for production debugging
-  productionBrowserSourceMaps: true,
+  // Source maps disabled for security
+  productionBrowserSourceMaps: false,
 
   // Security headers
   async headers() {
@@ -164,6 +164,18 @@ const nextConfig = {
           {
             key: 'Strict-Transport-Security',
             value: 'max-age=31536000; includeSubDomains',
+          },
+          {
+            key: 'Content-Security-Policy',
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;",
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
           },
         ],
       },

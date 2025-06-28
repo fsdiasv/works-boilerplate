@@ -112,6 +112,32 @@
 
     /* Theme bridge variables automatically inherit dark values */
   }
+
+  /* Dashboard-specific variables using --sw- prefix */
+  :root {
+    /* Content and layout */
+    --sw-content-background: hsl(var(--background));
+    --sw-sidebar-background: hsl(var(--sidebar));
+    --sw-sidebar-foreground: hsl(var(--sidebar-foreground));
+    --sw-sidebar-active-background: hsl(var(--sidebar-accent));
+    --sw-sidebar-active-foreground: hsl(var(--sidebar-accent-foreground));
+    --sw-sidebar-muted-foreground: hsl(var(--muted-foreground));
+    
+    /* Text hierarchy */
+    --sw-text-primary: hsl(var(--foreground));
+    --sw-text-secondary: hsl(var(--muted-foreground));
+    --sw-text-tertiary: hsl(var(--muted-foreground) / 0.7);
+    
+    /* Accent colors */
+    --sw-accent-purple: hsl(var(--primary));
+    --sw-accent-green: 142 71% 45%;
+    
+    /* Component specific */
+    --sw-badge-green-background: 142 71% 45% / 0.1;
+    --sw-button-primary: hsl(var(--primary));
+    --sw-button-link: hsl(var(--primary));
+    --sw-card: hsl(var(--card));
+  }
 }
 
 /* Base styles with mobile-first optimizations */
