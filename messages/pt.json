@@ -101,7 +101,7 @@
     "itemCount": "{count, plural, =0 {Nenhum item} =1 {1 item} other {# itens}}"
   },
   "formatting": {
-    "currency": "R$ {amount, number, currency}",
+    "currency": "{amount, number, ::currency/BRL}",
     "date": "{date, date, long}",
     "time": "{time, time, short}",
     "number": "{value, number}",
@@ -113,5 +113,10 @@
     "offlineReady": "Pronto para uso offline",
     "updateAvailable": "Atualização disponível",
     "updateNow": "Atualizar agora"
+  },
+  "error": {
+    "pageNotFound": "Página Não Encontrada",
+    "pageNotFoundDescription": "A página que você procura não existe.",
+    "goHome": "Ir para Início"
   }
 }

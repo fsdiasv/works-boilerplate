@@ -101,7 +101,7 @@
     "itemCount": "{count, plural, =0 {Sin elementos} =1 {1 elemento} other {# elementos}}"
   },
   "formatting": {
-    "currency": "€{amount, number, currency}",
+    "currency": "{amount, number, ::currency/EUR}",
     "date": "{date, date, long}",
     "time": "{time, time, short}",
     "number": "{value, number}",
@@ -113,5 +113,10 @@
     "offlineReady": "Listo para uso sin conexión",
     "updateAvailable": "Actualización disponible",
     "updateNow": "Actualizar ahora"
+  },
+  "error": {
+    "pageNotFound": "Página No Encontrada",
+    "pageNotFoundDescription": "La página que buscas no existe.",
+    "goHome": "Ir al Inicio"
   }
 }
