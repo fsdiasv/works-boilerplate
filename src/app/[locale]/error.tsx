@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
 interface ErrorProps {
@@ -8,9 +9,10 @@ interface ErrorProps {
   reset: () => void
 }
 
-export default function Error({ error, reset }: ErrorProps) {
+export default function LocalError({ error, reset }: ErrorProps) {
   const t = useTranslations('errors')
   const tCommon = useTranslations('common')
+  const router = useRouter()
 
   useEffect(() => {
     // Log the error to an error reporting service
@@ -65,7 +67,7 @@ export default function Error({ error, reset }: ErrorProps) {
           </button>
 
           <button
-            onClick={() => (window.location.href = '/')}
+            onClick={() => router.push('/')}
             className='block min-h-[44px] w-full touch-manipulation rounded-lg bg-gray-100 px-6 py-3 text-base font-medium text-gray-700 transition-colors duration-200 hover:bg-gray-200 focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:outline-none dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
           >
             {tCommon('navigation.home')}

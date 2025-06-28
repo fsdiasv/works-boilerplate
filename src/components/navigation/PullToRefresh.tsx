@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { ArrowDown, RefreshCw } from 'lucide-react'
 
 import { usePullToRefresh } from '@/hooks/useGestureNavigation'
-import { cn } from '@/lib/utils'
+import { cn } from 'src/lib/utils'
 
 interface PullToRefreshProps {
   onRefresh: () => Promise<void> | void

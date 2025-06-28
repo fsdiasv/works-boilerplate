@@ -9,7 +9,8 @@
       "dashboard": "Dashboard",
       "settings": "Settings",
       "profile": "Profile",
-      "home": "Home"
+      "home": "Home",
+      "mainMenu": "Main Menu"
     },
     "actions": {
       "save": "Save",

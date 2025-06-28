@@ -1,13 +1,13 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Home, Search, Heart, User, Plus } from 'lucide-react'
+import { Heart, Home, Plus, Search, User } from 'lucide-react'
+import { useLocale } from 'next-intl'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useLocale } from 'next-intl'
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
-import { cn } from '@/lib/utils'
+import { cn } from 'src/lib/utils'
 
 interface TabItem {
   id: string

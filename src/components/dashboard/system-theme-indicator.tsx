@@ -33,7 +33,7 @@ export function SystemThemeIndicator() {
   }
 
   return (
-    <div className='text-sw-text-tertiary flex items-center gap-1 text-xs'>
+    <div className='text-muted-foreground flex items-center gap-1 text-xs'>
       <Monitor className='h-3 w-3' />
       {getSystemIcon()}
       <span className='hidden sm:inline'>{getSystemLabel()}</span>

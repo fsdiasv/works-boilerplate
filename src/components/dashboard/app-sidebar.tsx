@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import {
   Sidebar,
@@ -29,7 +29,7 @@ import {
   SidebarSeparator,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { cn } from '@/lib/utils'
+import { cn } from 'src/lib/utils'
 
 import { DesktopSidebarToggle } from './desktop-sidebar-toggle'
 
@@ -50,6 +50,7 @@ const configuracoes = [
 export function AppSidebar() {
   const pathname = usePathname()
   const locale = useLocale()
+  const t = useTranslations('common')
   const { state, isMobile } = useSidebar()
   const isCollapsed = state === 'collapsed' && !isMobile
 
@@ -155,7 +156,7 @@ export function AppSidebar() {
               isCollapsed && 'hidden'
             )}
           >
-            Menu Principal
+            {t('navigation.mainMenu')}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>{renderMenuItems(menuPrincipal)}</SidebarMenu>
@@ -169,7 +170,7 @@ export function AppSidebar() {
               isCollapsed && 'hidden'
             )}
           >
-            Configurações
+            {t('navigation.settings')}
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>{renderMenuItems(configuracoes)}</SidebarMenu>

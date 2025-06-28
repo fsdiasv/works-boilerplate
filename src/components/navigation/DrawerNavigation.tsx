@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useGesture } from 'react-use-gesture'
 
 import { Button } from '@/components/ui/button'
-import { cn } from '@/lib/utils'
+import { cn } from 'src/lib/utils'
 
 interface DrawerNavigationProps {
   isOpen: boolean

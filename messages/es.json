@@ -9,7 +9,8 @@
       "dashboard": "Panel",
       "settings": "Configuración",
       "profile": "Perfil",
-      "home": "Inicio"
+      "home": "Inicio",
+      "mainMenu": "Menú Principal"
     },
     "actions": {
       "save": "Guardar",

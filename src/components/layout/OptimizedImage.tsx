@@ -80,11 +80,15 @@ export const OptimizedImage = forwardRef<HTMLDivElement, OptimizedImageProps>(
           'relative overflow-hidden',
           // Aspect ratio support
           aspectRatio != null && typeof aspectRatio === 'string' && aspectRatioClasses[aspectRatio],
-          aspectRatio != null && typeof aspectRatio === 'number' && `aspect-[${aspectRatio}]`,
           // Loading state
           isLoading && 'bg-muted animate-pulse',
           containerClassName
         )}
+        style={
+          aspectRatio != null && typeof aspectRatio === 'number'
+            ? { aspectRatio: aspectRatio.toString() }
+            : undefined
+        }
       >
         <Image
           src={src}

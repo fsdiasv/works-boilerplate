@@ -1,21 +1,21 @@
 'use client'
 
 import {
-  Settings,
-  CircleDollarSign,
   BookOpen,
-  Users,
-  MessageSquare,
-  LogOut,
-  Monitor,
-  Sun,
-  Moon,
-  ChevronRight,
   Check,
+  ChevronRight,
+  CircleDollarSign,
+  LogOut,
+  MessageSquare,
+  Monitor,
+  Moon,
+  Settings,
+  Sun,
+  Users,
 } from 'lucide-react'
-import Link from 'next/link'
 import { useLocale } from 'next-intl'
 import { useTheme } from 'next-themes'
+import Link from 'next/link'
 import * as React from 'react'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -23,15 +23,15 @@ import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuGroup,
-  DropdownMenuSub,
-  DropdownMenuSubTrigger,
-  DropdownMenuSubContent,
   DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useToast } from '@/components/ui/use-toast'
 
@@ -80,7 +80,7 @@ export function UserSettingsMenu() {
   const languages = [
     { code: 'en', name: 'English' },
     { code: 'es', name: 'Español' },
-    { code: 'fr', name: 'Français' },
+    { code: 'pt', name: 'Português' },
   ]
 
   return (
