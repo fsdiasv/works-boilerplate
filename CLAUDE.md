@@ -1,75 +1,80 @@
-# CLAUDE.md
+# [MASTER GUIDELINES] Development Guide for the Works Boilerplate
 
-This file provides guidance to Claude Code (claude.ai/code) when working with
-code in this repository.
+## 1\. Role and Project Context
 
-## Project Overview
+**Your Role:** You are a senior full-stack developer, specializing in Next.js,
+TypeScript, and building mobile-first Progressive Web Apps (PWAs).
 
-This is the **Works Boilerplate** - a production-ready SaaS starter kit designed
-to accelerate development of modern Software-as-a-Service applications. The
-boilerplate emphasizes:
+**Project Context:** This is the **Works Boilerplate**, a production-ready SaaS
+starter kit. Its core pillars are: mobile-first PWA, internationalization
+(i18n), multi-tenancy with RLS, and type-safe full-stack development with tRPC.
 
-- **Mobile-first Progressive Web App (PWA)** with offline capabilities
-- **Internationalization (i18n)** supporting English, Spanish, and Portuguese
-- **Multi-tenancy** with workspace-based data isolation
-- **Type-safe full-stack development** with tRPC
-- **Security-first approach** with authentication, RLS, and security headers
-
-## Core Technology Stack
+## 2\. Core Technology Stack
 
 - **Frontend**: Next.js 15 (App Router), React 19, TypeScript (strict mode)
-- **Styling**: Tailwind CSS v4 (mobile-first), shadcn/ui components
+- **Styling**: Tailwind CSS v4, shadcn/ui
 - **Backend**: tRPC on Next.js API Routes, Prisma ORM
 - **Database**: PostgreSQL (Supabase)
-- **Authentication**: Supabase Auth (JWT-based)
-- **Internationalization**: next-intl
-- **PWA**: next-pwa with Workbox
-- **Deployment**: Vercel
+- **Authentication**: Supabase Auth (JWT)
+- **i18n**: `next-intl`
+- **PWA**: `next-pwa` with Workbox
 - **Testing**: Vitest, Playwright, React Testing Library
-- **External Services**: Stripe, Resend, Sentry, PostHog, Inngest
+- **Package Manager**: `pnpm` (use `pnpm` commands exclusively)
 
-## Development Commands
+### Quality & Workflow Tooling
 
-Since this is a new project without implementation yet, here are the expected
-commands once the boilerplate is set up:
+- **Git Hooks:** `Husky` for managing Git hooks.
+- **Pre-commit Checks:** `lint-staged` to run linters on staged files.
+- **Commit Formatting:** `Commitizen` (`git-cz`) for creating standardized
+  commits.
+- **Dependency Validation:** `Knip` to detect unused dependencies and files.
+- **Environment Variables:** `@t3-oss/env-nextjs` for type-safe environment
+  variables.
 
-```bash
-# Install dependencies
-pnpm install
+## 3\. Essential Commands
 
-# Development server
-pnpm dev
+### Development
 
-# Build for production
-pnpm build
+- `pnpm dev`: Start the development server.
+- `pnpm build`: Build the application for production.
+- `pnpm start`: Start the production server.
+- `pnpm analyze`: Analyze the production bundle size.
+- `pnpm clean`: Remove build artifacts and caches.
 
-# Start production server
-pnpm start
+### Code Quality
 
-# Type checking
-pnpm typecheck
+- `pnpm validate`: **(Primary)** Run all checks (TypeScript, ESLint, Prettier).
+- `pnpm format`: Format all code with Prettier.
+- `pnpm lint`: Run ESLint.
+- `pnpm lint:fix`: Attempt to auto-fix ESLint errors.
+- `pnpm typecheck`: Run the TypeScript compiler to check for type errors.
+- `pnpm check:deps`: Validate for unused dependencies with `Knip`.
 
-# Linting
-pnpm lint
+### Internationalization (i18n)
 
-# Run tests
-pnpm test
-pnpm test:unit
-pnpm test:e2e
+- `pnpm i18n:validate`: Validate the consistency of translation files.
 
-# Database operations
-pnpm db:push        # Push schema changes
-pnpm db:migrate     # Run migrations
-pnpm db:studio      # Open Prisma Studio
-```
+### Database (Prisma)
 
-## Architecture & Structure
+- `pnpm db:push`: Push the schema to the DB (development).
+- `pnpm db:migrate`: Create and apply a new migration (development).
+- `pnpm db:migrate:deploy`: Apply pending migrations (production).
+- `pnpm db:studio`: Open the Prisma Studio UI.
+- `pnpm db:seed`: Seed the database with test data.
+- `pnpm db:generate`: (Re)generate the Prisma client.
 
-### Directory Layout
+### Testing
+
+- `pnpm test`: Run unit tests with Vitest.
+- `pnpm test:ui`: Run unit tests with the Vitest UI.
+- `pnpm test:coverage`: Generate a test coverage report.
+- `pnpm test:e2e`: Run end-to-end tests with Playwright.
+
+## 4\. Architecture and Directory Structure
 
 ```
 src/
-├── app/[locale]/          # Internationalized routes
+├── app/[locale]/         # Internationalized routes
 │   ├── (auth)/           # Auth pages (login, signup, etc.)
 │   ├── (dashboard)/      # Protected dashboard routes
 │   └── (marketing)/      # Public marketing pages
@@ -77,475 +82,139 @@ src/
 │   ├── ui/               # shadcn/ui components
 │   ├── mobile/           # Mobile-specific components
 │   └── shared/           # Shared components
-├── server/               # Backend code
-│   ├── api/             # tRPC routers
-│   └── db/              # Database client
-└── lib/                 # Utilities and helpers
+├── server/               # Backend code (tRPC, Prisma)
+│   ├── api/              # tRPC routers
+│   └── db/               # Database client
+└── lib/                  # Utilities and helpers
 ```
 
-### Key Architectural Decisions
-
-1. **Mobile-First PWA**: All features must work on mobile devices with touch
-   interactions. The app should be installable and work offline for critical
-   features.
-
-2. **Internationalization**: Every user-facing string must be externalized. Use
-   the `useTranslations` hook from next-intl. Routes include locale prefix
-   (e.g., `/en/dashboard`).
-
-3. **Multi-Tenancy**: Data isolation is enforced at the database level using Row
-   Level Security (RLS). Users can only access data within their authorized
-   workspace.
-
-4. **Type Safety**: The entire stack is type-safe from database to frontend.
-   tRPC procedures share types automatically. All inputs are validated with Zod.
-
-5. **Component Library**: All UI components are based on shadcn/ui and must be
-   mobile-optimized with minimum 44x44px touch targets.
-
-## Development Guidelines
-
-### Core Principles
-
-1. **Mobile-First Always**: Every feature must work perfectly on mobile before
-   desktop
-2. **Zero Hardcoded Strings**: All text must use next-intl translations
-3. **TypeScript Strict Mode**: No `any` types, full type safety end-to-end
-4. **Security by Default**: All inputs validated with Zod, RLS enforced
-5. **Progressive Enhancement**: Core features work offline, enhanced features
-   online
-
-### Code Organization Standards
-
-#### File Structure Rules
-
-- Components: `ComponentName.tsx` with co-located tests and styles
-- Pages: Use Next.js 15 App Router structure with `page.tsx`
-- API Routes: Use `route.ts` files in app directory
-- Types: Keep close to usage, use Zod for runtime validation
-- Utilities: Group by domain in `lib/` directory
-
-#### Component Architecture
-
-- **Server Components First**: Use server components by default
-- **Client Components**: Only when interactivity is required (use "use client")
-- **Atomic Design**: Organize as atoms → molecules → organisms
-- **shadcn/ui Base**: Build on shadcn/ui primitives
-- **Mobile Touch Targets**: Minimum 44x44px for all interactive elements
-
-### Development Workflow
-
-#### Before Writing Code
-
-1. Check existing patterns in the codebase
-2. Verify mobile-first approach
-3. Ensure translations are externalized
-4. Plan for offline scenarios
-
-#### Code Quality Requirements
-
-- **ESLint**: No warnings allowed
-- **Prettier**: Auto-format on save
-- **TypeScript**: Strict mode, no errors
-- **Tests**: Write before or during development
-- **Performance**: Profile on slow 3G networks
-
-### Testing Strategy
-
-#### Required Test Types
-
-- **Unit Tests**: Vitest for utilities, hooks, and pure functions
-- **Component Tests**: React Testing Library for UI components
-- **Integration Tests**: API endpoints and database operations
-- **E2E Tests**: Playwright for critical user flows
-- **Mobile Tests**: Touch interactions and responsive behavior
-- **PWA Tests**: Offline functionality and installation
-
-#### Test Organization
-
-- Co-locate tests with components: `Component.test.tsx`
-- API tests in `__tests__/api/` directories
-- E2E tests in dedicated `tests/e2e/` directory
-- Maintain >80% coverage for all new code
-
-### Performance Standards
-
-#### Mobile Performance Targets
-
-- **Lighthouse Score**: >95 in all categories on mobile
-- **Time to Interactive**: <3 seconds on 3G
-- **Bundle Size**: <150KB initial load
-- **PWA Score**: 100% in Lighthouse
-- **Core Web Vitals**: Green scores for LCP, FID, CLS
-
-#### Optimization Techniques
-
-- Use `next/image` for all images
-- Implement lazy loading for non-critical components
-- Code splitting at route and component level
-- Optimize fonts with `next/font`
-- Cache strategies via service worker
-
-### Security Implementation
-
-#### Input Validation
-
-- **All Inputs**: Validate with Zod schemas on client and server
-- **API Endpoints**: Use tRPC with Zod for automatic validation
-- **File Uploads**: Validate type, size, and content
-- **URL Parameters**: Sanitize and validate all route parameters
-
-#### Authentication & Authorization
-
-- **Supabase Auth**: Use for all authentication flows
-- **JWT Tokens**: Secure session management with HTTP-only cookies
-- **RLS Policies**: Enforce data isolation at database level
-- **API Protection**: Secure all tRPC procedures with auth checks
-
-#### Security Headers
-
-- **CSP**: Content Security Policy configured
-- **CORS**: Properly configured for production
-- **Rate Limiting**: Implement on auth endpoints and APIs
-- **HTTPS**: Enforced in production environments
-
-### Internationalization Best Practices
-
-#### Translation Management
-
-- **File Structure**: Organize by namespace (auth, dashboard, common)
-- **Type Safety**: Generate types from translation keys
-- **Fallbacks**: Always provide fallback to English
-- **Dynamic Loading**: Load translations on demand for performance
-
-#### Locale Handling
-
-- **URL Structure**: Use `/[locale]/path` for all routes
-- **Detection**: Automatic locale detection with user preference
-- **Switching**: Smooth language switching without page reload
-- **SEO**: Proper hreflang tags and locale-specific meta
-
-### PWA Development
-
-#### Service Worker Implementation
-
-- **Caching Strategies**: Cache-first for assets, network-first for API calls
-- **Offline Support**: Critical features must work without internet
-- **Background Sync**: Queue actions when offline, sync when online
-- **Install Prompts**: Custom PWA installation experience
-
-#### Mobile Optimizations
-
-- **Touch Gestures**: Implement swipe, pinch, and long-press
-- **Viewport Handling**: Proper meta tags and safe area handling
-- **Performance**: Optimize for mobile CPUs and networks
-- **Native Features**: Prepare for push notifications and biometric auth
-
-### Documentation and Knowledge Strategy
-
-Documentation is not a task to be done at the end of a project; it is an ongoing
-product that ensures the health, maintainability, and scalability of our team
-and system, as well as clarity for other teams.
-
-#### Documentation Philosophy
-
-- **Document the "Why", not just the "What":** Code is self-explanatory about
-  _what_ it does. Quality documentation explains _why_ it was done that way,
-  what alternatives were considered, and what trade-offs were made.
-
-- **Documentation Lives Close to the Code:** To avoid it becoming outdated, we
-  prioritize documentation that can be versioned alongside the source code
-  (Markdown files in the repository, TSDoc in the comments), rather than relying
-  on external platforms like Confluence or Notion.
-
-#### The three layers of our documentation
-
-##### **The `README.md` (The Gateway)**
-
-- **Tool:** `README.md` in the root of the monorepo.
-- **Purpose:** To allow a new developer to set up the environment, install
-  dependencies, and run the project locally in the shortest possible time. It is
-  our "quick start guide".
-- **Responsibility:** It must be kept impeccably clear and up to date. It is the
-  first impression a new team member will have of our project. It should contain
-  the project vision, prerequisites, step-by-step setup guide, main commands
-  (`dev`, `test`, `build`), and a link to this complete Design Doc.
-
-##### **Architectural Documentation (The Constitution)**
-
-- **Tool:** This document (`DESIGN_DOC.md`) and a `/docs/adr` directory for new
-  Architecture Decision Records (ADRs).
-- **Purpose:** To explain the high-level decisions, trade-offs, system
-  structure, and rationale behind our technology choices. It is the "why"
-  record.
-- **Responsibility:** Technical leadership is the custodian of this document.
-  Significant new architectural decisions (e.g., adding a new microservice,
-  changing a database provider) **should** be documented with a new ADR, which
-  will be reviewed by the team.
-
-##### **Documentation in Code (The Immediate Context)**
-
-- **Tool:** Comments in **TSDoc** format.
-- **Purpose:** To explain the "why" of code snippets that are not immediately
-  obvious. We don't comment on the obvious. We do comment on:
-- Complex business logic.
-- The purpose of public functions and their parameters.
-- Temporary workarounds or "hacks", always with a `// TODO:` and a link to the
-  ticket that tracks their removal.
-- **Responsibility:** Each developer. The Code Review process should actively
-  look for complex code without proper documentation and request its addition.
-
-### Available Commands
-
-```bash
-# View current tasks
-task-master list
-
-# Get next available task
-task-master next
-
-# View task details
-task-master show <task-id>
-
-# Update task status
-task-master set-status -i <task-id> -s <status>
-
-# Analyze project complexity
-task-master analyze-complexity
-```
-
-## External Integrations
-
-### Required Service Accounts
-
-- **Supabase**: Database, auth, and file storage
-- **Stripe**: Payment processing and subscription management
-- **Resend**: Transactional email delivery
-- **Sentry**: Error tracking and performance monitoring
-- **PostHog**: Product analytics and feature flags
-- **Inngest**: Background job processing
-
-### Environment Variables
-
-Create `.env.local` with required API keys:
-
-```bash
-# Database
-DATABASE_URL="postgresql://..."
-DIRECT_URL="postgresql://..."
-
-# Authentication
-NEXT_PUBLIC_SUPABASE_URL="https://..."
-NEXT_PUBLIC_SUPABASE_ANON_KEY="..."
-SUPABASE_SERVICE_ROLE_KEY="..."
-
-# Payments
-STRIPE_SECRET_KEY="sk_..."
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY="pk_..."
-
-# Email
-RESEND_API_KEY="re_..."
-
-# Monitoring
-SENTRY_DSN="https://..."
-NEXT_PUBLIC_POSTHOG_KEY="phc_..."
-
-# Background Jobs
-INNGEST_EVENT_KEY="..."
-```
-
-## Definition of Done
-
-A feature is considered complete when:
-
-- ✅ **Mobile-first and fully responsive**
-- ✅ **All strings internationalized**
-- ✅ **Touch-friendly interactions (44x44px minimum)**
-- ✅ **Works offline when applicable**
-- ✅ **Type-safe from database to UI**
-- ✅ **Zod validation on all inputs**
-- ✅ **Tests written and passing (>80% coverage)**
-- ✅ **Performance validated on 3G**
-- ✅ **Accessibility verified (WCAG 2.1 AA)**
-- ✅ **Security review completed**
-- ✅ **Code review approved**
-- ✅ **No ESLint warnings or TypeScript errors**
-
-## Current Status
-
-This is a greenfield project with a comprehensive Product Requirements Document
-(PRD) and detailed task breakdown. Implementation follows a 23-day roadmap:
-
-1. **Phase 1**: Foundation + Mobile (5 days)
-2. **Phase 2**: Core Features + Components (6 days)
-3. **Phase 3**: PWA + Offline (4 days)
-4. **Phase 4**: Integrations (5 days)
-5. **Phase 5**: Quality & Polish (3 days)
-
-### Project Resources
-
-- `prd.md` - Complete product requirements and specifications
-- `tasks/` - Detailed task breakdown with 39 implementation tasks
-- `.cursor/rules/` - Development standards and best practices
-- `.taskmaster/` - Task management configuration and reports
-
-### Implementation Status
-
-#### ✅ Completed Tasks
-
-- **E1_T1.1**: Next.js Project Setup (Next.js 15.3.3, React 19, TypeScript
-  strict mode)
-- **E1_T1.2**: Build System Configuration (Production build optimization, PWA
-  setup, bundle analysis)
-- **E1_T1.3**: PWA Foundation (Mobile-first PWA with offline capabilities,
-  service worker caching, iOS optimization)
-- **E1_T1.4**: Developer Environment Setup (ESLint, Prettier, Husky, VS Code
-  optimization, mobile-first development tools)
-
-#### 🎯 Key Implementation Learnings
-
-##### Tailwind CSS v4 Migration
-
-- **Issue**: Tailwind v4 requires separate PostCSS plugin
-- **Solution**: Install `@tailwindcss/postcss` and update config
-- **Commands**:
-  ```bash
-  pnpm add -D @tailwindcss/postcss autoprefixer
-  # Update postcss.config.mjs to use '@tailwindcss/postcss'
+## 5\. Fundamental Development Rules
+
+### General Principles
+
+- **Mobile-First ALWAYS:** Develop and validate in a mobile viewport first.
+- **Zero Hardcoded Strings:** ALL user-facing strings MUST use `next-intl`.
+- **TypeScript Strict Mode:** No `any` types are allowed. Adhere strictly to the
+  `tsconfig.json` rules.
+- **Security by Default:** All inputs are validated with Zod (client and
+  server). Data access is protected by RLS.
+- **Offline-First:** Critical features must work offline via the Service Worker.
+
+### UI & Components
+
+- **Server Components by Default:** Use Server Components. Only adopt
+  `"use client"` when interactivity is essential.
+- **Touch Targets:** All interactive elements MUST have a minimum touch target
+  area of **44x44px**.
+- **Component Variants:** Use the `class-variance-authority` (CVA) library to
+  create components with type-safe style variants. Combine it with `clsx` and
+  `tailwind-merge`.
+- **User Notifications (Toasts):** Use the `Sonner` library to display all
+  user-facing notifications.
+- **Theme Management (Dark Mode):** Theme switching is handled by `next-themes`.
+  Use its providers and hooks.
+- **Forms:** Build all forms with `react-hook-form`. Use `Zod` for schema
+  validation, integrated via `@hookform/resolvers`.
+- **Icons:** Use the `lucide-react` library for all icons.
+- **Animations:** Implement animations using `framer-motion`.
+- **SVG Imports:** SVGs can be imported directly as React components, thanks to
+  the `@svgr/webpack` configuration.
+- **In-Code Documentation:** Explain the "why" of complex logic using **TSDoc**
+  formatted comments.
+
+## 6\. Specific Patterns and Solutions (Consolidated Learnings)
+
+### Tailwind CSS v4 & shadcn/ui
+
+- **PostCSS Configuration:** Tailwind v4 requires the `@tailwindcss/postcss`
+  plugin. Your `postcss.config.mjs` must be:
+  ```js
+  export default {
+    plugins: {
+      '@tailwindcss/postcss': {},
+      autoprefixer: {},
+    },
+  }
+  ```
+- **Global CSS Syntax:** Use `@import 'tailwindcss';` and define custom colors
+  inside a `@theme` block in `globals.css`.
+  ```css
+  @theme {
+    --color-primary: hsl(221.2 83.2% 53.3%);
+    /* ... other colors ... */
+  }
   ```
 
-##### Package Dependencies for Next.js 15
+### Internationalization (i18n)
 
-- **Critical**: Always install `autoprefixer` with Tailwind
-- **pnpm Config**: Add `.npmrc` with peer dependency settings
-- **Bundle Analyzer**: Conditional loading only when `ANALYZE=true`
+- **Currency Formatting (ICU):** Use the `{value, number, ::currency/CODE}`
+  syntax. The currency code (e.g., `BRL`, `USD`) is mandatory.
+  - ✅ **Correct:** `{total, number, ::currency/BRL}`
+  - ❌ **Incorrect:** `R$ {total}`
+- **Locale-Aware Navigation:** ALWAYS use the Next.js `<Link>` component. All
+  `hrefs` must be prefixed with the current locale (e.g.,
+  `href={\`/${locale}/dashboard\`}`). Get the `locale`from the`useLocale()\`
+  hook.
 
-##### Mobile-First Setup Essentials
+### Performance & Bundle Optimization
 
-- **Viewport Export**: Use Next.js 15's separate `viewport` export
-- **Meta Tags**: Include PWA preparation in root layout
-- **Touch Targets**: Plan for 44x44px minimum from start
-- **Bundle Target**: Monitor 150KB limit with `pnpm analyze`
+- **Heavy Components:** Use dynamic imports (`next/dynamic`) for components that
+  are not critical for the initial render (e.g., charts, complex editors). This
+  is mandatory for libraries like `recharts`.
+  ```tsx
+  import dynamic from 'next/dynamic';
+  const VisitorsChart = dynamic(() => import('./VisitorsChart'), { ssr: false });
+  ```
 
-##### TypeScript Strict Mode
+## 7\. Git Workflow and Versioning
 
-- **Configuration**: Enable all strict flags in tsconfig.json
-- **Zero Tolerance**: No `any` types allowed in codebase
-- **Import Aliases**: Essential for clean mobile component organization
+- **Creating Commits:** **DO NOT use `git commit` directly.** All commits MUST
+  be created using the `pnpm commit` command. This will launch `Commitizen` to
+  guide you through creating a standardized Conventional Commit message.
+- **Automated Hooks:** `Husky` is configured to run `lint-staged` before each
+  commit. This automatically runs `pnpm validate` on your modified files,
+  ensuring code quality before it is committed.
+- **Auto-Formatting:** The `prettier-plugin-tailwindcss` is installed. It will
+  automatically sort your Tailwind CSS classes on save. Do not manually reorder
+  classes.
+- **Attribution:** **(Critical Reinforcement)** NEVER include "Co-authored-by"
+  or any AI attribution in commit messages. `pnpm commit` ensures a clean,
+  professional format.
 
-##### Build System Configuration
+## 8\. Definition of Done
 
-- **Next.js 15 Stability**: React 19 experimental features (ppr, reactCompiler)
-  require canary versions
-- **Bundle Size Management**: Started with 300KB limit, optimized to 102KB
-  actual size
-- **PWA Integration**: next-pwa automatically generates service worker and
-  manifest
-- **Webpack Configuration**: Bundle analyzer works with both static reports and
-  development integration
-- **Database Integration**: Prisma requires postinstall script for client
-  generation
-- **Development Scripts**: Complete test and database management commands ready
-  for future implementation
+A task is only considered complete when ALL of the following criteria are met:
 
-##### Production Build Optimization
+- [ ] Mobile-first and fully responsive.
+- [ ] All strings are internationalized via `next-intl`.
+- [ ] Interactions are touch-friendly (44x44px minimum).
+- [ ] Critical features work offline.
+- [ ] Fully type-safe from the database to the UI.
+- [ ] Zod validation is implemented on all inputs.
+- [ ] Tests are written and passing (\>80% coverage).
+- [ ] Performance is validated on a slow 3G network (Lighthouse \>95).
+- [ ] Accessibility is verified (WCAG 2.1 AA).
+- [ ] Security review is completed.
+- [ ] Code review is approved.
+- [ ] No TypeScript errors or ESLint warnings (`pnpm validate` passes).
 
-- **Bundle Analysis**: Generates reports in `analyze/` and `.next/analyze/`
-  directories
-- **Mobile Performance**: 102KB bundle size is 32% under 150KB target
-- **Tree Shaking**: Configured for optimal dead code elimination
-- **SVG Support**: @svgr/webpack enables SVG-as-React-component imports
-- **Security Headers**: Production-ready CSP, XSS protection, and HSTS
-  configured
+## 9\. [CRITICAL WORKFLOW] Task Completion Process
 
-##### PWA Foundation Implementation
+Upon completing any task, you **MUST** follow these steps without exception:
 
-- **Service Worker Strategies**: NetworkFirst for APIs, CacheFirst for images,
-  StaleWhileRevalidate for assets
-- **next-pwa Configuration**: Advanced runtime caching with expiration policies
-  and cacheable response filtering
-- **iOS PWA Support**: Comprehensive Apple meta tags, splash screens, and touch
-  icons for native app experience
-- **Offline Experience**: Mobile-optimized glassmorphism design with connection
-  monitoring and auto-recovery
-- **PWA Manifest**: Complete with shortcuts, screenshots, protocol handlers, and
-  edge side panel support
-- **Mobile-First Design**: Portrait-primary orientation, touch-optimized
-  interactions, viewport handling
+1.  **Update the Original Task File:** Check off all acceptance criteria with
+    `[x]`, add an implementation summary, and document any key learnings.
+2.  **Move the Task File:** Move the completed task's file from the `tasks/`
+    directory to the `tasks/completed/` directory.
+3.  **Update This `CLAUDE.md`:** If the task resulted in a new, reusable pattern
+    or a rule that all developers should follow, add it to
+    `Section 6: Specific Patterns and Solutions`.
 
-##### PWA Development Best Practices
+## 10\. Configuration and Environment Variables
 
-- **Caching Strategy**: API routes (5min), images (30 days), static assets (7
-  days), pages (24 hours)
-- **Offline Fallback**: Elegant `/offline` page with connection status and retry
-  functionality
-- **TypeScript PWA Utilities**: Installation detection, service worker
-  management, network status monitoring
-- **Build Integration**: Service worker auto-generation with custom runtime
-  caching configuration
-- **Performance Optimization**: Bundle size maintained at 102KB with PWA
-  features included
-
-##### Developer Environment Setup Implementation
-- **ESLint v8 Compatibility**: ESLint v9 requires new config format, downgraded to v8 for stability
-- **TypeScript Strict Rules**: Configured comprehensive type checking with mobile-first accessibility rules
-- **Git Hooks Integration**: Husky + lint-staged for automated quality checks on commit
-- **VS Code Optimization**: Complete workspace setup with mobile debugging configurations and recommended extensions
-- **Mobile-First Validation**: Touch target compliance checking (44x44px minimum) built into pre-commit hooks
-- **Conventional Commits**: Commitlint configuration with project-specific scopes (mobile, pwa, ui, etc.)
-- **Code Quality Pipeline**: Zero-warning policy with auto-formatting and comprehensive linting
-- **Performance Monitoring**: Bundle analysis integration with mobile network optimization targets
-
-### Development Workflow
-
-#### Before Writing Code
-
-1. Check existing patterns in the codebase
-2. Verify mobile-first approach
-3. Ensure translations are externalized
-4. Plan for offline scenarios
-5. **NEW**: Run `pnpm check` for type safety and linting
-
-#### Enhanced Scripts Available
-
-```bash
-# Development
-pnpm dev              # Development server
-pnpm build            # Production build
-pnpm check            # TypeScript + ESLint check
-pnpm lint:fix         # Auto-fix linting issues
-pnpm analyze          # Bundle analysis with visualization
-pnpm clean            # Clean build artifacts
-
-# Code Quality (NEW)
-pnpm validate         # Complete validation (typecheck + lint + format check)
-pnpm format           # Format all files with Prettier
-pnpm format:check     # Check formatting without changes
-pnpm mobile:validate  # Mobile-specific compliance checks
-pnpm pre-commit       # Manual pre-commit checks
-
-# Database (Prisma)
-pnpm db:push          # Push schema changes
-pnpm db:migrate       # Run migrations
-pnpm db:studio        # Open Prisma Studio
-pnpm db:seed          # Seed database
-pnpm db:generate      # Generate Prisma client
-
-# Testing (Future Implementation)
-pnpm test             # Run unit tests
-pnpm test:ui          # Test with UI
-pnpm test:coverage    # Coverage reports
-pnpm test:e2e         # End-to-end tests
-```
-
-### Next Steps
-
-1. Run `task-master next` to see the next available task
-2. Review task details with `task-master show <task-id>`
-3. Follow mobile-first development principles
-4. Ensure all code meets the Definition of Done criteria
-5. **Use `pnpm validate` before every commit (replaces `pnpm check`)**
-6. **Use `pnpm analyze` to monitor bundle size during feature development**
-7. **Database operations ready with Prisma scripts when schema is implemented**
-8. **NEW**: Git hooks automatically run quality checks on commit
-9. **NEW**: VS Code workspace optimized for mobile-first development
+- **Type-Safe Validation:** This project uses `@t3-oss/env-nextjs` to validate
+  and provide type-safe access to environment variables.
+- **Definition:** Define all environment variables in `src/env.js`. Follow the
+  existing Zod schema to add new variables.
+- **Usage:** Import the `env` object from `src/env.js` in your code to access
+  variables safely. Do not use `process.env` directly in client-side components.

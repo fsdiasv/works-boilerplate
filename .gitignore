@@ -12,6 +12,7 @@ dist
 # Environment variables
 .env*.local
 .env
+.env.mcp
 
 # Debug
 npm-debug.log*
@@ -40,10 +41,13 @@ yarn-error.log*
 # OS
 .DS_Store
 Thumbs.db
+*:Zone.Identifier
 
 # Testing
 coverage/
 .nyc_output
+playwright-report/
+test-results/
 
 # Bundle analyzer
 .next/analyze/

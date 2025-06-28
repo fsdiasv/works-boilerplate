@@ -268,8 +268,8 @@ to focus exclusively on delivering unique business value.
     Defer niche or overly specific features to application-level code.
 - **Resource Constraints**
   - **Risk:** The initial time investment to build the boilerplate correctly
-    might delay the start of the primary product (Socialworks).
-  - **Mitigation:** Frame the boilerplate as "Week 0" of the Socialworks
+    might delay the start of the primary product (Works-Boilerplate).
+  - **Mitigation:** Frame the boilerplate as "Week 0" of the Works-Boilerplate
     project. The time invested will be recouped multiple times over during the
     project's lifecycle and on all future projects.
 

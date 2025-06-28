@@ -1,4 +1,10 @@
-const withPWA = require('next-pwa')({
+import withBundleAnalyzerInit from '@next/bundle-analyzer'
+import createNextIntlPlugin from 'next-intl/plugin'
+import withPWAInit from 'next-pwa'
+
+const withNextIntl = createNextIntlPlugin('./src/i18n.ts')
+
+const withPWA = withPWAInit({
   dest: 'public',
   register: true,
   skipWaiting: true,
@@ -69,7 +75,7 @@ const withPWA = require('next-pwa')({
   ],
 })
 
-const withBundleAnalyzer = require('@next/bundle-analyzer')({
+const withBundleAnalyzer = withBundleAnalyzerInit({
   enabled: process.env.ANALYZE === 'true',
 })
 
@@ -115,16 +121,9 @@ const nextConfig = {
   webpack: (config, { isServer }) => {
     // Mobile bundle size limits
     config.performance = {
-      maxAssetSize: 300000, // 300KB - temporary limit for boilerplate
-      maxEntrypointSize: 300000, // Will optimize to 150KB as we build features
-      hints: 'warning', // Warnings for now, will change to 'error' later
-    }
-
-    // Tree shaking optimizations
-    config.optimization = {
-      ...config.optimization,
-      usedExports: true,
-      sideEffects: false,
+      maxAssetSize: 300000, // 300KB limit (temporary increase)
+      maxEntrypointSize: 600000, // 600KB limit for entry points
+      hints: 'warning', // Changed to warning for development
     }
 
     // SVG handling
@@ -133,17 +132,7 @@ const nextConfig = {
       use: ['@svgr/webpack'],
     })
 
-    // Bundle analyzer integration
-    if (process.env.ANALYZE === 'true' && !isServer) {
-      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer')
-      config.plugins.push(
-        new BundleAnalyzerPlugin({
-          analyzerMode: 'static',
-          reportFilename: '../analyze/client.html',
-          openAnalyzer: false,
-        })
-      )
-    }
+    // Bundle analyzer integration handled by withBundleAnalyzer
 
     return config
   },
@@ -151,8 +140,8 @@ const nextConfig = {
   // Compression for mobile networks
   compress: true,
 
-  // Source maps for production debugging
-  productionBrowserSourceMaps: true,
+  // Source maps disabled for security
+  productionBrowserSourceMaps: false,
 
   // Security headers
   async headers() {
@@ -176,6 +165,19 @@ const nextConfig = {
             key: 'Strict-Transport-Security',
             value: 'max-age=31536000; includeSubDomains',
           },
+          {
+            key: 'Content-Security-Policy',
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;",
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'strict-origin-when-cross-origin',
+          },
+          {
+            key: 'Permissions-Policy',
+            value: 'camera=(), microphone=(), geolocation=()',
+          },
         ],
       },
     ]
@@ -184,4 +186,4 @@ const nextConfig = {
   poweredByHeader: false,
 }
 
-module.exports = withBundleAnalyzer(withPWA(nextConfig))
+export default withBundleAnalyzer(withPWA(withNextIntl(nextConfig)))

@@ -1,0 +1,162 @@
+{
+  "common": {
+    "description": "Kit inicial SaaS mobile-first para aplicações modernas",
+    "language": {
+      "select": "Selecionar idioma",
+      "current": "Idioma atual"
+    },
+    "navigation": {
+      "dashboard": "Painel",
+      "settings": "Configurações",
+      "profile": "Perfil",
+      "home": "Início",
+      "mainMenu": "Menu Principal",
+      "billing": "Faturamento",
+      "contentRadar": "Radar de Conteúdo",
+      "createPost": "Criar Post",
+      "calendar": "Calendário",
+      "socialAccounts": "Contas Sociais",
+      "apiKeys": "Chaves de API",
+      "pricing": "Preços",
+      "documentation": "Documentação",
+      "community": "Comunidade",
+      "feedback": "Feedback"
+    },
+    "actions": {
+      "save": "Salvar",
+      "cancel": "Cancelar",
+      "submit": "Enviar",
+      "loading": "Carregando...",
+      "delete": "Excluir",
+      "edit": "Editar",
+      "create": "Criar",
+      "back": "Voltar",
+      "next": "Próximo",
+      "previous": "Anterior",
+      "confirm": "Confirmar",
+      "close": "Fechar",
+      "retry": "Tentar novamente"
+    },
+    "status": {
+      "online": "Online",
+      "offline": "Offline",
+      "error": "Erro",
+      "success": "Sucesso",
+      "warning": "Aviso",
+      "info": "Informação"
+    }
+  },
+  "auth": {
+    "signin": "Entrar",
+    "signup": "Cadastrar",
+    "signout": "Sair",
+    "email": "E-mail",
+    "password": "Senha",
+    "confirmPassword": "Confirmar senha",
+    "forgotPassword": "Esqueceu a senha?",
+    "rememberMe": "Lembrar de mim",
+    "emailRequired": "E-mail é obrigatório",
+    "passwordRequired": "Senha é obrigatória",
+    "invalidCredentials": "Credenciais inválidas",
+    "accountCreated": "Conta criada com sucesso",
+    "welcomeBack": "Bem-vindo de volta!"
+  },
+  "dashboard": {
+    "title": "Painel",
+    "welcome": "Bem-vindo!",
+    "overview": "Visão geral",
+    "recentActivity": "Atividade recente",
+    "statistics": "Estatísticas",
+    "noData": "Sem dados disponíveis",
+    "meta": {
+      "title": "Painel - Acme Inc.",
+      "description": "Visualize suas métricas de negócios, documentos e análises"
+    }
+  },
+  "profile": {
+    "title": "Perfil",
+    "personalInfo": "Informações pessoais",
+    "name": "Nome",
+    "email": "E-mail",
+    "phone": "Telefone",
+    "bio": "Biografia",
+    "updateProfile": "Atualizar perfil",
+    "changePassword": "Alterar senha",
+    "avatar": "Foto de perfil"
+  },
+  "settings": {
+    "title": "Configurações",
+    "general": "Geral",
+    "preferences": "Preferências",
+    "notifications": "Notificações",
+    "privacy": "Privacidade",
+    "security": "Segurança",
+    "language": "Idioma",
+    "theme": "Tema",
+    "darkMode": "Modo escuro",
+    "lightMode": "Modo claro"
+  },
+  "errors": {
+    "generic": "Algo deu errado. Por favor, tente novamente.",
+    "network": "Erro de conexão. Verifique sua internet.",
+    "notFound": "Página não encontrada",
+    "unauthorized": "Acesso não autorizado",
+    "serverError": "Erro no servidor"
+  },
+  "validation": {
+    "required": "Este campo é obrigatório",
+    "email": "Digite um e-mail válido",
+    "min": "Mínimo de {min} caracteres",
+    "max": "Máximo de {max} caracteres",
+    "passwordMatch": "As senhas não coincidem",
+    "itemCount": "{count, plural, =0 {Nenhum item} =1 {1 item} other {# itens}}"
+  },
+  "formatting": {
+    "currency": "{amount, number, ::currency/BRL}",
+    "date": "{date, date, long}",
+    "time": "{time, time, short}",
+    "number": "{value, number}",
+    "percent": "{value, number, percent}"
+  },
+  "pwa": {
+    "install": "Instalar aplicativo",
+    "installDescription": "Instale nosso app para uma melhor experiência",
+    "offlineReady": "Pronto para uso offline",
+    "updateAvailable": "Atualização disponível",
+    "updateNow": "Atualizar agora"
+  },
+  "error": {
+    "pageNotFound": "Página Não Encontrada",
+    "pageNotFoundDescription": "A página que você procura não existe.",
+    "goHome": "Ir para Início"
+  },
+  "UserSettingsMenu": {
+    "nav": {
+      "settings": "Configurações",
+      "pricing": "Preços",
+      "documentation": "Documentação",
+      "community": "Fórum da Comunidade",
+      "feedback": "Feedback"
+    },
+    "accessibility": {
+      "openUserSettings": "Abrir configurações do usuário"
+    },
+    "creditBalance": {
+      "title": "Saldo de Créditos",
+      "monthlyCredits": "Créditos mensais",
+      "purchasedCredits": "Créditos comprados",
+      "resetMessage": "Seus créditos mensais serão redefinidos em {days} dias.",
+      "buyMoreCredits": "Comprar mais créditos"
+    },
+    "preferences": {
+      "title": "Preferências",
+      "theme": "Tema",
+      "language": "Idioma"
+    },
+    "toast": {
+      "languageChanged": "Idioma Alterado",
+      "languageChangedDescription": "Idioma alterado para {language}."
+    },
+    "signOut": "Sair"
+  }
+}
