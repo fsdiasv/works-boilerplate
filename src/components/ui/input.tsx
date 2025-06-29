@@ -14,6 +14,8 @@ function Input({ className, type, ...props }: React.ComponentProps<'input'>) {
         className
       )}
       {...props}
+      // Suppress hydration warning for browser extension attributes (e.g., wfd-id from password managers)
+      suppressHydrationWarning
     />
   )
 }

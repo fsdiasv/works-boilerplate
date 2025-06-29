@@ -34,6 +34,8 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
           aria-invalid={error != null && error !== ''}
           aria-describedby={error != null && error !== '' ? `${id}-error` : undefined}
           {...props}
+          // Suppress hydration warning for browser extension attributes (e.g., wfd-id from password managers)
+          suppressHydrationWarning
         />
         {error != null && error !== '' && (
           <p id={`${id}-error`} className='mt-1 text-sm text-red-600'>
