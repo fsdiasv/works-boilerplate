@@ -74,38 +74,51 @@ export const Section = forwardRef<HTMLElement, SectionProps>(
     ref
   ) => {
     const getSafeAreaClass = () => {
-      if (!safeArea) return ''
+      if (safeArea === false) return ''
       if (typeof safeArea === 'boolean') return safeAreaClasses.all
       return safeAreaClasses[safeArea]
     }
 
-    return (
-      <Component
-        ref={ref as any}
-        className={cn(
-          // Base styles
-          'relative',
-          // Container queries
-          {
-            '@container': enableQueries,
-          },
-          // Padding
-          padding && paddingClasses[padding],
-          paddingX && paddingXClasses[paddingX],
-          paddingY && paddingYClasses[paddingY],
-          // Margin
-          marginClasses[margin],
-          // Full height
-          {
-            'min-h-screen-safe': fullHeight,
-          },
-          // Safe area
-          getSafeAreaClass(),
-          className
-        )}
-        {...props}
-      />
-    )
+    const elementProps = {
+      ...props,
+      className: cn(
+        // Base styles
+        'relative',
+        // Container queries
+        {
+          '@container': enableQueries,
+        },
+        // Padding
+        padding && paddingClasses[padding],
+        paddingX && paddingXClasses[paddingX],
+        paddingY && paddingYClasses[paddingY],
+        // Margin
+        marginClasses[margin],
+        // Full height
+        {
+          'min-h-screen-safe': fullHeight,
+        },
+        // Safe area
+        getSafeAreaClass(),
+        className
+      ),
+    }
+
+    // Type-safe component rendering
+    switch (Component) {
+      case 'div':
+        return <div ref={ref as React.Ref<HTMLDivElement>} {...elementProps} />
+      case 'section':
+        return <section ref={ref as React.Ref<HTMLElement>} {...elementProps} />
+      case 'article':
+        return <article ref={ref as React.Ref<HTMLElement>} {...elementProps} />
+      case 'main':
+        return <main ref={ref as React.Ref<HTMLElement>} {...elementProps} />
+      case 'aside':
+        return <aside ref={ref as React.Ref<HTMLElement>} {...elementProps} />
+      default:
+        return <section ref={ref as React.Ref<HTMLElement>} {...elementProps} />
+    }
   }
 )
 
