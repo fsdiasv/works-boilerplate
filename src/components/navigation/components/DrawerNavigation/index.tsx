@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client'
 
 import { AnimatePresence, motion } from 'framer-motion'
@@ -199,7 +198,11 @@ export function DrawerNavigation({
             animate='open'
             exit='closed'
             variants={drawerVariants}
-            {...dragHandlers}
+            onPointerDown={dragHandlers.onPointerDown}
+            onPointerMove={dragHandlers.onPointerMove}
+            onPointerUp={dragHandlers.onPointerUp}
+            onPointerCancel={dragHandlers.onPointerCancel}
+            onPointerLeave={dragHandlers.onPointerLeave}
             style={{
               x: dragOffset,
               width,
