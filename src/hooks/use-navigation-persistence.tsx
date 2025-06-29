@@ -153,7 +153,6 @@ export function useNavigationPersistence() {
   // Handle Android back button
   useEffect(() => {
     const handlePopState = (e: PopStateEvent) => {
-      e.preventDefault()
       navigateBack()
     }
 

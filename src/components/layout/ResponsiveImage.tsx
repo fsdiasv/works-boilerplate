@@ -1,8 +1,8 @@
 'use client'
 
 import Image from 'next/image'
-import { forwardRef, useEffect, useRef, useState } from 'react'
 import type React from 'react'
+import { forwardRef, useEffect, useRef, useState } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -74,7 +74,7 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
     const imageRef = useRef<HTMLDivElement>(null)
 
     const { isMobile, isTablet } = useViewport()
-    const { networkSpeed, isTouch } = useDeviceCapabilities()
+    const { networkSpeed } = useDeviceCapabilities()
 
     // Adaptive quality based on device and network
     const getQuality = () => {
@@ -142,7 +142,7 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
 
       observer.observe(imageRef.current)
       return () => observer.disconnect()
-    }, [])
+    }, [loading, priority, networkSpeed, isMobile])
 
     // Preload critical images
     useEffect(() => {
@@ -165,7 +165,7 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
       return () => {
         document.head.removeChild(link)
       }
-    }, [preload, src])
+    }, [preload, src, srcSet, isMobile, isTablet])
 
     const handleLoad = () => {
       setIsLoading(false)

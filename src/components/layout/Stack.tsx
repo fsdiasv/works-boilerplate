@@ -2,6 +2,7 @@
 
 import type React from 'react'
 import { forwardRef, type HTMLAttributes } from 'react'
+import { Slot } from '@radix-ui/react-slot'
 
 import { cn } from '@/lib/utils'
 
@@ -67,7 +68,7 @@ export const Stack = forwardRef<HTMLDivElement, StackProps>(
     },
     ref
   ) => {
-    const Component = asChild ? 'div' : 'div'
+    const Component = asChild ? Slot : 'div'
 
     return (
       <Component

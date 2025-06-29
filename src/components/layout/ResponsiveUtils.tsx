@@ -2,17 +2,28 @@
 
 import { useEffect, useState } from 'react'
 
+// TypeScript interfaces for browser APIs
+interface NetworkInformation extends EventTarget {
+  effectiveType?: '2g' | '3g' | '4g' | 'slow-2g'
+  addEventListener(type: 'change', listener: EventListener): void
+  removeEventListener(type: 'change', listener: EventListener): void
+}
+
+interface NavigatorWithConnection extends Navigator {
+  connection?: NetworkInformation
+  deviceMemory?: number
+}
+
 /**
  * Hook to detect current viewport size
  */
 export function useViewport() {
   const [viewport, setViewport] = useState({
-    width: typeof window !== 'undefined' ? window.innerWidth : 0,
-    height: typeof window !== 'undefined' ? window.innerHeight : 0,
-    isMobile: typeof window !== 'undefined' ? window.innerWidth < 768 : false,
-    isTablet:
-      typeof window !== 'undefined' ? window.innerWidth >= 768 && window.innerWidth < 1024 : false,
-    isDesktop: typeof window !== 'undefined' ? window.innerWidth >= 1024 : false,
+    width: 0,
+    height: 0,
+    isMobile: false,
+    isTablet: false,
+    isDesktop: false,
   })
 
   useEffect(() => {
@@ -61,11 +72,12 @@ export function useDeviceCapabilities() {
       const hasReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
 
       // Network speed detection
-      const connection = (navigator as any).connection
+      const navigatorWithConnection = navigator as NavigatorWithConnection
+      const connection = navigatorWithConnection.connection
       const networkSpeed = connection?.effectiveType === '4g' ? 'fast' : 'slow'
 
       // Device memory
-      const deviceMemory = (navigator as any).deviceMemory || 8
+      const deviceMemory = navigatorWithConnection.deviceMemory || 8
 
       setCapabilities({
         isTouch,
@@ -79,7 +91,8 @@ export function useDeviceCapabilities() {
     checkCapabilities()
 
     // Listen for network changes
-    const connection = (navigator as any).connection
+    const navigatorWithConnection = navigator as NavigatorWithConnection
+    const connection = navigatorWithConnection.connection
     if (connection) {
       connection.addEventListener('change', checkCapabilities)
       return () => connection.removeEventListener('change', checkCapabilities)

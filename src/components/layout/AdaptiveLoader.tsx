@@ -27,7 +27,6 @@ export const AdaptiveLoader = forwardRef<HTMLDivElement, AdaptiveLoaderProps>(
       children,
       fallback,
       loadingComponent = <div className='bg-muted h-32 animate-pulse rounded' />,
-      errorComponent,
       loadOn = 'visible',
       threshold = 0.1,
       rootMargin = '50px',
@@ -63,7 +62,7 @@ export const AdaptiveLoader = forwardRef<HTMLDivElement, AdaptiveLoaderProps>(
           }
           break
 
-        case 'interaction':
+        case 'interaction': {
           const handleInteraction = () => {
             setShouldLoad(true)
             cleanup()
@@ -81,8 +80,9 @@ export const AdaptiveLoader = forwardRef<HTMLDivElement, AdaptiveLoaderProps>(
           })
 
           return cleanup
+        }
 
-        case 'visible':
+        case 'visible': {
           if (!elementRef.current) return
 
           const observer = new IntersectionObserver(
@@ -97,6 +97,7 @@ export const AdaptiveLoader = forwardRef<HTMLDivElement, AdaptiveLoaderProps>(
 
           observer.observe(elementRef.current)
           return () => observer.disconnect()
+        }
 
         default:
           break
@@ -131,7 +132,7 @@ AdaptiveLoader.displayName = 'AdaptiveLoader'
 /**
  * Component for dynamically importing heavy components
  */
-interface DynamicComponentProps<P = {}> {
+interface DynamicComponentProps<P = Record<string, unknown>> {
   loader: () => Promise<{ default: React.ComponentType<P> }>
   props?: P
   fallback?: React.ReactNode
@@ -139,7 +140,7 @@ interface DynamicComponentProps<P = {}> {
   ssr?: boolean
 }
 
-export function DynamicComponent<P extends Record<string, any> = {}>({
+export function DynamicComponent<P extends Record<string, any> = Record<string, unknown>>({
   loader,
   props = {} as P,
   fallback = <div className='bg-muted h-32 animate-pulse rounded' />,
@@ -188,7 +189,7 @@ export const ProgressiveEnhancement: React.FC<ProgressiveEnhancementProps> = ({
         setIsEnhanced(true)
         break
 
-      case 'idle':
+      case 'idle': {
         if ('requestIdleCallback' in window) {
           const id = requestIdleCallback(() => setIsEnhanced(true))
           return () => cancelIdleCallback(id)
@@ -196,14 +197,15 @@ export const ProgressiveEnhancement: React.FC<ProgressiveEnhancementProps> = ({
           const timeout = setTimeout(() => setIsEnhanced(true), 1)
           return () => clearTimeout(timeout)
         }
-        break
+      }
 
-      case 'interaction':
+      case 'interaction': {
         const handleInteraction = () => setIsEnhanced(true)
         const event = isTouch ? 'touchstart' : 'mouseenter'
 
         document.addEventListener(event, handleInteraction, { once: true })
         return () => document.removeEventListener(event, handleInteraction)
+      }
 
       default:
         break

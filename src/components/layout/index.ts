@@ -36,7 +36,8 @@ export {
 } from './WebVitals'
 
 // PWA features
-export { PWALayout, usePWAFeatures, SafeAreaInset, useViewportMeta } from './PWALayout'
+export { PWALayout, SafeAreaInset, useViewportMeta } from './PWALayout'
+export { usePWAFeatures } from '@/hooks/use-pwa-features'
 
 // Development tools
 export { LayoutDebugger } from './LayoutDebugger'

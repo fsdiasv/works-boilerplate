@@ -26,6 +26,9 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
   className,
 }) => {
   const [isVisible, setIsVisible] = useState(false)
+  const [gridEnabled, setShowGrid] = useState(showGrid)
+  const [touchTargetsEnabled, setShowTouchTargets] = useState(showTouchTargets)
+  const [containerQueriesEnabled, setShowContainerQueries] = useState(showContainerQueries)
   const [performanceMetrics, setPerformanceMetrics] = useState({
     fps: 0,
     memory: 0,
@@ -105,6 +108,64 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
     }
   }, [showPerformance, isVisible])
 
+  // Handle debug styles
+  useEffect(() => {
+    const styleId = 'layout-debugger-styles'
+    let styleElement = document.getElementById(styleId) as HTMLStyleElement
+    
+    if (!isVisible) {
+      if (styleElement) {
+        styleElement.remove()
+      }
+      return
+    }
+
+    if (!styleElement) {
+      styleElement = document.createElement('style')
+      styleElement.id = styleId
+      document.head.appendChild(styleElement)
+    }
+
+    const styles: string[] = []
+
+    if (touchTargetsEnabled) {
+      styles.push(`
+        button, a, input, textarea, select, [role="button"], [tabindex]:not([tabindex="-1"]) {
+          position: relative;
+        }
+        button::after, a::after, input::after, textarea::after, select::after, [role="button"]::after, [tabindex]:not([tabindex="-1"])::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          min-width: 44px;
+          min-height: 44px;
+          border: 2px dashed rgba(255, 0, 255, 0.5);
+          pointer-events: none;
+          transform: translate(-50%, -50%);
+          left: 50%;
+          top: 50%;
+        }
+      `)
+    }
+
+    if (containerQueriesEnabled) {
+      styles.push(`
+        [class*="@container"], .container-queries {
+          outline: 2px dashed rgba(0, 255, 0, 0.5) !important;
+          outline-offset: -2px;
+        }
+      `)
+    }
+
+    styleElement.textContent = styles.join('\n')
+
+    return () => {
+      if (styleElement) {
+        styleElement.remove()
+      }
+    }
+  }, [isVisible, touchTargetsEnabled, containerQueriesEnabled])
+
   if (!isVisible) {
     return (
       <button
@@ -127,7 +188,7 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
   return (
     <>
       {/* Grid overlay */}
-      {showGrid && (
+      {gridEnabled && (
         <div
           className='pointer-events-none fixed inset-0 z-40'
           style={{
@@ -140,44 +201,9 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
         />
       )}
 
-      {/* Touch target indicators */}
-      {showTouchTargets && (
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-              button, a, input, textarea, select, [role="button"], [tabindex]:not([tabindex="-1"]) {
-                position: relative;
-              }
-              button::after, a::after, input::after, textarea::after, select::after, [role="button"]::after, [tabindex]:not([tabindex="-1"])::after {
-                content: '';
-                position: absolute;
-                inset: 0;
-                min-width: 44px;
-                min-height: 44px;
-                border: 2px dashed rgba(255, 0, 255, 0.5);
-                pointer-events: none;
-                transform: translate(-50%, -50%);
-                left: 50%;
-                top: 50%;
-              }
-            `,
-          }}
-        />
-      )}
+      {/* Touch target indicators are handled via useEffect */}
 
-      {/* Container query indicators */}
-      {showContainerQueries && (
-        <style
-          dangerouslySetInnerHTML={{
-            __html: `
-              [class*="@container"], .container-queries {
-                outline: 2px dashed rgba(0, 255, 0, 0.5) !important;
-                outline-offset: -2px;
-              }
-            `,
-          }}
-        />
-      )}
+      {/* Container query indicators are handled via useEffect */}
 
       {/* Debug panel */}
       <div
@@ -307,8 +333,8 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
           <label className='flex items-center gap-2'>
             <input
               type='checkbox'
-              checked={showGrid}
-              onChange={e => setIsVisible(e.target.checked)}
+              checked={gridEnabled}
+              onChange={e => setShowGrid(e.target.checked)}
               className='rounded'
             />
             Show Grid
@@ -316,8 +342,8 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
           <label className='flex items-center gap-2'>
             <input
               type='checkbox'
-              checked={showTouchTargets}
-              onChange={e => setIsVisible(e.target.checked)}
+              checked={touchTargetsEnabled}
+              onChange={e => setShowTouchTargets(e.target.checked)}
               className='rounded'
             />
             Show Touch Targets
@@ -325,8 +351,8 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
           <label className='flex items-center gap-2'>
             <input
               type='checkbox'
-              checked={showContainerQueries}
-              onChange={e => setIsVisible(e.target.checked)}
+              checked={containerQueriesEnabled}
+              onChange={e => setShowContainerQueries(e.target.checked)}
               className='rounded'
             />
             Show Container Queries

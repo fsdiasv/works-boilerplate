@@ -3,6 +3,9 @@
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 
 import { AuthLayout } from '@/components/auth/auth-layout'
 import { FormInput } from '@/components/ui/form-input'
@@ -10,15 +13,36 @@ import { PasswordInput } from '@/components/ui/password-input'
 import { PrimaryButton } from '@/components/ui/primary-button'
 import { SocialLoginButton } from '@/components/ui/social-login-button'
 
+const signupSchema = z.object({
+  name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name is too long'),
+  email: z.string().email('Invalid email address').min(1, 'Email is required'),
+  password: z
+    .string()
+    .min(8, 'Password must be at least 8 characters')
+    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
+    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
+    .regex(/[0-9]/, 'Password must contain at least one number'),
+})
+
+type SignupFormData = z.infer<typeof signupSchema>
+
 export default function SignUpPage() {
   const t = useTranslations('auth.signupPage')
   const locale = useLocale()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<SignupFormData>({
+    resolver: zodResolver(signupSchema),
+  })
+
+  const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true)
-    // Simulate API call
+    // Simulate API call with form data
+    console.log('Signup data:', data)
     await new Promise(resolve => setTimeout(resolve, 2000))
     setIsLoading(false)
   }
@@ -39,33 +63,33 @@ export default function SignUpPage() {
           </Link>
         </p>
 
-        <form onSubmit={e => void handleSubmit(e)} className='space-y-6'>
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
           <FormInput
             id='name'
-            name='name'
             label={t('nameLabel')}
             placeholder={t('namePlaceholder')}
-            required
             autoComplete='name'
+            {...(errors.name && { error: errors.name.message })}
+            {...register('name')}
           />
 
           <FormInput
             id='email'
-            name='email'
             type='email'
             label={t('emailLabel')}
             placeholder={t('emailPlaceholder')}
-            required
             autoComplete='email'
+            {...(errors.email && { error: errors.email.message })}
+            {...register('email')}
           />
 
           <PasswordInput
             id='password'
-            name='password'
             label={t('passwordLabel')}
             placeholder={t('passwordPlaceholder')}
-            required
             autoComplete='new-password'
+            {...(errors.password && { error: errors.password.message })}
+            {...register('password')}
           />
 
           <PrimaryButton type='submit' isLoading={isLoading}>

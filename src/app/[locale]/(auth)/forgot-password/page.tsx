@@ -3,20 +3,37 @@
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 
 import { AuthLayout } from '@/components/auth/auth-layout'
 import { FormInput } from '@/components/ui/form-input'
 import { PrimaryButton } from '@/components/ui/primary-button'
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email('Invalid email address').min(1, 'Email is required'),
+})
+
+type ForgotPasswordFormData = z.infer<typeof forgotPasswordSchema>
 
 export default function ForgotPasswordPage() {
   const t = useTranslations('auth.forgotPasswordPage')
   const locale = useLocale()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ForgotPasswordFormData>({
+    resolver: zodResolver(forgotPasswordSchema),
+  })
+
+  const onSubmit = async (data: ForgotPasswordFormData) => {
     setIsLoading(true)
-    // Simulate API call
+    // Simulate API call with form data
+    console.log('Password reset requested for:', data.email)
     await new Promise(resolve => setTimeout(resolve, 2000))
     setIsLoading(false)
   }
@@ -29,15 +46,15 @@ export default function ForgotPasswordPage() {
         </h1>
         <p className='mb-8 text-sm text-slate-500 sm:text-base lg:text-lg'>{t('description')}</p>
 
-        <form onSubmit={e => void handleSubmit(e)} className='space-y-6'>
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
           <FormInput
             id='email'
-            name='email'
             type='email'
             label={t('emailLabel')}
             placeholder={t('emailPlaceholder')}
-            required
             autoComplete='email'
+            {...(errors.email && { error: errors.email.message })}
+            {...register('email')}
           />
 
           <PrimaryButton type='submit' isLoading={isLoading}>

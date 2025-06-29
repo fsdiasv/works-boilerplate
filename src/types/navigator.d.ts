@@ -1,14 +1,15 @@
-interface Navigator {
-  standalone?: boolean
-  setAppBadge?: (count?: number) => Promise<void>
-  clearAppBadge?: () => Promise<void>
-}
+import type { BeforeInstallPromptEvent } from '@/lib/pwa'
 
-interface BeforeInstallPromptEvent extends Event {
-  prompt: () => Promise<void>
-  userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>
-}
+export {}
 
-interface WindowEventMap {
-  beforeinstallprompt: BeforeInstallPromptEvent
+declare global {
+  interface Navigator {
+    standalone?: boolean
+    setAppBadge?: (count?: number) => Promise<void>
+    clearAppBadge?: () => Promise<void>
+  }
+
+  interface WindowEventMap {
+    beforeinstallprompt: BeforeInstallPromptEvent
+  }
 }

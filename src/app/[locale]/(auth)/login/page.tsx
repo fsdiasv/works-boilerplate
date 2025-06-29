@@ -3,6 +3,9 @@
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { z } from 'zod'
 
 import { AuthLayout } from '@/components/auth/auth-layout'
 import { FormInput } from '@/components/ui/form-input'
@@ -10,15 +13,30 @@ import { PasswordInput } from '@/components/ui/password-input'
 import { PrimaryButton } from '@/components/ui/primary-button'
 import { SocialLoginButton } from '@/components/ui/social-login-button'
 
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address').min(1, 'Email is required'),
+  password: z.string().min(1, 'Password is required'),
+})
+
+type LoginFormData = z.infer<typeof loginSchema>
+
 export default function LoginPage() {
   const t = useTranslations('auth.loginPage')
   const locale = useLocale()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
+  })
+
+  const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
-    // Simulate API call
+    // Simulate API call with form data
+    console.log('Login data:', data)
     await new Promise(resolve => setTimeout(resolve, 2000))
     setIsLoading(false)
   }
@@ -39,25 +57,25 @@ export default function LoginPage() {
           </Link>
         </p>
 
-        <form onSubmit={e => void handleSubmit(e)} className='space-y-6'>
+        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
           <FormInput
             id='email'
-            name='email'
             type='email'
             label={t('emailLabel')}
             placeholder={t('emailPlaceholder')}
-            required
             autoComplete='email'
+            {...(errors.email && { error: errors.email.message })}
+            {...register('email')}
           />
 
           <div>
             <PasswordInput
               id='password'
-              name='password'
               label={t('passwordLabel')}
               placeholder={t('passwordPlaceholder')}
-              required
               autoComplete='current-password'
+              {...(errors.password && { error: errors.password.message })}
+              {...register('password')}
             />
             <div className='mt-2 text-right'>
               <Link

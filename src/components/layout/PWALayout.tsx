@@ -4,6 +4,7 @@ import { forwardRef, useEffect, useState } from 'react'
 import type React from 'react'
 
 import { cn } from '@/lib/utils'
+import type { BeforeInstallPromptEvent } from '@/lib/pwa'
 
 interface PWALayoutProps extends React.HTMLAttributes<HTMLDivElement> {
   children: React.ReactNode
@@ -34,7 +35,7 @@ export const PWALayout = forwardRef<HTMLDivElement, PWALayoutProps>(
   ) => {
     const [isStandalone, setIsStandalone] = useState(false)
     const [isPWAInstalled, setIsPWAInstalled] = useState(false)
-    const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+    const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
 
     useEffect(() => {
       // Check if running in standalone mode
@@ -91,7 +92,7 @@ export const PWALayout = forwardRef<HTMLDivElement, PWALayoutProps>(
       // Listen for install prompt
       const handleBeforeInstallPrompt = (e: Event) => {
         e.preventDefault()
-        setDeferredPrompt(e)
+        setDeferredPrompt(e as BeforeInstallPromptEvent)
       }
 
       window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
@@ -114,7 +115,7 @@ export const PWALayout = forwardRef<HTMLDivElement, PWALayoutProps>(
     const handleInstallClick = async () => {
       if (!deferredPrompt) return
 
-      deferredPrompt.prompt()
+      await deferredPrompt.prompt()
       const { outcome } = await deferredPrompt.userChoice
 
       if (outcome === 'accepted') {
@@ -139,37 +140,45 @@ export const PWALayout = forwardRef<HTMLDivElement, PWALayoutProps>(
       <div
         ref={ref}
         className={cn(
-          'relative',
+          // Mobile-first base styles
+          'relative min-h-screen w-full',
+          // Responsive layout adjustments
+          'flex flex-col',
           // Full screen mode
           fullScreen && 'fixed inset-0',
           // Safe area padding
           getSafeAreaClass(),
           // Standalone mode specific styles
           isStandalone && 'standalone-mode',
+          // Ensure proper touch scrolling on mobile
+          'overflow-x-hidden overflow-y-auto',
+          '-webkit-overflow-scrolling-touch',
           className
         )}
         {...props}
       >
         {children}
 
-        {/* Install prompt for PWA */}
+        {/* Install prompt for PWA - Mobile-first responsive design */}
         {showInstallPrompt && deferredPrompt && !isPWAInstalled && (
-          <div className='animate-slide-up fixed right-4 bottom-20 left-4 z-50 mx-auto max-w-sm'>
-            <div className='bg-background rounded-lg border p-4 shadow-lg'>
-              <h3 className='mb-2 font-semibold'>Install App</h3>
-              <p className='text-muted-foreground mb-3 text-sm'>
+          <div className='animate-slide-up fixed right-4 bottom-20 left-4 z-50 mx-auto w-full max-w-sm md:right-8 md:bottom-8 md:left-auto md:w-96'>
+            <div className='bg-background rounded-lg border p-4 shadow-lg md:p-6'>
+              <h3 className='mb-2 text-base font-semibold md:text-lg'>Install App</h3>
+              <p className='text-muted-foreground mb-3 text-sm md:mb-4'>
                 Install this app on your device for a better experience
               </p>
-              <div className='flex gap-2'>
+              <div className='flex flex-col gap-2 sm:flex-row'>
                 <button
                   onClick={handleInstallClick}
-                  className='bg-primary text-primary-foreground hover:bg-primary/90 flex-1 rounded-md px-4 py-2 text-sm font-medium'
+                  className='bg-primary text-primary-foreground hover:bg-primary/90 w-full rounded-md px-4 py-3 text-sm font-medium transition-colors active:scale-95 sm:flex-1 sm:py-2 min-h-[44px] touch-manipulation'
+                  aria-label="Install the app"
                 >
                   Install
                 </button>
                 <button
                   onClick={() => setDeferredPrompt(null)}
-                  className='hover:bg-muted rounded-md border px-4 py-2 text-sm font-medium'
+                  className='hover:bg-muted w-full rounded-md border px-4 py-3 text-sm font-medium transition-colors active:scale-95 sm:w-auto sm:py-2 min-h-[44px] touch-manipulation'
+                  aria-label="Dismiss install prompt"
                 >
                   Not now
                 </button>
@@ -183,48 +192,6 @@ export const PWALayout = forwardRef<HTMLDivElement, PWALayoutProps>(
 )
 
 PWALayout.displayName = 'PWALayout'
-
-/**
- * Hook for PWA features detection
- */
-export function usePWAFeatures() {
-  const [features, setFeatures] = useState({
-    isInstalled: false,
-    isStandalone: false,
-    canInstall: false,
-    isIOS: false,
-    isAndroid: false,
-    hasNotificationSupport: false,
-    hasShareSupport: false,
-  })
-
-  useEffect(() => {
-    const checkFeatures = async () => {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-      const isAndroid = /Android/.test(navigator.userAgent)
-      const isStandalone =
-        window.matchMedia('(display-mode: standalone)').matches ||
-        (window.navigator as any).standalone === true
-
-      const hasNotificationSupport = 'Notification' in window
-      const hasShareSupport = 'share' in navigator
-
-      setFeatures({
-        isInstalled: isStandalone,
-        isStandalone,
-        canInstall: !isStandalone,
-        isIOS,
-        isAndroid,
-        hasNotificationSupport,
-        hasShareSupport,
-      })
-    }
-
-    checkFeatures()
-  }, [])
-
-  return features
-}
 
 /**
  * Safe area inset component
@@ -246,7 +213,7 @@ export const SafeAreaInset: React.FC<SafeAreaInsetProps> = ({ position, classNam
 }
 
 /**
- * Viewport meta tag manager for PWA
+ * Viewport meta tag manager for PWA with mobile-first defaults
  */
 export function useViewportMeta(options: {
   width?: string
@@ -256,25 +223,42 @@ export function useViewportMeta(options: {
   maximumScale?: number
   userScalable?: boolean
   viewportFit?: 'auto' | 'contain' | 'cover'
-}) {
+} = {}) {
   useEffect(() => {
-    const viewport = document.querySelector('meta[name="viewport"]')
-    if (!viewport) return
+    let viewport = document.querySelector('meta[name="viewport"]')
+    
+    // Create viewport meta tag if it doesn't exist
+    if (!viewport) {
+      viewport = document.createElement('meta')
+      viewport.setAttribute('name', 'viewport')
+      document.head.appendChild(viewport)
+    }
 
+    // Mobile-first viewport settings with sensible defaults
     const content = [
       options.width ? `width=${options.width}` : 'width=device-width',
       options.height ? `height=${options.height}` : null,
-      options.initialScale ? `initial-scale=${options.initialScale}` : 'initial-scale=1',
-      options.minimumScale ? `minimum-scale=${options.minimumScale}` : null,
-      options.maximumScale ? `maximum-scale=${options.maximumScale}` : null,
+      options.initialScale !== undefined ? `initial-scale=${options.initialScale}` : 'initial-scale=1',
+      options.minimumScale !== undefined ? `minimum-scale=${options.minimumScale}` : 'minimum-scale=1',
+      options.maximumScale !== undefined ? `maximum-scale=${options.maximumScale}` : 'maximum-scale=5',
       options.userScalable !== undefined
         ? `user-scalable=${options.userScalable ? 'yes' : 'no'}`
-        : null,
+        : 'user-scalable=yes', // Allow zooming by default for accessibility
       options.viewportFit ? `viewport-fit=${options.viewportFit}` : 'viewport-fit=cover',
+      // Add shrink-to-fit=no for iOS 9+ compatibility
+      'shrink-to-fit=no',
     ]
       .filter(Boolean)
       .join(', ')
 
     viewport.setAttribute('content', content)
-  }, [options])
+    
+    // Return cleanup function to restore original viewport if component unmounts
+    return () => {
+      // Only reset to default if we created the viewport tag
+      if (viewport && viewport.parentNode && !document.querySelector('meta[name="viewport"][data-original]')) {
+        viewport.setAttribute('content', 'width=device-width, initial-scale=1')
+      }
+    }
+  }, [options.width, options.height, options.initialScale, options.minimumScale, options.maximumScale, options.userScalable, options.viewportFit])
 }
