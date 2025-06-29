@@ -23,7 +23,6 @@ to focus exclusively on delivering unique business value.
 # Core Features
 
 - **Mobile-First Progressive Web App (PWA) Foundation**
-
   - **What it does:** Provides a complete PWA setup, including a Web App
     Manifest, a caching Service Worker, and offline fallback pages. The entire
     architecture is designed with a mobile-first philosophy.
@@ -36,7 +35,6 @@ to focus exclusively on delivering unique business value.
     stale-while-revalidate for API data) and handle offline states gracefully.
 
 - **Global-Ready Internationalization (i18n)**
-
   - **What it does:** Implements a complete multi-language system supporting
     English, Spanish, and Portuguese out-of-the-box, with a clear structure for
     adding more languages.
@@ -48,7 +46,6 @@ to focus exclusively on delivering unique business value.
     user locale detection.
 
 - **Comprehensive & Accessible UI System**
-
   - **What it does:** Delivers a complete set of UI components built on
     `shadcn/ui` and `Tailwind CSS`. Every component is responsive,
     touch-friendly, accessible (WCAG 2.1 AA), and supports dark mode.
@@ -61,7 +58,6 @@ to focus exclusively on delivering unique business value.
     variants.
 
 - **Secure Authentication & Multi-Tenancy**
-
   - **What it does:** Implements a full authentication system (email/password,
     OAuth) and a workspace-based multi-tenancy model with data isolation
     enforced at the database level.
@@ -74,7 +70,6 @@ to focus exclusively on delivering unique business value.
     access data within their authorized workspace.
 
 - **Type-Safe Full-Stack API**
-
   - **What it does:** Provides a fully-configured, end-to-end type-safe API
     layer.
   - **Why it's important:** It eliminates an entire class of bugs related to
@@ -99,7 +94,6 @@ to focus exclusively on delivering unique business value.
 # User Experience
 
 - **User Personas**
-
   - **Primary Persona: Alex, the Senior Full-Stack Engineer.** Alex's goal is to
     ship high-quality features as quickly as possible. They value clear
     patterns, automation, and a boilerplate that "just works" so they can focus
@@ -107,7 +101,6 @@ to focus exclusively on delivering unique business value.
     developer experience with fast builds, hot reloading, and type-safety.
 
 - **Key User Flows**
-
   - **Developer Flow 1: Project Initialization:**
     1.  Alex clones the boilerplate repository.
     2.  Runs `pnpm install` to set up dependencies.
@@ -148,7 +141,6 @@ to focus exclusively on delivering unique business value.
 # Technical Architecture
 
 - **System Components**
-
   - **Frontend:** Next.js 15 App Router, React 19, Tailwind CSS.
   - **Backend/API:** tRPC running on Next.js API Routes.
   - **Database:** PostgreSQL hosted on Supabase.
@@ -161,13 +153,11 @@ to focus exclusively on delivering unique business value.
   - **Hosting:** Vercel.
 
 - **Data Models**
-
   - The core data structure is centered around Users, Workspaces, and
     Subscriptions, enabling a standard multi-tenant SaaS model. See Appendix for
     the full Prisma schema.
 
 - **APIs and Integrations**
-
   - **Internal API:** A unified, type-safe API is provided via tRPC.
   - **External Integrations:**
     - **Supabase:** For database, authentication, and file storage.
@@ -186,7 +176,6 @@ to focus exclusively on delivering unique business value.
 # Development Roadmap
 
 - **MVP (v1.0) Requirements: The Production-Ready Foundation**
-
   - **Phase 1: Core Setup & UI Foundation**
     - Next.js 15, TypeScript, and Tailwind CSS configuration.
     - Basic PWA setup (Manifest, empty Service Worker).
@@ -345,7 +334,6 @@ to focus exclusively on delivering unique business value.
   ```
 
 - **Definition of Done (DoD)** A feature is considered "done" when:
-
   - It is implemented and functional.
   - It is mobile-first and fully responsive.
   - All user-facing strings are internationalized.
@@ -843,7 +831,6 @@ works-boilerplate/
 ## 6.1 Phase 1: Foundation + Mobile (5 days)
 
 1.  **Initial project setup**
-
     - Next.js 15 with strict TypeScript
     - Mobile-first Tailwind configuration
     - Basic PWA setup
@@ -857,7 +844,6 @@ works-boilerplate/
 ## 6.2 Phase 2: Core Features + Components (6 days)
 
 1.  **Component system**
-
     - All shadcn/ui components
     - Mobile adaptations
     - Touch interactions
@@ -869,7 +855,6 @@ works-boilerplate/
 ## 6.3 Phase 3: PWA + Offline (4 days)
 
 1.  **Progressive Web App**
-
     - Complete service worker
     - Offline strategies
     - Install flow

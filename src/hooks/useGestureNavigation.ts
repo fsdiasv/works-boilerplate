@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
-import { useGesture } from 'react-use-gesture'
+import { useDrag } from '@use-gesture/react'
 
 interface UseGestureNavigationOptions {
   enabled?: boolean
@@ -40,43 +40,39 @@ export function useGestureNavigation({
     }
   }, [onSwipeRight, enableBackGesture, router])
 
-  const bind = useGesture(
-    {
-      onDrag: ({ movement, velocity, direction, cancel }) => {
-        const mx = (movement as unknown as [number, number])[0]
-        const vx = (velocity as unknown as [number, number])[0]
-        const dx = (direction as unknown as [number, number])[0]
-        if (!enabled) return
+  const bind = useDrag(
+    ({ movement, velocity, direction, cancel, last }) => {
+      const [mx] = movement
+      const [vx] = velocity
+      const [dx] = direction
+      if (!enabled) return
 
-        // Prevent navigation if already navigating
-        if (isNavigating) {
-          cancel()
-          return
+      // Prevent navigation if already navigating
+      if (isNavigating) {
+        cancel()
+        return
+      }
+
+      // Check for swipe gestures
+      if (last && (Math.abs(mx) > threshold || Math.abs(vx) > 0.5)) {
+        setIsNavigating(true)
+
+        if (dx > 0 && mx > threshold) {
+          // Swipe right
+          handleSwipeRight()
+        } else if (dx < 0 && mx < -threshold) {
+          // Swipe left
+          handleSwipeLeft()
         }
 
-        // Check for swipe gestures
-        if (Math.abs(mx) > threshold || Math.abs(vx) > 0.5) {
-          setIsNavigating(true)
-
-          if (dx > 0 && mx > threshold) {
-            // Swipe right
-            handleSwipeRight()
-          } else if (dx < 0 && mx < -threshold) {
-            // Swipe left
-            handleSwipeLeft()
-          }
-
-          // Reset navigating state after animation
-          setTimeout(() => setIsNavigating(false), 300)
-        }
-      },
+        // Reset navigating state after animation
+        setTimeout(() => setIsNavigating(false), 300)
+      }
     },
     {
-      drag: {
-        axis: 'x',
-        bounds: { left: -200, right: 200 },
-        rubberband: true,
-      },
+      axis: 'x',
+      bounds: { left: -200, right: 200 },
+      rubberband: true,
     }
   )
 
@@ -123,38 +119,34 @@ export function usePullToRefresh({
     }
   }, [onRefresh, isRefreshing])
 
-  const bind = useGesture(
-    {
-      onDrag: ({ movement, direction, first, last }) => {
-        const my = (movement as [number, number])[1]
-        const dy = (direction as [number, number])[1]
-        if (!enabled || isRefreshing) return
+  const bind = useDrag(
+    ({ movement, direction, first, last }) => {
+      const [, my] = movement
+      const [, dy] = direction
+      if (!enabled || isRefreshing) return
 
-        // Only trigger on downward swipes from the top
-        if (first && window.scrollY > 0) return
+      // Only trigger on downward swipes from the top
+      if (first && window.scrollY > 0) return
 
-        if (dy > 0 && my > 0) {
-          const distance = Math.min(my * resistance, threshold * 1.5)
-          setPullDistance(distance)
-          setCanRefresh(distance >= threshold)
+      if (dy > 0 && my > 0) {
+        const distance = Math.min(my * resistance, threshold * 1.5)
+        setPullDistance(distance)
+        setCanRefresh(distance >= threshold)
+      }
+
+      if (last) {
+        if (canRefresh) {
+          void handleRefresh()
+        } else {
+          setPullDistance(0)
+          setCanRefresh(false)
         }
-
-        if (last) {
-          if (canRefresh) {
-            void handleRefresh()
-          } else {
-            setPullDistance(0)
-            setCanRefresh(false)
-          }
-        }
-      },
+      }
     },
     {
-      drag: {
-        axis: 'y',
-        bounds: { top: 0, bottom: threshold * 2 },
-        rubberband: true,
-      },
+      axis: 'y',
+      bounds: { top: 0, bottom: threshold * 2 },
+      rubberband: true,
     }
   )
 
@@ -195,47 +187,43 @@ export function useSwipeNavigation({
 
   const currentIndex = views.indexOf(currentView)
 
-  const bind = useGesture(
-    {
-      onDrag: ({ movement, dragging, velocity, direction, last }) => {
-        const mx = (movement as unknown as [number, number])[0]
-        const vx = (velocity as unknown as [number, number])[0]
-        const dx = (direction as unknown as [number, number])[0]
-        if (!enabled) return
+  const bind = useDrag(
+    ({ movement, dragging, velocity, direction, last }) => {
+      const [mx] = movement
+      const [vx] = velocity
+      const [dx] = direction
+      if (!enabled) return
 
-        setIsDragging(dragging)
+      setIsDragging(dragging ?? false)
 
-        if (!last) {
-          setDragOffset(mx)
-          return
+      if (!last) {
+        setDragOffset(mx)
+        return
+      }
+
+      // Determine if we should navigate
+      const shouldNavigate = Math.abs(mx) > threshold || Math.abs(vx) > 0.5
+
+      if (shouldNavigate) {
+        if (dx > 0 && currentIndex > 0) {
+          // Swipe right - go to previous view
+          const prevView = views[currentIndex - 1]
+          if (prevView != null) onViewChange(prevView)
+        } else if (dx < 0 && currentIndex < views.length - 1) {
+          // Swipe left - go to next view
+          const nextView = views[currentIndex + 1]
+          if (nextView != null) onViewChange(nextView)
         }
+      }
 
-        // Determine if we should navigate
-        const shouldNavigate = Math.abs(mx) > threshold || Math.abs(vx) > 0.5
-
-        if (shouldNavigate) {
-          if (dx > 0 && currentIndex > 0) {
-            // Swipe right - go to previous view
-            const prevView = views[currentIndex - 1]
-            if (prevView != null) onViewChange(prevView)
-          } else if (dx < 0 && currentIndex < views.length - 1) {
-            // Swipe left - go to next view
-            const nextView = views[currentIndex + 1]
-            if (nextView != null) onViewChange(nextView)
-          }
-        }
-
-        // Reset
-        setDragOffset(0)
-        setIsDragging(false)
-      },
+      // Reset
+      setDragOffset(0)
+      setIsDragging(false)
     },
     {
-      drag: {
-        axis: 'x',
-        bounds: { left: -200, right: 200 },
-        rubberband: true,
-      },
+      axis: 'x',
+      bounds: { left: -200, right: 200 },
+      rubberband: true,
     }
   )
 

@@ -104,6 +104,12 @@
     --safe-area-inset-right: env(safe-area-inset-right);
     --safe-area-inset-bottom: env(safe-area-inset-bottom);
     --safe-area-inset-left: env(safe-area-inset-left);
+
+    /* Shorthand variables for safe area insets */
+    --sat: var(--safe-area-inset-top);
+    --sar: var(--safe-area-inset-right);
+    --sab: var(--safe-area-inset-bottom);
+    --sal: var(--safe-area-inset-left);
   }
 
   .dark {
@@ -390,17 +396,239 @@
       opacity: 1;
     }
   }
+
+  /* Viewport-aware spacing utilities */
+  .p-fluid {
+    padding: clamp(1rem, 2vw + 0.5rem, 2rem);
+  }
+
+  .px-fluid {
+    padding-left: clamp(1rem, 3vw + 0.5rem, 3rem);
+    padding-right: clamp(1rem, 3vw + 0.5rem, 3rem);
+  }
+
+  .py-fluid {
+    padding-top: clamp(1rem, 2vw + 0.5rem, 2rem);
+    padding-bottom: clamp(1rem, 2vw + 0.5rem, 2rem);
+  }
+
+  .m-fluid {
+    margin: clamp(1rem, 2vw + 0.5rem, 2rem);
+  }
+
+  .mx-fluid {
+    margin-left: clamp(1rem, 3vw + 0.5rem, 3rem);
+    margin-right: clamp(1rem, 3vw + 0.5rem, 3rem);
+  }
+
+  .my-fluid {
+    margin-top: clamp(1rem, 2vw + 0.5rem, 2rem);
+    margin-bottom: clamp(1rem, 2vw + 0.5rem, 2rem);
+  }
+
+  .gap-fluid {
+    gap: clamp(0.5rem, 1.5vw + 0.25rem, 1.5rem);
+  }
+
+  /* Container queries utility */
+  .container-queries {
+    container-type: inline-size;
+  }
+
+  /* Safe area container for PWA */
+  .safe-area-container {
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  /* Responsive touch targets */
+  .touch-responsive {
+    min-height: clamp(2.75rem, 5vw, 3.5rem);
+    min-width: clamp(2.75rem, 5vw, 3.5rem);
+  }
+
+  /* Viewport units with fallback */
+  .vw-100 {
+    width: 100vw;
+    width: 100dvw;
+  }
+
+  .vh-100 {
+    height: 100vh;
+    height: 100dvh;
+  }
+
+  /* Dynamic padding based on viewport */
+  .px-viewport {
+    padding-left: max(1rem, env(safe-area-inset-left));
+    padding-right: max(1rem, env(safe-area-inset-right));
+  }
+
+  .py-viewport {
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
 }
 
 /* Print styles */
 @media print {
-  .no-print {
+  /* Hide non-essential elements */
+  .no-print,
+  nav,
+  aside,
+  footer,
+  .btn-touch,
+  .glass,
+  [role='navigation'],
+  [role='banner']:not(.print-header),
+  [aria-label*='menu'],
+  [aria-label*='navigation'] {
     display: none !important;
   }
 
+  /* Reset colors for better print contrast */
   * {
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Base text and background */
+  body {
     color: black !important;
     background: white !important;
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+
+  /* Headings */
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: black !important;
+    page-break-after: avoid;
+    page-break-inside: avoid;
+  }
+
+  h1 {
+    font-size: 20pt;
+  }
+  h2 {
+    font-size: 18pt;
+  }
+  h3 {
+    font-size: 16pt;
+  }
+  h4 {
+    font-size: 14pt;
+  }
+  h5,
+  h6 {
+    font-size: 12pt;
+  }
+
+  /* Links */
+  a {
+    color: black !important;
+    text-decoration: underline;
+  }
+
+  /* Show link URLs */
+  a[href^='http']:after {
+    content: ' (' attr(href) ')';
+    font-size: 0.8em;
+    color: #666;
+  }
+
+  /* Images */
+  img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  /* Tables */
+  table {
+    border-collapse: collapse !important;
+    width: 100%;
+  }
+
+  table,
+  th,
+  td {
+    border: 1px solid #ddd !important;
+  }
+
+  th,
+  td {
+    padding: 8px !important;
+  }
+
+  /* Page breaks */
+  .page-break {
+    page-break-after: always;
+  }
+
+  .avoid-break {
+    page-break-inside: avoid;
+  }
+
+  /* Margins for print */
+  @page {
+    margin: 2cm;
+    size: A4;
+  }
+
+  /* Container adjustments */
+  .container,
+  main,
+  article {
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  /* Grid and flex adjustments */
+  .grid {
+    display: block !important;
+  }
+
+  .grid > * {
+    display: block !important;
+    width: 100% !important;
+    margin-bottom: 1em;
+  }
+
+  /* Remove shadows and effects */
+  * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* Ensure content is visible */
+  .print-visible {
+    display: block !important;
+    visibility: visible !important;
+  }
+
+  /* Typography adjustments */
+  p,
+  li {
+    orphans: 3;
+    widows: 3;
+  }
+
+  /* Code blocks */
+  pre,
+  code {
+    border: 1px solid #ddd;
+    page-break-inside: avoid;
+    font-family: monospace;
+    font-size: 11pt;
   }
 }
 

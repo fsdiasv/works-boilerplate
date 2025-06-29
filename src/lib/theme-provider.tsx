@@ -60,7 +60,6 @@ export function useStandaloneMode(): boolean {
     // Check if running in standalone mode
     const isStandaloneMode =
       window.matchMedia('(display-mode: standalone)').matches ||
-      // @ts-expect-error Legacy iOS PWA detection
       Boolean(window.navigator.standalone) ||
       document.referrer.includes('android-app://')
 

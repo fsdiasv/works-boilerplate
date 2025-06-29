@@ -23,7 +23,14 @@
       "feedback": "Feedback",
       "search": "Buscar",
       "create": "Criar",
-      "favorites": "Favoritos"
+      "favorites": "Favoritos",
+      "notifications": "Notificações",
+      "menu": "Menu",
+      "main": "Principal",
+      "account": "Conta",
+      "support": "Suporte",
+      "help": "Ajuda",
+      "logout": "Sair"
     },
     "actions": {
       "save": "Salvar",
@@ -49,6 +56,9 @@
       "info": "Informação"
     }
   },
+  "app": {
+    "name": "Works"
+  },
   "auth": {
     "signin": "Entrar",
     "signup": "Cadastrar",
@@ -62,7 +72,52 @@
     "passwordRequired": "Senha é obrigatória",
     "invalidCredentials": "Credenciais inválidas",
     "accountCreated": "Conta criada com sucesso",
-    "welcomeBack": "Bem-vindo de volta!"
+    "welcomeBack": "Bem-vindo de volta!",
+    "signupPage": {
+      "title": "Cadastre-se no Copy UI.",
+      "subtitle": "Já tem uma conta?",
+      "subtitleLink": "Entrar",
+      "nameLabel": "Nome",
+      "namePlaceholder": "Seu nome",
+      "emailLabel": "Endereço de e-mail",
+      "emailPlaceholder": "Digite o e-mail para começar",
+      "passwordLabel": "Senha",
+      "passwordPlaceholder": "Digite sua senha",
+      "submitButton": "Cadastrar",
+      "divider": "Ou continue com",
+      "legalText": "Ao criar uma conta você concorda com nossos",
+      "termsOfService": "Termos de Serviço",
+      "and": "e nossa",
+      "privacyPolicy": "Política de Privacidade"
+    },
+    "loginPage": {
+      "title": "Bem-vindo de volta!",
+      "subtitle": "Não tem uma conta?",
+      "subtitleLink": "Cadastre-se",
+      "emailLabel": "Endereço de e-mail",
+      "emailPlaceholder": "Digite seu e-mail",
+      "passwordLabel": "Senha",
+      "passwordPlaceholder": "Digite sua senha",
+      "forgotPasswordLink": "Esqueceu sua senha?",
+      "submitButton": "Entrar",
+      "divider": "Ou continue com"
+    },
+    "forgotPasswordPage": {
+      "title": "Esqueceu sua senha?",
+      "description": "Sem problemas. Digite seu endereço de e-mail abaixo e enviaremos um link para redefini-la.",
+      "emailLabel": "Endereço de e-mail",
+      "emailPlaceholder": "seu.email@exemplo.com",
+      "submitButton": "Enviar link de redefinição",
+      "backToLogin": "Voltar para",
+      "backToLoginLink": "Entrar"
+    },
+    "testimonial": {
+      "author": {
+        "name": "Peter Mick",
+        "title": "Fundador da Copytime e Tweetsiu"
+      },
+      "quote": "O Works-Boilerplate tem sido um <highlight>divisor de águas</highlight> para mim! É incrivelmente intuitivo e transformou a maneira como abordo o design. Não consigo imaginar trabalhar sem ele. 🚀"
+    }
   },
   "dashboard": {
     "title": "Painel",

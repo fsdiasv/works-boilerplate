@@ -1,10 +1,10 @@
 'use client'
 
+import { useDrag } from '@use-gesture/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import type React from 'react'
-import { useGesture } from 'react-use-gesture'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -120,36 +120,35 @@ export function DrawerNavigation({
     [enableSwipeToClose, onClose, side, width, enableHapticFeedback]
   )
 
-  const bind = useGesture(
-    {
-      onDrag: ({ movement, dragging }) => {
-        setIsDragging(dragging)
-        handleDrag(movement as unknown as [number, number])
-      },
-      onDragEnd: ({ movement, velocity }) => {
-        handleDragEnd(
-          movement as unknown as [number, number],
-          velocity as unknown as [number, number]
-        )
-      },
+  const bind = useDrag(
+    ({ movement, dragging, velocity, last }) => {
+      if (!enableSwipeToClose) return
+      
+      setIsDragging(dragging ?? false)
+      handleDrag(movement)
+      
+      if (last) {
+        handleDragEnd(movement, velocity)
+      }
     },
     {
-      drag: {
-        axis: 'x',
-        bounds: {
-          left: side === 'left' ? -width * 0.3 : 0,
-          right: side === 'right' ? width * 0.3 : 0,
-        },
-        rubberband: true,
+      axis: 'x',
+      bounds: {
+        left: side === 'left' ? -width * 0.3 : 0,
+        right: side === 'right' ? width * 0.3 : 0,
       },
+      rubberband: true,
+      enabled: enableSwipeToClose,
     }
   )
+
+  const dragHandlers = enableSwipeToClose ? bind() : {}
 
   const drawerVariants = {
     closed: {
       x: side === 'left' ? -width : width,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 300,
         damping: 30,
       },
@@ -157,7 +156,7 @@ export function DrawerNavigation({
     open: {
       x: 0,
       transition: {
-        type: 'spring',
+        type: 'spring' as const,
         stiffness: 300,
         damping: 30,
       },
@@ -199,7 +198,11 @@ export function DrawerNavigation({
             animate='open'
             exit='closed'
             variants={drawerVariants}
-            {...(enableSwipeToClose ? bind() : {})}
+            onPointerDown={dragHandlers.onPointerDown}
+            onPointerMove={dragHandlers.onPointerMove}
+            onPointerUp={dragHandlers.onPointerUp}
+            onPointerCancel={dragHandlers.onPointerCancel}
+            onPointerLeave={dragHandlers.onPointerLeave}
             style={{
               x: dragOffset,
               width,

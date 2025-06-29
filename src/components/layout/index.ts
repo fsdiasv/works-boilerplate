@@ -1,22 +1,43 @@
-// Layout Components
+// Base layout components
 export { Container } from './Container'
 export { Grid, GridItem } from './Grid'
+export { Stack, Spacer } from './Stack'
+export { Section } from './Section'
+
+// Typography
 export { Typography, Heading, Text } from './Typography'
+
+// Images
 export { OptimizedImage, AvatarImage } from './OptimizedImage'
+export { ResponsiveImage, Picture } from './ResponsiveImage'
 
-// Navigation Components
-export { BottomTabNavigation } from '../navigation/components/BottomTabNavigation'
-export { SmartHeader, SearchHeader } from '../navigation/components/SmartHeader'
-export { DrawerNavigation, DrawerNavItems } from '../navigation/components/DrawerNavigation'
-export { PullToRefresh } from '../navigation/components/PullToRefresh'
-
-// Hooks
+// Responsive utilities
 export {
-  useGestureNavigation,
-  usePullToRefresh,
-  useSwipeNavigation,
-} from '../../hooks/useGestureNavigation'
-export { useWebVitals, useLayoutShiftMonitoring } from '../../hooks/useWebVitals'
+  useViewport,
+  useDeviceCapabilities,
+  useResponsiveValue,
+  useContainerQuery,
+} from './ResponsiveUtils'
 
-// Monitoring
-export { PerformanceMonitor } from '../monitoring/PerformanceMonitor'
+// Adaptive loading
+export {
+  AdaptiveLoader,
+  DynamicComponent,
+  ProgressiveEnhancement,
+  ResourceHint,
+} from './AdaptiveLoader'
+
+// Core Web Vitals
+export {
+  WebVitals,
+  useLayoutShiftPrevention,
+  LayoutStable,
+  useFontLoadOptimization,
+} from './WebVitals'
+
+// PWA features
+export { PWALayout, SafeAreaInset, useViewportMeta } from './PWALayout'
+export { usePWAFeatures } from '@/hooks/use-pwa-features'
+
+// Development tools
+export { LayoutDebugger } from './LayoutDebugger'
