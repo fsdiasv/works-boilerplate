@@ -1,10 +1,10 @@
 'use client'
 
+import { useDrag } from '@use-gesture/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import type React from 'react'
-import { useDrag } from '@use-gesture/react'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'

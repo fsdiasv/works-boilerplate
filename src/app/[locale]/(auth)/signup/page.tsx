@@ -39,10 +39,9 @@ export default function SignUpPage() {
     resolver: zodResolver(signupSchema),
   })
 
-  const onSubmit = async (data: SignupFormData) => {
+  const onSubmit = async (_data: SignupFormData) => {
     setIsLoading(true)
-    // Simulate API call with form data
-    console.log('Signup data:', data)
+    // TODO: Implement actual signup API call with form data
     await new Promise(resolve => setTimeout(resolve, 2000))
     setIsLoading(false)
   }
@@ -63,7 +62,7 @@ export default function SignUpPage() {
           </Link>
         </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+        <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className='space-y-6'>
           <FormInput
             id='name'
             label={t('nameLabel')}
@@ -107,7 +106,7 @@ export default function SignUpPage() {
             </div>
           </div>
 
-          <div className='mt-6 flex gap-4'>
+          <div className='mt-6 grid grid-cols-3 gap-3'>
             <SocialLoginButton provider='google' />
             <SocialLoginButton provider='twitter' />
             <SocialLoginButton provider='github' />

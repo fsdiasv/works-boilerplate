@@ -33,10 +33,9 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   })
 
-  const onSubmit = async (data: LoginFormData) => {
+  const onSubmit = async (_data: LoginFormData) => {
     setIsLoading(true)
-    // Simulate API call with form data
-    console.log('Login data:', data)
+    // TODO: Implement actual login API call with form data
     await new Promise(resolve => setTimeout(resolve, 2000))
     setIsLoading(false)
   }
@@ -44,10 +43,10 @@ export default function LoginPage() {
   return (
     <AuthLayout>
       <div className='w-full'>
-        <h1 className='mb-2 text-3xl font-bold text-slate-800 sm:text-4xl lg:text-5xl'>
+        <h1 className='mb-2 text-3xl font-bold text-slate-800 sm:text-4xl lg:text-4xl xl:text-5xl'>
           {t('title')}
         </h1>
-        <p className='mb-8 text-sm text-slate-500 sm:text-base lg:text-lg'>
+        <p className='mb-8 text-sm text-slate-500 sm:text-base'>
           {t('subtitle')}{' '}
           <Link
             href={`/${locale}/signup`}
@@ -57,7 +56,7 @@ export default function LoginPage() {
           </Link>
         </p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+        <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className='space-y-6'>
           <FormInput
             id='email'
             type='email'
@@ -102,7 +101,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <div className='mt-6 flex gap-4'>
+          <div className='mt-6 grid grid-cols-3 gap-3'>
             <SocialLoginButton provider='google' />
             <SocialLoginButton provider='twitter' />
             <SocialLoginButton provider='github' />

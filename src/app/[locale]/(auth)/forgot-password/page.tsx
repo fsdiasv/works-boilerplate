@@ -1,10 +1,10 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 
 import { AuthLayout } from '@/components/auth/auth-layout'
@@ -30,10 +30,9 @@ export default function ForgotPasswordPage() {
     resolver: zodResolver(forgotPasswordSchema),
   })
 
-  const onSubmit = async (data: ForgotPasswordFormData) => {
+  const onSubmit = async (_data: ForgotPasswordFormData) => {
     setIsLoading(true)
-    // Simulate API call with form data
-    console.log('Password reset requested for:', data.email)
+    // TODO: Implement actual password reset API call
     await new Promise(resolve => setTimeout(resolve, 2000))
     setIsLoading(false)
   }
@@ -46,7 +45,7 @@ export default function ForgotPasswordPage() {
         </h1>
         <p className='mb-8 text-sm text-slate-500 sm:text-base lg:text-lg'>{t('description')}</p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className='space-y-6'>
+        <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className='space-y-6'>
           <FormInput
             id='email'
             type='email'
