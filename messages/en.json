@@ -151,6 +151,9 @@
       "backToLogin": "Back to Login",
       "invalidLink": "Invalid verification link"
     },
+    "deleteAccount": {
+      "confirmationText": "DELETE MY ACCOUNT"
+    },
     "toast": {
       "checkEmail": "Check your email to confirm your account",
       "signedOut": "You have been signed out successfully",

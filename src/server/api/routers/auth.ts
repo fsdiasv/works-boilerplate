@@ -291,6 +291,8 @@ export const authRouter = createTRPCRouter({
   deleteAccount: accountDeletionRateLimitedProcedure
     .input(
       z.object({
+        // Frontend should use auth.deleteAccount.confirmationText translation key
+        // The literal value must match what's in the translation files
         confirmation: z.literal('DELETE MY ACCOUNT'),
       })
     )

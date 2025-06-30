@@ -136,6 +136,9 @@
       "backToLogin": "Volver a Iniciar Sesión",
       "invalidLink": "Enlace de verificación inválido"
     },
+    "deleteAccount": {
+      "confirmationText": "ELIMINAR MI CUENTA"
+    },
     "toast": {
       "checkEmail": "Revisa tu correo para confirmar tu cuenta",
       "signedOut": "Has cerrado sesión exitosamente",
