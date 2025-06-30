@@ -3,7 +3,13 @@ import { getTranslations } from 'next-intl/server'
 // import { hash, compare } from 'bcryptjs' // TODO: Remove if not needed
 import { z } from 'zod'
 
-import { createTRPCRouter, publicProcedure, protectedProcedure } from '@/server/api/trpc'
+import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
+import {
+  authRateLimitedProcedure,
+  passwordResetRateLimitedProcedure,
+  accountDeletionRateLimitedProcedure,
+  rateLimitedProtectedProcedure,
+} from '@/server/api/trpc-rate-limited'
 
 // Helper to create schemas with translations
 async function createSignUpSchema(locale: string) {
@@ -63,7 +69,7 @@ export const authRouter = createTRPCRouter({
   }),
 
   // Sign up
-  signUp: publicProcedure
+  signUp: authRateLimitedProcedure
     .input(
       z.object({
         email: z.string(),
@@ -143,7 +149,7 @@ export const authRouter = createTRPCRouter({
     }),
 
   // Update password
-  updatePassword: protectedProcedure
+  updatePassword: rateLimitedProtectedProcedure
     .input(
       z.object({
         currentPassword: z.string(),
@@ -214,7 +220,7 @@ export const authRouter = createTRPCRouter({
    * 2. Synchronizes fullName and avatarUrl to the database user record
    * 3. Upserts the user's profile with additional information (bio, website, etc.)
    */
-  updateProfile: protectedProcedure
+  updateProfile: rateLimitedProtectedProcedure
     .input(
       z.object({
         fullName: z.string().optional(),
@@ -282,7 +288,7 @@ export const authRouter = createTRPCRouter({
     }),
 
   // Delete account
-  deleteAccount: protectedProcedure
+  deleteAccount: accountDeletionRateLimitedProcedure
     .input(
       z.object({
         confirmation: z.literal('DELETE MY ACCOUNT'),
@@ -298,21 +304,27 @@ export const authRouter = createTRPCRouter({
         where: { id: ctx.user.id },
       })
 
-      // Then delete from Supabase
-      const { error } = await ctx.supabase.auth.admin.deleteUser(ctx.user.id)
+      // Sign out the user from their current session
+      const { error: signOutError } = await ctx.supabase.auth.signOut()
 
-      if (error) {
+      if (signOutError) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to delete account',
+          message: 'Failed to sign out user',
         })
       }
+
+      // Note: The actual deletion from Supabase Auth should be handled by:
+      // 1. A database trigger that calls a Supabase Edge Function
+      // 2. A scheduled job that processes deletions
+      // 3. A webhook endpoint that's called after database deletion
+      // This ensures the service role key is never exposed to client code
 
       return { success: true }
     }),
 
   // Send password reset email
-  sendPasswordResetEmail: publicProcedure
+  sendPasswordResetEmail: passwordResetRateLimitedProcedure
     .input(
       z.object({
         email: z.string(),
@@ -341,7 +353,7 @@ export const authRouter = createTRPCRouter({
     }),
 
   // Verify email
-  verifyEmail: publicProcedure
+  verifyEmail: authRateLimitedProcedure
     .input(
       z.object({
         token: z.string(),
@@ -365,7 +377,7 @@ export const authRouter = createTRPCRouter({
     }),
 
   // Sign out
-  signOut: protectedProcedure.mutation(async ({ ctx }) => {
+  signOut: rateLimitedProtectedProcedure.mutation(async ({ ctx }) => {
     const { error } = await ctx.supabase.auth.signOut()
 
     if (error) {

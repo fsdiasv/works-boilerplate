@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import createMiddleware from 'next-intl/middleware'
 
 import { defaultLocale, locales } from '@/i18n/config'
+import { addCSPHeaders } from '@/lib/csp'
 import { updateSession } from '@/lib/supabase/middleware'
 
 const intlMiddleware = createMiddleware({
@@ -75,7 +76,11 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(`/${locale}`, request.url))
   }
 
-  // Return the response with any auth cookie updates
+  // Add CSP headers
+  const isDev = process.env.NODE_ENV === 'development'
+  addCSPHeaders(authResponse.headers, isDev)
+
+  // Return the response with any auth cookie updates and CSP headers
   return authResponse
 }
 
