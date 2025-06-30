@@ -74,15 +74,20 @@ protection.
 
 ## Environment Variables Required
 
-Add these to your `.env.local`:
+See [Environment Setup Guide](./environment-setup.md) for detailed instructions.
+
+**Quick Setup:**
 
 ```bash
-# Internal API secret for secure endpoints (generate a 32+ char random string)
-INTERNAL_API_SECRET=your-very-secure-random-string-here
+# Generate a secure INTERNAL_API_SECRET
+node scripts/generate-secret.js
 
-# Upstash Redis (optional for development, required for production)
-UPSTASH_REDIS_REST_URL=https://your-redis-url.upstash.io
-UPSTASH_REDIS_REST_TOKEN=your-token
+# Add to your .env.local:
+INTERNAL_API_SECRET="your-generated-secret-here"
+
+# Optional: Add Upstash Redis for production rate limiting
+UPSTASH_REDIS_REST_URL="https://your-redis-url.upstash.io"
+UPSTASH_REDIS_REST_TOKEN="your-token"
 ```
 
 ## Testing Instructions
