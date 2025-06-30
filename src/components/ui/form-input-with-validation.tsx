@@ -1,6 +1,7 @@
 'use client'
 
 import { Check, AlertCircle } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import { forwardRef, InputHTMLAttributes, useState, useEffect } from 'react'
 
 import { useDebouncedValidation } from '@/hooks/use-debounced-validation'
@@ -30,6 +31,8 @@ const FormInputWithValidation = forwardRef<HTMLInputElement, FormInputWithValida
     },
     ref
   ) => {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const t = useTranslations('validation')
     const [localValue, setLocalValue] = useState((value as string) || '')
     const { validationError, isValidating } = useDebouncedValidation(localValue, {
       delay: validationDelay,
@@ -90,9 +93,9 @@ const FormInputWithValidation = forwardRef<HTMLInputElement, FormInputWithValida
             localValue !== '' && (
               <div className='absolute top-[50%] right-3 -translate-y-[50%]'>
                 {isValid === true ? (
-                  <Check className='h-5 w-5 text-green-500' aria-label='Valid input' />
+                  <Check className='h-5 w-5 text-green-500' aria-label={t('validInput')} />
                 ) : displayError !== undefined && displayError !== '' ? (
-                  <AlertCircle className='h-5 w-5 text-red-500' aria-label='Invalid input' />
+                  <AlertCircle className='h-5 w-5 text-red-500' aria-label={t('invalidInput')} />
                 ) : null}
               </div>
             )}

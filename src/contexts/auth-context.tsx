@@ -2,11 +2,12 @@
 
 import type { User, Session, AuthError as SupabaseAuthError } from '@supabase/supabase-js'
 import { useRouter } from 'next/navigation'
-import { useLocale } from 'next-intl'
-import { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react'
+import { useLocale, useTranslations } from 'next-intl'
+import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 
 import { createClient } from '@/lib/supabase/client'
+import { performLogoutCleanup } from '@/lib/utils/auth-cleanup'
 
 interface AuthContextValue {
   user: User | null
@@ -39,7 +40,9 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
 
   const router = useRouter()
   const locale = useLocale()
+  const t = useTranslations('auth.toast')
   const supabase = useMemo(() => createClient(), [])
+  const isLoggingOut = useRef(false)
 
   useEffect(() => {
     const {
@@ -61,7 +64,10 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
           router.push(`/${locale}/dashboard`)
           break
         case 'SIGNED_OUT':
-          router.push(`/${locale}`)
+          // Only redirect if not manually logging out
+          if (!isLoggingOut.current) {
+            router.push(`/${locale}`)
+          }
           break
         case 'PASSWORD_RECOVERY':
           router.push(`/${locale}/auth/reset-password`)
@@ -86,7 +92,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
     return () => {
       subscription.unsubscribe()
     }
-  }, [supabase, router, locale])
+  }, [supabase, router, locale, t])
 
   const signIn = useCallback(
     async (email: string, password: string) => {
@@ -137,7 +143,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
           throw signUpError
         }
 
-        toast.success('Check your email to confirm your account')
+        toast.success(t('checkEmail'))
       } catch (err) {
         const authError = err as SupabaseAuthError
         toast.error(authError.message)
@@ -146,28 +152,47 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         setLoading(false)
       }
     },
-    [supabase, locale]
+    [supabase, locale, t]
   )
 
   const signOut = useCallback(async () => {
     try {
       setError(null)
       setLoading(true)
+      isLoggingOut.current = true
 
+      // Perform cleanup before signing out
+      await performLogoutCleanup()
+
+      // Sign out from Supabase
       const { error: signOutError } = await supabase.auth.signOut()
 
       if (signOutError) {
         setError(signOutError)
         throw signOutError
       }
+
+      // Clear local state
+      setUser(null)
+      setSession(null)
+
+      // Show success message
+      toast.success(t('signedOut'))
+
+      // Navigate to home page
+      router.push(`/${locale}`)
     } catch (err) {
       const authError = err as SupabaseAuthError
-      toast.error(authError.message)
+      toast.error(authError.message || t('signOutError'))
       throw authError
     } finally {
       setLoading(false)
+      // Reset the flag after a delay to ensure navigation completes
+      setTimeout(() => {
+        isLoggingOut.current = false
+      }, 1000)
     }
-  }, [supabase])
+  }, [supabase, router, locale, t])
 
   const signInWithProvider = useCallback(
     async (provider: 'google' | 'github' | 'apple') => {
@@ -216,7 +241,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
           throw resetError
         }
 
-        toast.success('Check your email for the password reset link')
+        toast.success(t('resetPasswordEmail'))
       } catch (err) {
         const authError = err as SupabaseAuthError
         toast.error(authError.message)
@@ -225,7 +250,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         setLoading(false)
       }
     },
-    [supabase, locale]
+    [supabase, locale, t]
   )
 
   const updatePassword = useCallback(
@@ -243,7 +268,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
           throw updateError
         }
 
-        toast.success('Password updated successfully')
+        toast.success(t('passwordUpdated'))
       } catch (err) {
         const authError = err as SupabaseAuthError
         toast.error(authError.message)
@@ -252,7 +277,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         setLoading(false)
       }
     },
-    [supabase]
+    [supabase, t]
   )
 
   const updateEmail = useCallback(
@@ -270,7 +295,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
           throw updateError
         }
 
-        toast.success('Check your new email to confirm the change')
+        toast.success(t('checkNewEmail'))
       } catch (err) {
         const authError = err as SupabaseAuthError
         toast.error(authError.message)
@@ -279,7 +304,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         setLoading(false)
       }
     },
-    [supabase]
+    [supabase, t]
   )
 
   const updateProfile = useCallback(
@@ -297,7 +322,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
           throw updateError
         }
 
-        toast.success('Profile updated successfully')
+        toast.success(t('profileUpdated'))
       } catch (err) {
         const authError = err as SupabaseAuthError
         toast.error(authError.message)
@@ -306,7 +331,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         setLoading(false)
       }
     },
-    [supabase]
+    [supabase, t]
   )
 
   const refreshSession = useCallback(async () => {

@@ -4,6 +4,16 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { env } from '@/lib/env'
 import type { Database } from '@/types/supabase'
 
+/**
+ * Updates the Supabase authentication session and synchronizes cookies between request and response.
+ *
+ * This function creates a Supabase server client configured for SSR with PKCE flow,
+ * refreshes the current user session, and handles authentication errors by clearing
+ * invalid tokens from response cookies.
+ *
+ * @param request - The incoming Next.js request with authentication cookies
+ * @returns Object containing the Supabase client, updated response, and user data
+ */
 export async function updateSession(request: NextRequest) {
   const supabaseResponse = NextResponse.next({
     request,
@@ -29,7 +39,7 @@ export async function updateSession(request: NextRequest) {
         autoRefreshToken: true,
         detectSessionInUrl: false,
         flowType: 'pkce',
-        debug: process.env.NODE_ENV === 'development',
+        debug: env.NODE_ENV === 'development',
       },
     }
   )

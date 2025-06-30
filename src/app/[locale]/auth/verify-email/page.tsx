@@ -2,7 +2,7 @@
 
 import { Loader2, CheckCircle, XCircle } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -20,6 +20,7 @@ export default function VerifyEmailPage({
 
   const router = useRouter()
   const locale = useLocale()
+  const t = useTranslations('auth.verifyEmail')
 
   const verifyEmailMutation = api.auth.verifyEmail.useMutation({
     onSuccess: () => {
@@ -53,23 +54,23 @@ export default function VerifyEmailPage({
     } else if (params.token !== undefined) {
       // Invalid parameters
       setStatus('error')
-      setErrorMessage('Invalid verification link')
+      setErrorMessage(t('invalidLink'))
     }
-  }, [params, verifyEmailMutation])
+  }, [params, t, verifyEmailMutation])
 
   return (
     <div className='relative container flex min-h-screen flex-col items-center justify-center px-4 md:px-8'>
       <Card className='w-full max-w-md'>
         <CardHeader className='text-center'>
           <CardTitle className='text-2xl font-bold'>
-            {status === 'loading' && 'Verifying Email'}
-            {status === 'success' && 'Email Verified!'}
-            {status === 'error' && 'Verification Failed'}
+            {status === 'loading' && t('title.loading')}
+            {status === 'success' && t('title.success')}
+            {status === 'error' && t('title.error')}
           </CardTitle>
           <CardDescription>
-            {status === 'loading' && 'Please wait while we verify your email...'}
-            {status === 'success' && 'Your email has been successfully verified.'}
-            {status === 'error' && 'We could not verify your email address.'}
+            {status === 'loading' && t('description.loading')}
+            {status === 'success' && t('description.success')}
+            {status === 'error' && t('description.error')}
           </CardDescription>
         </CardHeader>
         <CardContent className='flex flex-col items-center space-y-4'>
@@ -79,9 +80,7 @@ export default function VerifyEmailPage({
           {status === 'success' && (
             <>
               <CheckCircle className='h-12 w-12 text-green-500' />
-              <p className='text-muted-foreground text-center text-sm'>
-                Redirecting to dashboard...
-              </p>
+              <p className='text-muted-foreground text-center text-sm'>{t('redirecting')}</p>
             </>
           )}
           {status === 'error' && (
@@ -89,7 +88,7 @@ export default function VerifyEmailPage({
               <XCircle className='text-destructive h-12 w-12' />
               <p className='text-destructive text-center text-sm'>{errorMessage}</p>
               <Button onClick={() => router.push(`/${locale}/login`)} className='w-full'>
-                Back to Login
+                {t('backToLogin')}
               </Button>
             </>
           )}

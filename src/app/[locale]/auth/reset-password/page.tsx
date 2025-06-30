@@ -14,26 +14,29 @@ import { PasswordStrengthIndicator } from '@/components/ui/password-strength-ind
 import { PrimaryButton } from '@/components/ui/primary-button'
 import { useAuth } from '@/hooks/use-auth'
 
-const resetPasswordSchema = z
-  .object({
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters')
-      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-      .regex(/[0-9]/, 'Password must contain at least one number'),
-    confirmPassword: z.string(),
-  })
-  .refine(data => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  })
-
-type ResetPasswordFormData = z.infer<typeof resetPasswordSchema>
+type ResetPasswordFormData = {
+  password: string
+  confirmPassword: string
+}
 
 export default function ResetPasswordPage() {
   const t = useTranslations('auth.resetPasswordPage')
+  const tValidation = useTranslations('validation')
   const locale = useLocale()
+  const resetPasswordSchema = z
+    .object({
+      password: z
+        .string()
+        .min(8, tValidation('passwordMinLength'))
+        .regex(/[A-Z]/, tValidation('passwordUppercase'))
+        .regex(/[a-z]/, tValidation('passwordLowercase'))
+        .regex(/[0-9]/, tValidation('passwordNumber')),
+      confirmPassword: z.string(),
+    })
+    .refine(data => data.password === data.confirmPassword, {
+      message: tValidation('passwordMatch'),
+      path: ['confirmPassword'],
+    })
   const router = useRouter()
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)

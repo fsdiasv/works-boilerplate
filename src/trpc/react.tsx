@@ -41,6 +41,10 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
           headers() {
             const headers = new Headers()
             headers.set('x-trpc-source', 'nextjs-react')
+            // Pass the current pathname for locale detection
+            if (typeof window !== 'undefined') {
+              headers.set('x-pathname', window.location.pathname)
+            }
             return headers
           },
         }),

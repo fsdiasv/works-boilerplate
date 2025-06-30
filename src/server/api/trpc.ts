@@ -10,6 +10,7 @@ import { db } from '@/server/db'
 interface CreateContextOptions {
   user: User | null
   supabase: Awaited<ReturnType<typeof createClient>>
+  locale: string
 }
 
 export const createInnerTRPCContext = (opts: CreateContextOptions) => {
@@ -17,18 +18,25 @@ export const createInnerTRPCContext = (opts: CreateContextOptions) => {
     user: opts.user,
     supabase: opts.supabase,
     db,
+    locale: opts.locale,
   }
 }
 
-export const createTRPCContext = async (_opts: FetchCreateContextFnOptions) => {
+export const createTRPCContext = async (opts: FetchCreateContextFnOptions) => {
   const supabase = await createClient()
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // Extract locale from request headers
+  const headers = opts.req.headers
+  const pathname = headers.get('x-pathname') ?? ''
+  const locale = pathname !== '' ? (pathname.split('/')[1] ?? 'en') : 'en'
+
   return createInnerTRPCContext({
     user,
     supabase,
+    locale,
   })
 }
 

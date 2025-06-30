@@ -33,7 +33,7 @@ export async function createClient() {
         autoRefreshToken: true,
         detectSessionInUrl: false,
         flowType: 'pkce',
-        debug: process.env.NODE_ENV === 'development',
+        debug: env.NODE_ENV === 'development',
       },
       global: {
         headers: {

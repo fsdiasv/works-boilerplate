@@ -74,6 +74,7 @@
     "invalidCredentials": "Invalid credentials",
     "accountCreated": "Account created successfully",
     "welcomeBack": "Welcome back!",
+    "genericSignupError": "Unable to create account. Please check your email for further instructions.",
     "signupPage": {
       "title": "Sign up to Copy UI.",
       "subtitle": "Already have an account?",
@@ -103,6 +104,9 @@
       "submitButton": "Sign in",
       "divider": "Or continue with"
     },
+    "socialLogin": {
+      "signInWith": "Sign in with {provider}"
+    },
     "forgotPasswordPage": {
       "title": "Forgot your password?",
       "description": "No worries. Enter your email address below and we'll send you a link to reset it.",
@@ -131,6 +135,38 @@
         "title": "Founder of Copytime and Tweetsiu"
       },
       "quote": "Works-Boilerplate has been a <highlight>game-changer</highlight> for me! It's incredibly intuitive and has transformed the way I approach design. I can't imagine working without it. 🚀"
+    },
+    "verifyEmail": {
+      "title": {
+        "loading": "Verifying Email",
+        "success": "Email Verified!",
+        "error": "Verification Failed"
+      },
+      "description": {
+        "loading": "Please wait while we verify your email...",
+        "success": "Your email has been successfully verified.",
+        "error": "We could not verify your email address."
+      },
+      "redirecting": "Redirecting to dashboard...",
+      "backToLogin": "Back to Login",
+      "invalidLink": "Invalid verification link"
+    },
+    "toast": {
+      "checkEmail": "Check your email to confirm your account",
+      "signedOut": "You have been signed out successfully",
+      "signOutError": "Failed to sign out",
+      "resetPasswordEmail": "Check your email for the password reset link",
+      "passwordUpdated": "Password updated successfully",
+      "checkNewEmail": "Check your new email to confirm the change",
+      "profileUpdated": "Profile updated successfully"
+    },
+    "validation": {
+      "invalidEmail": "Invalid email address",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "nameMinLength": "Name must be at least 2 characters",
+      "currentPasswordRequired": "Current password is required",
+      "urlInvalid": "Invalid URL",
+      "bioMaxLength": "Bio must not exceed 500 characters"
     }
   },
   "dashboard": {
@@ -199,7 +235,13 @@
     "min": "Minimum {min} characters",
     "max": "Maximum {max} characters",
     "passwordMatch": "Passwords do not match",
-    "itemCount": "{count, plural, =0 {No items} =1 {1 item} other {# items}}"
+    "itemCount": "{count, plural, =0 {No items} =1 {1 item} other {# items}}",
+    "passwordMinLength": "Password must be at least 8 characters",
+    "passwordUppercase": "Password must contain at least one uppercase letter",
+    "passwordLowercase": "Password must contain at least one lowercase letter",
+    "passwordNumber": "Password must contain at least one number",
+    "validInput": "Valid input",
+    "invalidInput": "Invalid input"
   },
   "formatting": {
     "currency": "{amount, number, ::currency/USD}",
@@ -409,8 +451,11 @@
     },
     "toast": {
       "languageChanged": "Language Changed",
-      "languageChangedDescription": "Language switched to {language}."
+      "languageChangedDescription": "Language switched to {language}.",
+      "signOutError": "Sign Out Failed",
+      "signOutErrorDescription": "There was a problem signing out. Please try again."
     },
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "signingOut": "Signing Out..."
   }
 }

@@ -1,8 +1,8 @@
-import type React from 'react'
+import type { ComponentProps } from 'react'
 
 import { cn } from '@/lib/utils'
 
-interface SkeletonProps extends React.ComponentProps<'div'> {
+interface SkeletonProps extends ComponentProps<'div'> {
   variant?: 'text' | 'circular' | 'rectangular'
   animation?: 'pulse' | 'wave' | 'none'
 }

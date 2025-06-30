@@ -35,6 +35,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useToast } from '@/components/ui/use-toast'
+import { useAuth } from '@/hooks/use-auth'
 import { localeNames, type Locale } from '@/i18n/config'
 
 // Mock user data - replace with actual data source
@@ -66,7 +67,9 @@ export function UserSettingsMenu() {
   const router = useRouter()
   const pathname = usePathname()
   const [isPending, startTransition] = React.useTransition()
+  const [isLoggingOut, setIsLoggingOut] = React.useState(false)
   const t = useTranslations('UserSettingsMenu')
+  const { signOut } = useAuth()
 
   const navLinks = [
     { href: '/settings', icon: Settings, label: t('nav.settings') },
@@ -93,6 +96,22 @@ export function UserSettingsMenu() {
         description: t('toast.languageChangedDescription', { language: localeNames[newLocale] }),
       })
     })
+  }
+
+  const handleSignOut = async () => {
+    try {
+      setIsLoggingOut(true)
+      await signOut()
+    } catch (error) {
+      console.error('Failed to sign out:', error)
+      toast({
+        title: t('toast.signOutError'),
+        description: t('toast.signOutErrorDescription'),
+        variant: 'destructive',
+      })
+    } finally {
+      setIsLoggingOut(false)
+    }
   }
 
   const languages = [
@@ -207,14 +226,13 @@ export function UserSettingsMenu() {
           </div>
         </div>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link
-            href={`/${locale}/logout`}
-            className='flex items-center text-red-600 hover:!text-red-700 dark:text-red-500 dark:hover:!text-red-400'
-          >
-            <LogOut className='mr-2 h-4 w-4' />
-            <span>{t('signOut')}</span>
-          </Link>
+        <DropdownMenuItem
+          onClick={() => void handleSignOut()}
+          disabled={isLoggingOut}
+          className='flex cursor-pointer items-center text-red-600 hover:!text-red-700 dark:text-red-500 dark:hover:!text-red-400'
+        >
+          <LogOut className='mr-2 h-4 w-4' />
+          <span>{isLoggingOut ? t('signingOut') : t('signOut')}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
