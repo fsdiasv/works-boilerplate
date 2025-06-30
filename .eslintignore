@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Build outputs
+.next/
+out/
+dist/
+build/
+
+# Environment files
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# Testing
+coverage/
+playwright-report/
+test-results/
+
+# Cache
+.turbo/
+.cache/
+
+# JS files that are not TypeScript
+*.js
+!next.config.js
+!vitest.config.js
+
+# Generated files
+public/fallback-*.js
+public/sw.js
+public/workbox-*.js
+
+# Scripts
+scripts/
+
+# Playwright config is already in TypeScript, so we don't need to ignore it

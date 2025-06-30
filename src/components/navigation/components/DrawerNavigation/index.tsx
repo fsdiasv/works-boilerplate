@@ -3,8 +3,8 @@
 import { useDrag } from '@use-gesture/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
 import type React from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
@@ -123,10 +123,10 @@ export function DrawerNavigation({
   const bind = useDrag(
     ({ movement, dragging, velocity, last }) => {
       if (!enableSwipeToClose) return
-      
+
       setIsDragging(dragging ?? false)
       handleDrag(movement)
-      
+
       if (last) {
         handleDragEnd(movement, velocity)
       }
@@ -188,7 +188,7 @@ export function DrawerNavigation({
             animate='open'
             exit='closed'
             variants={overlayVariants}
-            onClick={closeOnOverlayClick ? onClose : undefined}
+            onClick={closeOnOverlayClick === true ? onClose : undefined}
             className={cn('fixed inset-0 z-50 bg-black/50 backdrop-blur-sm', overlayClassName)}
           />
 
@@ -278,10 +278,10 @@ export function DrawerNavItems({
             <li key={item.id}>
               <button
                 onClick={() => {
-                  if (enableHapticFeedback && item.isDisabled !== true) {
+                  if (enableHapticFeedback === true && item.isDisabled !== true) {
                     triggerHapticFeedback('selection')
                   }
-                  if (onItemClick) {
+                  if (onItemClick !== undefined) {
                     onItemClick(item)
                   }
                 }}

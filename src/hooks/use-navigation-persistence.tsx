@@ -1,5 +1,5 @@
-import { useRouter, usePathname } from 'next/navigation'
-import { useEffect, useCallback } from 'react'
+import { usePathname, useRouter } from 'next/navigation'
+import { useCallback, useEffect } from 'react'
 
 const NAVIGATION_STATE_KEY = 'works-nav-state'
 const NAVIGATION_HISTORY_KEY = 'works-nav-history'
@@ -54,8 +54,8 @@ export function useNavigationPersistence() {
 
     try {
       const saved = localStorage.getItem(NAVIGATION_STATE_KEY)
-      if (saved) {
-        return JSON.parse(saved)
+      if (saved !== null) {
+        return JSON.parse(saved) as NavigationState
       }
     } catch (error) {
       console.error('Failed to parse navigation state:', error)
@@ -72,8 +72,8 @@ export function useNavigationPersistence() {
 
     try {
       const saved = localStorage.getItem(NAVIGATION_HISTORY_KEY)
-      if (saved) {
-        return JSON.parse(saved)
+      if (saved !== null) {
+        return JSON.parse(saved) as NavigationHistory
       }
     } catch (error) {
       console.error('Failed to parse navigation history:', error)
@@ -118,7 +118,7 @@ export function useNavigationPersistence() {
 
     if (history.currentIndex > 0) {
       const previousPath = history.paths[history.currentIndex - 1]
-      if (previousPath) {
+      if (previousPath !== undefined) {
         router.push(previousPath)
       }
     } else {
@@ -133,7 +133,7 @@ export function useNavigationPersistence() {
 
     if (history.currentIndex < history.paths.length - 1) {
       const nextPath = history.paths[history.currentIndex + 1]
-      if (nextPath) {
+      if (nextPath !== undefined) {
         router.push(nextPath)
       }
     }
@@ -152,7 +152,7 @@ export function useNavigationPersistence() {
 
   // Handle Android back button
   useEffect(() => {
-    const handlePopState = (e: PopStateEvent) => {
+    const handlePopState = () => {
       navigateBack()
     }
 

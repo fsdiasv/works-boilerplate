@@ -30,7 +30,7 @@ export default function ForgotPasswordPage() {
     resolver: zodResolver(forgotPasswordSchema),
   })
 
-  const onSubmit = async (_data: ForgotPasswordFormData) => {
+  const onSubmit = async () => {
     setIsLoading(true)
     // TODO: Implement actual password reset API call
     await new Promise(resolve => setTimeout(resolve, 2000))
@@ -45,7 +45,7 @@ export default function ForgotPasswordPage() {
         </h1>
         <p className='mb-8 text-sm text-slate-500 sm:text-base lg:text-lg'>{t('description')}</p>
 
-        <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className='space-y-6'>
+        <form onSubmit={e => void handleSubmit(onSubmit)(e)} className='space-y-6'>
           <FormInput
             id='email'
             type='email'
@@ -64,7 +64,7 @@ export default function ForgotPasswordPage() {
         <p className='mt-8 text-sm text-slate-500'>
           {t('backToLogin')}{' '}
           <Link
-            href={`/${locale}/login`}
+            href={`/${locale}/auth/login`}
             className='font-semibold text-blue-600 hover:text-blue-700'
           >
             {t('backToLoginLink')}

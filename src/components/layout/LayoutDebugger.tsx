@@ -16,7 +16,7 @@ interface LayoutDebuggerProps {
   className?: string
 }
 
-export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
+export function LayoutDebugger({
   showGrid = true,
   showBreakpoints = true,
   showContainerQueries = true,
@@ -24,7 +24,7 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
   showViewportInfo = true,
   showPerformance = true,
   className,
-}) => {
+}: LayoutDebuggerProps) {
   const [isVisible, setIsVisible] = useState(false)
   const [gridEnabled, setShowGrid] = useState(showGrid)
   const [touchTargetsEnabled, setShowTouchTargets] = useState(showTouchTargets)
@@ -50,7 +50,7 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
 
   // Monitor performance metrics
   useEffect(() => {
-    if (!showPerformance || !isVisible) return
+    if (!showPerformance || !isVisible) return undefined
 
     let frameCount = 0
     let lastTime = performance.now()
@@ -77,11 +77,16 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
     // Monitor memory usage
     const memoryInterval = setInterval(() => {
       if ('memory' in performance) {
-        const memory = (performance as any).memory
-        setPerformanceMetrics(prev => ({
-          ...prev,
-          memory: Math.round(memory.usedJSHeapSize / 1048576), // Convert to MB
-        }))
+        const performanceWithMemory = performance as typeof performance & {
+          memory?: { usedJSHeapSize: number }
+        }
+        if (performanceWithMemory.memory?.usedJSHeapSize !== undefined) {
+          const memoryUsage = performanceWithMemory.memory.usedJSHeapSize
+          setPerformanceMetrics(prev => ({
+            ...prev,
+            memory: Math.round(memoryUsage / 1048576), // Convert to MB
+          }))
+        }
       }
     }, 1000)
 
@@ -111,16 +116,16 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
   // Handle debug styles
   useEffect(() => {
     const styleId = 'layout-debugger-styles'
-    let styleElement = document.getElementById(styleId) as HTMLStyleElement
-    
+    let styleElement = document.getElementById(styleId) as HTMLStyleElement | null
+
     if (!isVisible) {
-      if (styleElement) {
+      if (styleElement !== null) {
         styleElement.remove()
       }
-      return
+      return undefined
     }
 
-    if (!styleElement) {
+    if (styleElement === null) {
       styleElement = document.createElement('style')
       styleElement.id = styleId
       document.head.appendChild(styleElement)
@@ -160,9 +165,8 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
     styleElement.textContent = styles.join('\n')
 
     return () => {
-      if (styleElement) {
-        styleElement.remove()
-      }
+      const element = document.getElementById(styleId)
+      element?.remove()
     }
   }, [isVisible, touchTargetsEnabled, containerQueriesEnabled])
 
@@ -239,7 +243,12 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
               Viewport: {viewport.width} × {viewport.height}
             </div>
             <div>
-              Device: {viewport.isMobile ? 'Mobile' : viewport.isTablet ? 'Tablet' : 'Desktop'}
+              Device:{' '}
+              {viewport.isMobile === true
+                ? 'Mobile'
+                : viewport.isTablet === true
+                  ? 'Tablet'
+                  : 'Desktop'}
             </div>
           </div>
         )}
@@ -252,7 +261,7 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
               <span
                 className={cn(
                   'rounded px-2 py-1',
-                  viewport.width < 475 && 'bg-primary text-primary-foreground'
+                  viewport.width < 475 ? 'bg-primary text-primary-foreground' : ''
                 )}
               >
                 base
@@ -260,9 +269,9 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
               <span
                 className={cn(
                   'rounded px-2 py-1',
-                  viewport.width >= 475 &&
-                    viewport.width < 640 &&
-                    'bg-primary text-primary-foreground'
+                  viewport.width >= 475 && viewport.width < 640
+                    ? 'bg-primary text-primary-foreground'
+                    : ''
                 )}
               >
                 xs
@@ -270,9 +279,9 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
               <span
                 className={cn(
                   'rounded px-2 py-1',
-                  viewport.width >= 640 &&
-                    viewport.width < 768 &&
-                    'bg-primary text-primary-foreground'
+                  viewport.width >= 640 && viewport.width < 768
+                    ? 'bg-primary text-primary-foreground'
+                    : ''
                 )}
               >
                 sm
@@ -280,9 +289,9 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
               <span
                 className={cn(
                   'rounded px-2 py-1',
-                  viewport.width >= 768 &&
-                    viewport.width < 1024 &&
-                    'bg-primary text-primary-foreground'
+                  viewport.width >= 768 && viewport.width < 1024
+                    ? 'bg-primary text-primary-foreground'
+                    : ''
                 )}
               >
                 md
@@ -290,9 +299,9 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
               <span
                 className={cn(
                   'rounded px-2 py-1',
-                  viewport.width >= 1024 &&
-                    viewport.width < 1280 &&
-                    'bg-primary text-primary-foreground'
+                  viewport.width >= 1024 && viewport.width < 1280
+                    ? 'bg-primary text-primary-foreground'
+                    : ''
                 )}
               >
                 lg
@@ -300,9 +309,9 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
               <span
                 className={cn(
                   'rounded px-2 py-1',
-                  viewport.width >= 1280 &&
-                    viewport.width < 1536 &&
-                    'bg-primary text-primary-foreground'
+                  viewport.width >= 1280 && viewport.width < 1536
+                    ? 'bg-primary text-primary-foreground'
+                    : ''
                 )}
               >
                 xl
@@ -310,7 +319,7 @@ export const LayoutDebugger: React.FC<LayoutDebuggerProps> = ({
               <span
                 className={cn(
                   'rounded px-2 py-1',
-                  viewport.width >= 1536 && 'bg-primary text-primary-foreground'
+                  viewport.width >= 1536 ? 'bg-primary text-primary-foreground' : ''
                 )}
               >
                 2xl

@@ -77,7 +77,7 @@ export function useDeviceCapabilities() {
       const networkSpeed = connection?.effectiveType === '4g' ? 'fast' : 'slow'
 
       // Device memory
-      const deviceMemory = navigatorWithConnection.deviceMemory || 8
+      const deviceMemory = navigatorWithConnection.deviceMemory ?? 8
 
       setCapabilities({
         isTouch,
@@ -132,6 +132,7 @@ export function useContainerQuery(ref: React.RefObject<HTMLElement>) {
   const [containerSize, setContainerSize] = useState({ width: 0, height: 0 })
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions
     if (!ref.current) return
 
     const observer = new ResizeObserver(entries => {

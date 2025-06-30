@@ -22,11 +22,11 @@ interface WebVitalsProps {
 /**
  * Component for monitoring and optimizing Core Web Vitals
  */
-export const WebVitals: React.FC<WebVitalsProps> = ({
+export function WebVitals({
   onReport,
   showIndicator = process.env.NODE_ENV === 'development',
   className,
-}) => {
+}: WebVitalsProps) {
   const [metrics, setMetrics] = useState<WebVitalsMetrics>({
     cls: null,
     fcp: null,
@@ -48,6 +48,7 @@ export const WebVitals: React.FC<WebVitalsProps> = ({
 
       // Log to console in development
       if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
         console.log(`[Web Vitals] ${metric.name}:`, metric.value.toFixed(2))
       }
     }
@@ -75,7 +76,6 @@ export const WebVitals: React.FC<WebVitalsProps> = ({
     }
 
     const threshold = thresholds[metric as keyof typeof thresholds]
-    if (!threshold) return 'pending'
 
     if (value <= threshold.good) return 'good'
     if (value <= threshold.needsImprovement) return 'needs-improvement'
@@ -100,7 +100,7 @@ export const WebVitals: React.FC<WebVitalsProps> = ({
       <div className='mb-2 font-semibold'>Core Web Vitals</div>
       <div className='space-y-1'>
         {Object.entries(metrics).map(([key, value]) => {
-          const status = getMetricStatus(key, value)
+          const status = getMetricStatus(key, value as number | null)
           return (
             <div key={key} className='flex items-center gap-2'>
               <div
@@ -108,7 +108,7 @@ export const WebVitals: React.FC<WebVitalsProps> = ({
                 aria-label={`${key.toUpperCase()} status: ${status}`}
               />
               <span className='font-mono uppercase'>{key}:</span>
-              <span>{value !== null ? `${value.toFixed(2)}` : 'measuring...'}</span>
+              <span>{value !== null ? `${(value as number).toFixed(2)}` : 'measuring...'}</span>
             </div>
           )
         })}
@@ -128,7 +128,11 @@ export function useLayoutShiftPrevention() {
       mutations.forEach(mutation => {
         if (mutation.type === 'childList') {
           mutation.addedNodes.forEach(node => {
-            if (node instanceof HTMLElement && node.dataset.preventShift) {
+            if (
+              node instanceof HTMLElement &&
+              node.dataset.preventShift !== undefined &&
+              node.dataset.preventShift.length > 0
+            ) {
               const rect = node.getBoundingClientRect()
               elementsRef.current.set(node.dataset.preventShift, rect)
 
@@ -177,18 +181,18 @@ interface LayoutStableProps {
   className?: string
 }
 
-export const LayoutStable: React.FC<LayoutStableProps> = ({
+export function LayoutStable({
   children,
   width,
   height,
   aspectRatio,
   className,
-}) => {
+}: LayoutStableProps) {
   const style: React.CSSProperties = {}
 
-  if (width) style.width = typeof width === 'number' ? `${width}px` : width
-  if (height) style.height = typeof height === 'number' ? `${height}px` : height
-  if (aspectRatio) style.aspectRatio = aspectRatio.toString()
+  if (width !== undefined) style.width = typeof width === 'number' ? `${width}px` : width
+  if (height !== undefined) style.height = typeof height === 'number' ? `${height}px` : height
+  if (aspectRatio !== undefined) style.aspectRatio = aspectRatio.toString()
 
   return (
     <div className={cn('relative', className)} style={style} data-prevent-shift='true'>
@@ -203,7 +207,7 @@ export const LayoutStable: React.FC<LayoutStableProps> = ({
 export function useFontLoadOptimization(fonts: string[]) {
   useEffect(() => {
     if ('fonts' in document) {
-      Promise.all(
+      void Promise.all(
         fonts.map(font =>
           document.fonts.load(font).catch(err => {
             console.warn(`Failed to preload font: ${font}`, err)

@@ -83,11 +83,11 @@ export const AdaptiveLoader = forwardRef<HTMLDivElement, AdaptiveLoaderProps>(
         }
 
         case 'visible': {
-          if (!elementRef.current) return
+          if (!elementRef.current) return undefined
 
           const observer = new IntersectionObserver(
             ([entry]) => {
-              if (entry?.isIntersecting) {
+              if (entry?.isIntersecting === true) {
                 setShouldLoad(true)
                 observer.disconnect()
               }
@@ -108,12 +108,12 @@ export const AdaptiveLoader = forwardRef<HTMLDivElement, AdaptiveLoaderProps>(
 
     // Show fallback for low-end devices or slow networks
     if (networkSpeed === 'slow' || deviceMemory < 4) {
-      return fallback ? <>{fallback}</> : null
+      return fallback != null ? <>{fallback}</> : null
     }
 
     if (!shouldLoad) {
       return (
-        <div ref={ref || elementRef} className={className}>
+        <div ref={ref ?? elementRef} className={className}>
           {loadingComponent}
         </div>
       )
@@ -140,7 +140,7 @@ interface DynamicComponentProps<P = Record<string, unknown>> {
   ssr?: boolean
 }
 
-export function DynamicComponent<P extends Record<string, any> = Record<string, unknown>>({
+export function DynamicComponent<P extends Record<string, unknown> = Record<string, unknown>>({
   loader,
   props = {} as P,
   fallback = <div className='bg-muted h-32 animate-pulse rounded' />,
@@ -169,12 +169,12 @@ interface ProgressiveEnhancementProps {
   className?: string
 }
 
-export const ProgressiveEnhancement: React.FC<ProgressiveEnhancementProps> = ({
+export function ProgressiveEnhancement({
   basic,
   enhanced,
   enhanceOn = 'idle',
   className,
-}) => {
+}: ProgressiveEnhancementProps) {
   const [isEnhanced, setIsEnhanced] = useState(false)
   const { isTouch, networkSpeed } = useDeviceCapabilities()
 
@@ -197,6 +197,7 @@ export const ProgressiveEnhancement: React.FC<ProgressiveEnhancementProps> = ({
           const timeout = setTimeout(() => setIsEnhanced(true), 1)
           return () => clearTimeout(timeout)
         }
+        break
       }
 
       case 'interaction': {
@@ -228,20 +229,14 @@ interface ResourceHintProps {
   rel?: 'preload' | 'prefetch' | 'preconnect' | 'dns-prefetch'
 }
 
-export const ResourceHint: React.FC<ResourceHintProps> = ({
-  href,
-  as,
-  type,
-  crossOrigin,
-  rel = 'preload',
-}) => {
+export function ResourceHint({ href, as, type, crossOrigin, rel = 'preload' }: ResourceHintProps) {
   useEffect(() => {
     const link = document.createElement('link')
     link.rel = rel
     link.href = href
 
-    if (as) link.as = as
-    if (type) link.type = type
+    if (as !== undefined && as.length > 0) link.as = as
+    if (type !== undefined && type.length > 0) link.type = type
     if (crossOrigin) link.crossOrigin = crossOrigin
 
     document.head.appendChild(link)
