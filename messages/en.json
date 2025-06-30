@@ -68,6 +68,7 @@
     "confirmPassword": "Confirm password",
     "forgotPassword": "Forgot password?",
     "rememberMe": "Remember me",
+    "trustedDevice": "Trusted device",
     "emailRequired": "Email is required",
     "passwordRequired": "Password is required",
     "invalidCredentials": "Invalid credentials",
@@ -111,6 +112,19 @@
       "backToLogin": "Back to",
       "backToLoginLink": "Sign in"
     },
+    "resetPasswordPage": {
+      "title": "Reset your password",
+      "subtitle": "Enter your new password below",
+      "passwordLabel": "New password",
+      "passwordPlaceholder": "Enter your new password",
+      "confirmPasswordLabel": "Confirm password",
+      "confirmPasswordPlaceholder": "Confirm your new password",
+      "submitButton": "Reset password",
+      "backToLogin": "Back to login",
+      "invalidTokenTitle": "Invalid or expired link",
+      "invalidTokenMessage": "This password reset link is invalid or has expired. Please request a new one.",
+      "requestNewLink": "Request new link"
+    },
     "testimonial": {
       "author": {
         "name": "Peter Mick",
@@ -141,6 +155,24 @@
     "updateProfile": "Update profile",
     "changePassword": "Change password",
     "avatar": "Profile picture"
+  },
+  "components": {
+    "passwordStrength": {
+      "strength": "Strength",
+      "strengthLevel": "Password strength: {level}",
+      "weak": "Weak",
+      "fair": "Fair",
+      "good": "Good",
+      "strong": "Strong",
+      "veryStrong": "Very Strong",
+      "hint": "Add more characters",
+      "requirements": {
+        "length": "At least 8 characters",
+        "uppercase": "One uppercase letter",
+        "lowercase": "One lowercase letter",
+        "number": "One number"
+      }
+    }
   },
   "settings": {
     "title": "Settings",

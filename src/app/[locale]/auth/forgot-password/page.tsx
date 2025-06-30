@@ -10,6 +10,7 @@ import { z } from 'zod'
 import { AuthLayout } from '@/components/auth/auth-layout'
 import { FormInput } from '@/components/ui/form-input'
 import { PrimaryButton } from '@/components/ui/primary-button'
+import { useAuth } from '@/hooks/use-auth'
 
 const forgotPasswordSchema = z.object({
   email: z.string().email('Invalid email address').min(1, 'Email is required'),
@@ -21,6 +22,7 @@ export default function ForgotPasswordPage() {
   const t = useTranslations('auth.forgotPasswordPage')
   const locale = useLocale()
   const [isLoading, setIsLoading] = useState(false)
+  const { resetPassword } = useAuth()
 
   const {
     register,
@@ -30,11 +32,16 @@ export default function ForgotPasswordPage() {
     resolver: zodResolver(forgotPasswordSchema),
   })
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: ForgotPasswordFormData) => {
     setIsLoading(true)
-    // TODO: Implement actual password reset API call
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setIsLoading(false)
+    try {
+      await resetPassword(data.email)
+      // Success message is shown by auth context
+    } catch {
+      // Error is handled by auth context with toast
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (

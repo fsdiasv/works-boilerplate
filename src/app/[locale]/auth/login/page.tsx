@@ -11,7 +11,9 @@ import { AuthLayout } from '@/components/auth/auth-layout'
 import { FormInput } from '@/components/ui/form-input'
 import { PasswordInput } from '@/components/ui/password-input'
 import { PrimaryButton } from '@/components/ui/primary-button'
+import { RememberMeCheckbox } from '@/components/ui/remember-me-checkbox'
 import { SocialLoginButton } from '@/components/ui/social-login-button'
+import { useAuth } from '@/hooks/use-auth'
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address').min(1, 'Email is required'),
@@ -24,6 +26,8 @@ export default function LoginPage() {
   const t = useTranslations('auth.loginPage')
   const locale = useLocale()
   const [isLoading, setIsLoading] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
+  const { signIn } = useAuth()
 
   const {
     register,
@@ -33,11 +37,23 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   })
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
-    // TODO: Implement actual login API call with form data
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setIsLoading(false)
+    try {
+      // Store remember me preference
+      if (rememberMe) {
+        localStorage.setItem('rememberMe', 'true')
+      } else {
+        localStorage.removeItem('rememberMe')
+      }
+
+      await signIn(data.email, data.password)
+      // Redirect is handled by auth context
+    } catch {
+      // Error is handled by auth context with toast
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -85,6 +101,12 @@ export default function LoginPage() {
               </Link>
             </div>
           </div>
+
+          <RememberMeCheckbox
+            checked={rememberMe}
+            onCheckedChange={setRememberMe}
+            showTrustBadge={false}
+          />
 
           <PrimaryButton type='submit' isLoading={isLoading}>
             {t('submitButton')}

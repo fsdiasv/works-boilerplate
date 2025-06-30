@@ -34,17 +34,17 @@ import { cn } from 'src/lib/utils'
 import { DesktopSidebarToggle } from './desktop-sidebar-toggle'
 
 const menuPrincipal = [
-  { href: '/dashboard', icon: Home, label: 'Dashboard' },
-  { href: '/radar', icon: Search, label: 'Radar de Conteúdo' },
-  { href: '/criar-post', icon: Edit3, label: 'Criar Post' },
-  { href: '/calendario', icon: Calendar, label: 'Calendário' },
+  { href: '/dashboard', icon: Home, labelKey: 'dashboard' },
+  { href: '/radar', icon: Search, labelKey: 'contentRadar' },
+  { href: '/criar-post', icon: Edit3, labelKey: 'createPost' },
+  { href: '/calendario', icon: Calendar, labelKey: 'calendar' },
 ]
 
 const configuracoes = [
-  { href: '/perfil', icon: User, label: 'Perfil' },
-  { href: '/contas-sociais', icon: Camera, label: 'Contas Sociais' },
-  { href: '/chaves-api', icon: KeyRound, label: 'Chaves de API' },
-  { href: '/faturamento', icon: CreditCard, label: 'Faturamento' },
+  { href: '/perfil', icon: User, labelKey: 'profile' },
+  { href: '/contas-sociais', icon: Camera, labelKey: 'socialAccounts' },
+  { href: '/chaves-api', icon: KeyRound, labelKey: 'apiKeys' },
+  { href: '/faturamento', icon: CreditCard, labelKey: 'billing' },
 ]
 
 export function AppSidebar() {
@@ -62,7 +62,7 @@ export function AppSidebar() {
     return items.map(item => {
       const isActive = pathnameWithoutLocale === item.href
       return (
-        <SidebarMenuItem key={item.label}>
+        <SidebarMenuItem key={item.labelKey}>
           <SidebarMenuButton
             asChild
             className={cn(
@@ -78,7 +78,7 @@ export function AppSidebar() {
             )}
             isActive={isActive}
             tooltip={{
-              children: item.label,
+              children: t(`navigation.${item.labelKey}`),
               side: 'right',
               align: 'center',
               hidden: !isCollapsed || isMobile,
@@ -95,7 +95,7 @@ export function AppSidebar() {
                   isActive && 'text-sw-text-primary'
                 )}
               >
-                {item.label}
+                {t(`navigation.${item.labelKey}`)}
               </span>
             </Link>
           </SidebarMenuButton>

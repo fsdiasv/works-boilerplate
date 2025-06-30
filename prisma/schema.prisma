@@ -11,10 +11,59 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
-// Placeholder schema - to be implemented with actual models
+// Core user model synced with Supabase Auth
 model User {
+  id            String    @id @default(uuid()) // Use UUID to match Supabase
+  email         String    @unique
+  fullName      String?   @map("full_name")
+  avatarUrl     String?   @map("avatar_url")
+  emailVerified Boolean   @default(false) @map("email_verified")
+  phone         String?
+  locale        String    @default("en")
+  timezone      String    @default("UTC")
+  metadata      Json?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  profile  Profile?
+  sessions Session[]
+
+  @@map("users")
+}
+
+// Extended user profile
+model Profile {
   id        String   @id @default(cuid())
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  userId    String   @unique @map("user_id")
+  bio       String?
+  website   String?
+  company   String?
+  jobTitle  String?  @map("job_title")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+// Session tracking for security and analytics
+model Session {
+  id           String   @id @default(cuid())
+  userId       String   @map("user_id")
+  token        String   @unique
+  expiresAt    DateTime @map("expires_at")
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  createdAt    DateTime @default(now()) @map("created_at")
+  lastActiveAt DateTime @default(now()) @map("last_active_at")
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
 }

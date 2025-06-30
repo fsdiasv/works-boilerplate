@@ -2,6 +2,7 @@
 
 import { ButtonHTMLAttributes, forwardRef } from 'react'
 
+import { useAuth } from '@/hooks/use-auth'
 import { cn } from '@/lib/utils'
 
 export interface SocialLoginButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -57,6 +58,16 @@ const providerIcons = {
 
 const SocialLoginButton = forwardRef<HTMLButtonElement, SocialLoginButtonProps>(
   ({ className, provider, ...props }, ref) => {
+    const { signInWithProvider } = useAuth()
+
+    const handleClick = async () => {
+      try {
+        await signInWithProvider(provider === 'twitter' ? 'github' : provider)
+      } catch {
+        // Error is handled by auth context
+      }
+    }
+
     return (
       <button
         ref={ref}
@@ -68,6 +79,7 @@ const SocialLoginButton = forwardRef<HTMLButtonElement, SocialLoginButtonProps>(
           className
         )}
         aria-label={`Sign in with ${provider}`}
+        onClick={() => void handleClick()}
         {...props}
       >
         {providerIcons[provider]}

@@ -166,6 +166,26 @@ src/
   const VisitorsChart = dynamic(() => import('./VisitorsChart'), { ssr: false })
   ```
 
+### Authentication (Supabase)
+
+- **Session Management:** Use cookie-based sessions with SSR support. The
+  Supabase client is configured differently for server, client, and middleware
+  contexts.
+- **Auth Context:** All auth operations go through `useAuth()` hook from
+  `/src/contexts/auth-context.tsx`. This provides consistent error handling and
+  toast notifications.
+- **Protected Routes:** Middleware automatically handles auth checks. Define
+  protected routes in the `protectedRoutes` array in `/src/middleware.ts`.
+- **OAuth Providers:** Support for Google, GitHub, and Apple. Configure redirect
+  URLs in Supabase dashboard as `{SITE_URL}/auth/callback`.
+- **TypeScript Strict Mode:** Handle nullable auth values explicitly:
+  ```tsx
+  // ✅ Correct
+  if (token !== undefined && token !== '') { ... }
+  // ❌ Incorrect
+  if (token) { ... }
+  ```
+
 ## 7\. Git Workflow and Versioning
 
 - **Creating Commits:** **DO NOT use `git commit` directly.** All commits MUST

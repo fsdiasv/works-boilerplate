@@ -100,7 +100,22 @@ const nextConfig = {
     // reactCompiler: true, // React Compiler - requires additional setup
 
     // Mobile optimizations
-    optimizePackageImports: ['@/components', '@/lib', 'lucide-react', 'framer-motion'],
+    optimizePackageImports: [
+      '@/components',
+      '@/lib',
+      'lucide-react',
+      'framer-motion',
+      'recharts',
+      '@supabase/supabase-js',
+      '@supabase/ssr',
+      'react-hook-form',
+      '@hookform/resolvers',
+      'sonner',
+      'next-themes',
+      'class-variance-authority',
+      'clsx',
+      'tailwind-merge',
+    ],
   },
 
   // Mobile-first image optimization
@@ -132,6 +147,46 @@ const nextConfig = {
       use: ['@svgr/webpack'],
     })
 
+    // Code splitting optimization
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            // Split large vendor libraries
+            supabase: {
+              test: /[\\/]node_modules[\\/](@supabase)[\\/]/,
+              name: 'supabase',
+              priority: 10,
+            },
+            framer: {
+              test: /[\\/]node_modules[\\/](framer-motion)[\\/]/,
+              name: 'framer',
+              priority: 10,
+            },
+            recharts: {
+              test: /[\\/]node_modules[\\/](recharts|d3-.*|victory-.*)[\\/]/,
+              name: 'charts',
+              priority: 10,
+            },
+            ui: {
+              test: /[\\/]components[\\/]ui[\\/]/,
+              name: 'ui',
+              priority: 5,
+            },
+            commons: {
+              minChunks: 2,
+              priority: -10,
+              reuseExistingChunk: true,
+            },
+          },
+        },
+      }
+    }
+
     // Bundle analyzer integration handled by withBundleAnalyzer
 
     return config
@@ -145,6 +200,13 @@ const nextConfig = {
 
   // Security headers
   async headers() {
+    // More permissive CSP for development
+    const isDev = process.env.NODE_ENV === 'development'
+
+    const cspHeader = isDev
+      ? "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' http://localhost:* ws://localhost:* https://*.supabase.co wss://*.supabase.co https://*.supabase.com wss://*.supabase.com http://gc.kis.v2.scr.kaspersky-labs.com ws://gc.kis.v2.scr.kaspersky-labs.com; frame-src 'self' https://*.supabase.co https://*.supabase.com;"
+      : "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.supabase.com wss://*.supabase.com; frame-src 'self' https://*.supabase.co https://*.supabase.com;"
+
     return [
       {
         source: '/(.*)',
@@ -167,8 +229,7 @@ const nextConfig = {
           },
           {
             key: 'Content-Security-Policy',
-            value:
-              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;",
+            value: cspHeader,
           },
           {
             key: 'Referrer-Policy',
