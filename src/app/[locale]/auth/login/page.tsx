@@ -1,10 +1,10 @@
 'use client'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 
 import { AuthLayout } from '@/components/auth/auth-layout'
@@ -13,21 +13,15 @@ import { PasswordInput } from '@/components/ui/password-input'
 import { PrimaryButton } from '@/components/ui/primary-button'
 import { SocialLoginButton } from '@/components/ui/social-login-button'
 
-const signupSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name is too long'),
+const loginSchema = z.object({
   email: z.string().email('Invalid email address').min(1, 'Email is required'),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number'),
+  password: z.string().min(1, 'Password is required'),
 })
 
-type SignupFormData = z.infer<typeof signupSchema>
+type LoginFormData = z.infer<typeof loginSchema>
 
-export default function SignUpPage() {
-  const t = useTranslations('auth.signupPage')
+export default function LoginPage() {
+  const t = useTranslations('auth.loginPage')
   const locale = useLocale()
   const [isLoading, setIsLoading] = useState(false)
 
@@ -35,13 +29,13 @@ export default function SignUpPage() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<SignupFormData>({
-    resolver: zodResolver(signupSchema),
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
   })
 
-  const onSubmit = async (_data: SignupFormData) => {
+  const onSubmit = async () => {
     setIsLoading(true)
-    // TODO: Implement actual signup API call with form data
+    // TODO: Implement actual login API call with form data
     await new Promise(resolve => setTimeout(resolve, 2000))
     setIsLoading(false)
   }
@@ -49,29 +43,20 @@ export default function SignUpPage() {
   return (
     <AuthLayout>
       <div className='w-full'>
-        <h1 className='mb-2 text-3xl font-bold text-slate-800 sm:text-4xl lg:text-5xl'>
+        <h1 className='mb-2 text-3xl font-bold text-slate-800 sm:text-4xl lg:text-4xl xl:text-5xl'>
           {t('title')}
         </h1>
-        <p className='mb-8 text-sm text-slate-500 sm:text-base lg:text-lg'>
+        <p className='mb-8 text-sm text-slate-500 sm:text-base'>
           {t('subtitle')}{' '}
           <Link
-            href={`/${locale}/login`}
+            href={`/${locale}/auth/signup`}
             className='font-semibold text-blue-600 hover:text-blue-700'
           >
             {t('subtitleLink')}
           </Link>
         </p>
 
-        <form onSubmit={(e) => void handleSubmit(onSubmit)(e)} className='space-y-6'>
-          <FormInput
-            id='name'
-            label={t('nameLabel')}
-            placeholder={t('namePlaceholder')}
-            autoComplete='name'
-            {...(errors.name && { error: errors.name.message })}
-            {...register('name')}
-          />
-
+        <form onSubmit={e => void handleSubmit(onSubmit)(e)} className='space-y-6'>
           <FormInput
             id='email'
             type='email'
@@ -82,14 +67,24 @@ export default function SignUpPage() {
             {...register('email')}
           />
 
-          <PasswordInput
-            id='password'
-            label={t('passwordLabel')}
-            placeholder={t('passwordPlaceholder')}
-            autoComplete='new-password'
-            {...(errors.password && { error: errors.password.message })}
-            {...register('password')}
-          />
+          <div>
+            <PasswordInput
+              id='password'
+              label={t('passwordLabel')}
+              placeholder={t('passwordPlaceholder')}
+              autoComplete='current-password'
+              {...(errors.password && { error: errors.password.message })}
+              {...register('password')}
+            />
+            <div className='mt-2 text-right'>
+              <Link
+                href={`/${locale}/auth/forgot-password`}
+                className='text-sm font-semibold text-blue-600 hover:text-blue-700'
+              >
+                {t('forgotPasswordLink')}
+              </Link>
+            </div>
+          </div>
 
           <PrimaryButton type='submit' isLoading={isLoading}>
             {t('submitButton')}
@@ -112,24 +107,6 @@ export default function SignUpPage() {
             <SocialLoginButton provider='github' />
           </div>
         </div>
-
-        <p className='mt-8 text-center text-xs text-slate-500'>
-          {t('legalText')}{' '}
-          <Link
-            href={`/${locale}/terms`}
-            className='font-semibold text-slate-800 hover:text-blue-600'
-          >
-            {t('termsOfService')}
-          </Link>{' '}
-          {t('and')}{' '}
-          <Link
-            href={`/${locale}/privacy`}
-            className='font-semibold text-slate-800 hover:text-blue-600'
-          >
-            {t('privacyPolicy')}
-          </Link>
-          .
-        </p>
       </div>
     </AuthLayout>
   )

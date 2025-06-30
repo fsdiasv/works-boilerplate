@@ -1,8 +1,8 @@
 'use client'
 
+import { useDrag } from '@use-gesture/react'
 import { useRouter } from 'next/navigation'
 import { useCallback, useEffect, useState } from 'react'
-import { useDrag } from '@use-gesture/react'
 
 interface UseGestureNavigationOptions {
   enabled?: boolean
@@ -77,7 +77,7 @@ export function useGestureNavigation({
   )
 
   return {
-    bind: enabled ? bind : () => ({}),
+    bind: enabled === true ? bind : () => ({}),
     isNavigating,
   }
 }
@@ -159,7 +159,7 @@ export function usePullToRefresh({
   }, [enabled])
 
   return {
-    bind: enabled ? bind : () => ({}),
+    bind: enabled === true ? bind : () => ({}),
     pullDistance,
     isRefreshing,
     canRefresh,
@@ -228,7 +228,7 @@ export function useSwipeNavigation({
   )
 
   return {
-    bind: enabled ? bind : () => ({}),
+    bind: enabled === true ? bind : () => ({}),
     dragOffset,
     isDragging,
     canGoBack: currentIndex > 0,

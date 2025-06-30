@@ -1,8 +1,8 @@
 'use client'
 
+import { Slot } from '@radix-ui/react-slot'
 import type React from 'react'
 import { forwardRef, type HTMLAttributes } from 'react'
-import { Slot } from '@radix-ui/react-slot'
 
 import { cn } from '@/lib/utils'
 

@@ -30,7 +30,7 @@ export function initializePWA(): void {
   // Listen for the beforeinstallprompt event
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault()
-    deferredPrompt = e as BeforeInstallPromptEvent
+    deferredPrompt = e
 
     // Dispatch custom event to notify components
     window.dispatchEvent(new CustomEvent('pwa-installable', { detail: true }))

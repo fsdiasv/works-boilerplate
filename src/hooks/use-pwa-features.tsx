@@ -1,4 +1,5 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+
 import type { BeforeInstallPromptEvent } from '@/lib/pwa'
 
 interface PWAFeatures {
@@ -31,7 +32,7 @@ export function usePWAFeatures() {
   const detectStandaloneMode = useCallback(() => {
     const isStandalone =
       window.matchMedia('(display-mode: standalone)').matches ||
-      window.navigator.standalone === true ||
+      (window.navigator as { standalone?: boolean }).standalone === true ||
       document.referrer.includes('android-app://') ||
       window.location.href.includes('mode=standalone')
 
@@ -56,13 +57,13 @@ export function usePWAFeatures() {
     // Try to get pre-calculated CSS custom properties first
     const getInsetValue = (property: string, fallback: string): number => {
       const value = computedStyle.getPropertyValue(property)
-      if (value && value !== '') {
+      if (value !== '') {
         const parsed = parseInt(value)
         return isNaN(parsed) ? 0 : parsed
       }
       // For CSS env() variables, we need to check if they're already applied via CSS
       const fallbackValue = computedStyle.getPropertyValue(fallback)
-      if (fallbackValue && fallbackValue !== '') {
+      if (fallbackValue !== '') {
         const parsed = parseInt(fallbackValue)
         return isNaN(parsed) ? 0 : parsed
       }
@@ -95,10 +96,10 @@ export function usePWAFeatures() {
   const vibrate = useCallback((pattern: number | number[] = 10) => {
     if ('vibrate' in navigator) {
       // Ensure pattern is touch-friendly (short vibrations for better UX)
-      const touchFriendlyPattern = Array.isArray(pattern) 
+      const touchFriendlyPattern = Array.isArray(pattern)
         ? pattern.map(p => Math.min(p, 100)) // Cap at 100ms for touch feedback
         : Math.min(pattern, 100)
-      
+
       navigator.vibrate(touchFriendlyPattern)
       return true
     }
@@ -112,12 +113,14 @@ export function usePWAFeatures() {
         try {
           if (count === undefined || count === 0) {
             // TypeScript doesn't know about these methods yet
-            if (navigator.clearAppBadge) {
-              await navigator.clearAppBadge()
+            if ('clearAppBadge' in navigator) {
+              await (navigator as { clearAppBadge: () => Promise<void> }).clearAppBadge()
             }
           } else {
             if ('setAppBadge' in navigator) {
-              await navigator.setAppBadge(count)
+              await (navigator as { setAppBadge: (count: number) => Promise<void> }).setAppBadge(
+                count
+              )
             }
           }
           return true
@@ -187,9 +190,9 @@ export function usePWAFeatures() {
     const handleDisplayModeChange = () => updateFeatures()
 
     // Listen for orientation changes (may affect safe areas)
-    let orientationTimeoutId: NodeJS.Timeout | null = null
+    let orientationTimeoutId: ReturnType<typeof setTimeout> | null = null
     const handleOrientationChange = () => {
-      if (orientationTimeoutId) clearTimeout(orientationTimeoutId)
+      if (orientationTimeoutId !== null) clearTimeout(orientationTimeoutId)
       orientationTimeoutId = setTimeout(updateFeatures, 100) // Delay to ensure values are updated
     }
 
@@ -207,7 +210,7 @@ export function usePWAFeatures() {
       window.removeEventListener('orientationchange', handleOrientationChange)
       window.removeEventListener('resize', handleOrientationChange)
       displayModeQuery.removeEventListener('change', handleDisplayModeChange)
-      if (orientationTimeoutId) clearTimeout(orientationTimeoutId)
+      if (orientationTimeoutId !== null) clearTimeout(orientationTimeoutId)
     }
   }, [detectStandaloneMode, detectPWA, setSafeAreaProperties])
 
@@ -224,35 +227,35 @@ export function usePWAFeatures() {
 
   // Detect touch capabilities
   const [isTouchDevice, setIsTouchDevice] = useState(false)
-  
+
   useEffect(() => {
     const checkTouch = () => {
       setIsTouchDevice(
         'ontouchstart' in window ||
-        navigator.maxTouchPoints > 0 ||
-        window.matchMedia('(pointer: coarse)').matches
+          navigator.maxTouchPoints > 0 ||
+          window.matchMedia('(pointer: coarse)').matches
       )
     }
-    
+
     checkTouch()
     window.addEventListener('resize', checkTouch)
-    
+
     return () => window.removeEventListener('resize', checkTouch)
   }, [])
 
   // Screen orientation utilities
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait')
-  
+
   useEffect(() => {
     const updateOrientation = () => {
       const isPortrait = window.innerHeight > window.innerWidth
       setOrientation(isPortrait ? 'portrait' : 'landscape')
     }
-    
+
     updateOrientation()
     window.addEventListener('orientationchange', updateOrientation)
     window.addEventListener('resize', updateOrientation)
-    
+
     return () => {
       window.removeEventListener('orientationchange', updateOrientation)
       window.removeEventListener('resize', updateOrientation)

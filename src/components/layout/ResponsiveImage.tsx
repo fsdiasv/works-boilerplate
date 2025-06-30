@@ -80,9 +80,9 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
     const getQuality = () => {
       if (typeof quality === 'number') return quality
 
-      if (isMobile) return quality.mobile || quality.default
-      if (isTablet) return quality.tablet || quality.default
-      return quality.desktop || quality.default
+      if (isMobile) return quality.mobile ?? quality.default
+      if (isTablet) return quality.tablet ?? quality.default
+      return quality.desktop ?? quality.default
     }
 
     // Adaptive loading strategy
@@ -103,7 +103,7 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
 
     // Responsive sizes if not provided
     const getResponsiveSizes = () => {
-      if (sizes) return sizes
+      if (sizes !== undefined && sizes.length > 0) return sizes
 
       if (fill) {
         return '(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw'
@@ -116,9 +116,9 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
     const getResponsiveSrc = () => {
       if (!srcSet) return src
 
-      if (isMobile && srcSet.mobile) return srcSet.mobile
-      if (isTablet && srcSet.tablet) return srcSet.tablet
-      if (srcSet.desktop) return srcSet.desktop
+      if (isMobile && srcSet.mobile !== undefined && srcSet.mobile.length > 0) return srcSet.mobile
+      if (isTablet && srcSet.tablet !== undefined && srcSet.tablet.length > 0) return srcSet.tablet
+      if (srcSet.desktop !== undefined && srcSet.desktop.length > 0) return srcSet.desktop
 
       return src
     }
@@ -129,7 +129,7 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
 
       const observer = new IntersectionObserver(
         ([entry]) => {
-          if (entry?.isIntersecting) {
+          if (entry?.isIntersecting === true) {
             setIsIntersecting(true)
             observer.disconnect()
           }
@@ -142,7 +142,7 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
 
       observer.observe(imageRef.current)
       return () => observer.disconnect()
-    }, [loading, priority, networkSpeed, isMobile])
+    }, [loading, priority, networkSpeed, isMobile, getLoadingStrategy])
 
     // Preload critical images
     useEffect(() => {
@@ -165,7 +165,7 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
       return () => {
         document.head.removeChild(link)
       }
-    }, [preload, src, srcSet, isMobile, isTablet])
+    }, [preload, src, srcSet, isMobile, isTablet, formats, getResponsiveSrc])
 
     const handleLoad = () => {
       setIsLoading(false)
@@ -186,19 +186,19 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
 
     return (
       <div
-        ref={ref || imageRef}
+        ref={ref ?? imageRef}
         className={cn(
           'relative overflow-hidden',
           // Aspect ratio support
           aspectRatio != null && typeof aspectRatio === 'string' && aspectRatioClasses[aspectRatio],
           // Layout shift prevention
-          !fill && width && height && 'bg-transparent',
+          !fill && width !== undefined && height !== undefined && 'bg-transparent',
           containerClassName
         )}
         style={
           aspectRatio != null && typeof aspectRatio === 'number'
             ? { aspectRatio: aspectRatio.toString() }
-            : !fill && width && height
+            : !fill && width !== undefined && height !== undefined
               ? { aspectRatio: `${width}/${height}` }
               : undefined
         }
@@ -212,7 +212,11 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
             quality={getQuality()}
             sizes={getResponsiveSizes()}
             loading={getLoadingStrategy()}
-            placeholder={placeholder === 'blur' && blurDataURL ? 'blur' : 'empty'}
+            placeholder={
+              placeholder === 'blur' && blurDataURL !== undefined && blurDataURL.length > 0
+                ? 'blur'
+                : 'empty'
+            }
             {...(blurDataURL != null && blurDataURL.length > 0 ? { blurDataURL } : {})}
             onLoad={handleLoad}
             onError={handleError}
@@ -274,7 +278,12 @@ export const Picture = forwardRef<HTMLDivElement, PictureProps>(
           {sources.map((source, index) => (
             <source key={index} srcSet={source.srcSet} media={source.media} type={source.type} />
           ))}
-          <ResponsiveImage src={src} alt={alt} {...(className && { className })} {...props} />
+          <ResponsiveImage
+            src={src}
+            alt={alt}
+            {...(className !== undefined && className.length > 0 && { className })}
+            {...props}
+          />
         </picture>
       </div>
     )
