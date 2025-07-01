@@ -75,7 +75,7 @@ export function createRateLimitMiddleware(options: RateLimitOptions) {
           identifier = { type: 'email', value: ctx.user.email }
           break
 
-        default:
+        default: {
           // Default to IP address
           // In production, this would come from headers like X-Forwarded-For
           // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -88,6 +88,7 @@ export function createRateLimitMiddleware(options: RateLimitOptions) {
             ctx.req?.connection?.remoteAddress ??
             'unknown'
           identifier = { type: 'ip', value: ip as string }
+        }
       }
     }
 

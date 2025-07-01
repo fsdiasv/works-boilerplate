@@ -149,55 +149,48 @@ export const authRouter = createTRPCRouter({
     }),
 
   // Update password
-  updatePassword: rateLimitedProtectedProcedure
-    .input(
-      z.object({
-        currentPassword: z.string(),
-        newPassword: z.string(),
+  updatePassword: rateLimitedProtectedProcedure.mutation(async ({ ctx, input }) => {
+    // Validate with translations
+    const schema = await createUpdatePasswordSchema(ctx.locale)
+    const validatedInput = schema.parse(input)
+    const { currentPassword, newPassword } = validatedInput
+
+    // Check if user email exists and is valid
+    const userEmail = ctx.user.email
+    if (userEmail === undefined || userEmail === '') {
+      throw new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'User email is not available. Please sign in again.',
       })
-    )
-    .mutation(async ({ ctx, input }) => {
-      // Validate with translations
-      const schema = await createUpdatePasswordSchema(ctx.locale)
-      const validatedInput = schema.parse(input)
-      const { currentPassword, newPassword } = validatedInput
+    }
 
-      // Check if user email exists and is valid
-      const userEmail = ctx.user.email
-      if (userEmail === undefined || userEmail === '') {
-        throw new TRPCError({
-          code: 'BAD_REQUEST',
-          message: 'User email is not available. Please sign in again.',
-        })
-      }
+    // Verify current password
+    const { error: userError } = await ctx.supabase.auth.signInWithPassword({
+      email: userEmail,
+      password: currentPassword,
+    })
 
-      // Verify current password
-      const { error: userError } = await ctx.supabase.auth.signInWithPassword({
-        email: userEmail,
-        password: currentPassword,
+    if (userError !== null) {
+      throw new TRPCError({
+        code: 'UNAUTHORIZED',
+        message: 'Current password is incorrect',
       })
+    }
 
-      if (userError !== null) {
-        throw new TRPCError({
-          code: 'UNAUTHORIZED',
-          message: 'Current password is incorrect',
-        })
-      }
+    // Update password
+    const { error } = await ctx.supabase.auth.updateUser({
+      password: newPassword,
+    })
 
-      // Update password
-      const { error } = await ctx.supabase.auth.updateUser({
-        password: newPassword,
+    if (error) {
+      throw new TRPCError({
+        code: 'INTERNAL_SERVER_ERROR',
+        message: error.message,
       })
+    }
 
-      if (error) {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: error.message,
-        })
-      }
-
-      return { success: true }
-    }),
+    return { success: true }
+  }),
 
   /**
    * Updates the user's profile information including personal details and metadata.

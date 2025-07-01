@@ -3,6 +3,7 @@ import createMiddleware from 'next-intl/middleware'
 
 import { defaultLocale, locales } from '@/i18n/config'
 import { addCSPHeaders } from '@/lib/csp'
+import { env } from '@/lib/env'
 import { updateSession } from '@/lib/supabase/middleware'
 
 const intlMiddleware = createMiddleware({
@@ -27,7 +28,12 @@ function isAuthRoute(pathname: string): boolean {
 
 export default async function middleware(request: NextRequest) {
   // First, handle i18n
-  intlMiddleware(request)
+  const intlResponse = intlMiddleware(request)
+
+  // If intl middleware returns a response (redirect or rewrite), return it
+  if (intlResponse instanceof NextResponse) {
+    return intlResponse
+  }
 
   // Then, handle auth
   const { supabase, response: authResponse, user } = await updateSession(request)
@@ -77,7 +83,7 @@ export default async function middleware(request: NextRequest) {
   }
 
   // Add CSP headers
-  const isDev = process.env.NODE_ENV === 'development'
+  const isDev = env.NODE_ENV === 'development'
   addCSPHeaders(authResponse.headers, isDev)
 
   // Return the response with any auth cookie updates and CSP headers

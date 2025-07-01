@@ -1,3 +1,5 @@
+import { timingSafeEqual } from 'crypto'
+
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 
@@ -21,8 +23,16 @@ export async function POST(request: NextRequest) {
     const { userId, secret } = requestSchema.parse(body)
 
     // Verify the secret to ensure this is an authorized request
-    // In production, this should be a secure token stored in environment variables
-    if (secret !== env.INTERNAL_API_SECRET) {
+    // Use constant-time comparison to prevent timing attacks
+    const secretBuffer = Buffer.from(secret)
+    const envSecretBuffer = Buffer.from(env.INTERNAL_API_SECRET)
+
+    // Ensure buffers are the same length for timingSafeEqual
+    const isValidSecret =
+      secretBuffer.length === envSecretBuffer.length &&
+      timingSafeEqual(secretBuffer, envSecretBuffer)
+
+    if (!isValidSecret) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 

@@ -7,14 +7,26 @@ const messagesDir = path.join(__dirname, '..', 'messages')
 const locales = ['en', 'es', 'pt']
 
 function flattenObject(obj, prefix = '') {
-  return Object.keys(obj).reduce((acc, key) => {
-    const pre = prefix.length ? `${prefix}.` : ''
-    if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-      return { ...acc, ...flattenObject(obj[key], pre + key) }
-    } else {
-      return { ...acc, [pre + key]: obj[key] }
+  const result = {}
+
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      const pre = prefix.length ? `${prefix}.` : ''
+      if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+        // Recursively flatten nested objects
+        const nested = flattenObject(obj[key], pre + key)
+        for (const nestedKey in nested) {
+          if (Object.prototype.hasOwnProperty.call(nested, nestedKey)) {
+            result[nestedKey] = nested[nestedKey]
+          }
+        }
+      } else {
+        result[pre + key] = obj[key]
+      }
     }
-  }, {})
+  }
+
+  return result
 }
 
 function validateTranslations() {
