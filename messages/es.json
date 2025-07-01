@@ -150,7 +150,6 @@
     },
     "validation": {
       "invalidEmail": "Dirección de correo electrónico inválida",
-      "passwordMinLength": "La contraseña debe tener al menos 8 caracteres",
       "nameMinLength": "El nombre debe tener al menos 2 caracteres",
       "currentPasswordRequired": "La contraseña actual es obligatoria",
       "urlInvalid": "URL inválida",

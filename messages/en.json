@@ -165,7 +165,6 @@
     },
     "validation": {
       "invalidEmail": "Invalid email address",
-      "passwordMinLength": "Password must be at least 8 characters",
       "nameMinLength": "Name must be at least 2 characters",
       "currentPasswordRequired": "Current password is required",
       "urlInvalid": "Invalid URL",

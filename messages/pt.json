@@ -150,7 +150,6 @@
     },
     "validation": {
       "invalidEmail": "Endereço de e-mail inválido",
-      "passwordMinLength": "A senha deve ter pelo menos 8 caracteres",
       "nameMinLength": "O nome deve ter pelo menos 2 caracteres",
       "currentPasswordRequired": "A senha atual é obrigatória",
       "urlInvalid": "URL inválida",

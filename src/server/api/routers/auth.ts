@@ -13,23 +13,25 @@ import {
 
 // Helper to create schemas with translations
 async function createSignUpSchema(locale: string) {
-  const t = await getTranslations({ locale, namespace: 'auth.validation' })
+  const tAuth = await getTranslations({ locale, namespace: 'auth.validation' })
+  const tValidation = await getTranslations({ locale, namespace: 'validation' })
 
   return z.object({
-    email: z.string().email(t('invalidEmail')),
-    password: z.string().min(8, t('passwordMinLength')),
-    fullName: z.string().min(2, t('nameMinLength')).optional(),
+    email: z.string().email(tAuth('invalidEmail')),
+    password: z.string().min(8, tValidation('passwordMinLength')),
+    fullName: z.string().min(2, tAuth('nameMinLength')).optional(),
     locale: z.string().optional(),
     timezone: z.string().optional(),
   })
 }
 
 async function createUpdatePasswordSchema(locale: string) {
-  const t = await getTranslations({ locale, namespace: 'auth.validation' })
+  const tAuth = await getTranslations({ locale, namespace: 'auth.validation' })
+  const tValidation = await getTranslations({ locale, namespace: 'validation' })
 
   return z.object({
-    currentPassword: z.string().min(1, t('currentPasswordRequired')),
-    newPassword: z.string().min(8, t('passwordMinLength')),
+    currentPassword: z.string().min(1, tAuth('currentPasswordRequired')),
+    newPassword: z.string().min(8, tValidation('passwordMinLength')),
   })
 }
 
