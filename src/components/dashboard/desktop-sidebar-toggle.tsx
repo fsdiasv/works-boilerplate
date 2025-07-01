@@ -4,7 +4,7 @@ import { PanelLeft } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { useSidebar } from '@/components/ui/sidebar'
-import { cn } from '@/lib/utils'
+import { cn } from 'src/lib/utils'
 
 /**
  * A button to toggle the sidebar's collapsed state on desktop.

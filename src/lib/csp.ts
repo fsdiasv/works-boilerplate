@@ -1,10 +1,10 @@
-import crypto from 'crypto'
-
 /**
  * Generates a random nonce for Content Security Policy
  */
 export function generateNonce(): string {
-  return crypto.randomBytes(16).toString('base64')
+  const array = new Uint8Array(16)
+  crypto.getRandomValues(array)
+  return btoa(String.fromCharCode(...array))
 }
 
 /**
