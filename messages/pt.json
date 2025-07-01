@@ -155,6 +155,17 @@
       "currentPasswordRequired": "A senha atual é obrigatória",
       "urlInvalid": "URL inválida",
       "bioMaxLength": "A biografia não deve exceder 500 caracteres"
+    },
+    "errors": {
+      "generic": "Falha na autenticação. Por favor, tente novamente.",
+      "oauthProviderError": "O provedor de autenticação encontrou um erro. Por favor, tente novamente.",
+      "oauthMissingCode": "Código de autorização ausente. Por favor, tente fazer login novamente.",
+      "oauthStateMismatch": "Falha na validação de segurança. Por favor, tente fazer login novamente.",
+      "oauthExchangeFailed": "Falha ao concluir a autenticação. Por favor, tente novamente.",
+      "oauthInvalidSession": "Sessão inválida recebida. Por favor, tente fazer login novamente.",
+      "oauthSessionMismatch": "Falha na validação da sessão. Por favor, tente fazer login novamente.",
+      "oauthCodeReused": "Esta autorização já foi usada. Por favor, faça login novamente.",
+      "oauthUnexpectedError": "Ocorreu um erro inesperado. Por favor, tente novamente."
     }
   },
   "dashboard": {

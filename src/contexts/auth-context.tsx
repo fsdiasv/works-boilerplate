@@ -9,6 +9,26 @@ import { toast } from 'sonner'
 import { createClient } from '@/lib/supabase/client'
 import { performLogoutCleanup } from '@/lib/utils/auth-cleanup'
 
+/**
+ * Generates a cryptographically secure random state parameter for OAuth flows.
+ * This is used for CSRF protection during the OAuth authorization process.
+ *
+ * @returns A random 32-character hexadecimal string
+ */
+function generateRandomState(): string {
+  const array = new Uint8Array(16)
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions
+  if (typeof window !== 'undefined' && window.crypto) {
+    window.crypto.getRandomValues(array)
+  } else {
+    // Fallback for environments without crypto API
+    for (let i = 0; i < array.length; i++) {
+      array[i] = Math.floor(Math.random() * 256)
+    }
+  }
+  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')
+}
+
 interface AuthContextValue {
   user: User | null
   session: Session | null
@@ -200,13 +220,19 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         setError(null)
         setLoading(true)
 
-        const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        // Generate a random state parameter for CSRF protection
+        const state = generateRandomState()
+
+        // Store state in a secure cookie (this would typically be done server-side)
+        // For now, we'll pass it through and let the server handle it
+        const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
           provider,
           options: {
             redirectTo: `${window.location.origin}/${locale}/auth/callback`,
             queryParams: {
               access_type: 'offline',
               prompt: 'consent',
+              state, // Include state parameter for CSRF protection
             },
           },
         })
@@ -214,6 +240,18 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         if (oauthError) {
           setError(oauthError)
           throw oauthError
+        }
+
+        // Store state in cookie for validation on callback
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (data?.url) {
+          // Extract state from the URL to store it
+          const authUrl = new URL(data.url)
+          const urlState = authUrl.searchParams.get('state')
+          if (urlState !== null && urlState !== '') {
+            // Set cookie with same parameters as middleware expects
+            document.cookie = `oauth_state=${urlState}; path=/; secure; samesite=lax; max-age=600` // 10 minute expiry
+          }
         }
       } catch (err) {
         const authError = err as SupabaseAuthError

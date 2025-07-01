@@ -170,6 +170,17 @@
       "currentPasswordRequired": "Current password is required",
       "urlInvalid": "Invalid URL",
       "bioMaxLength": "Bio must not exceed 500 characters"
+    },
+    "errors": {
+      "generic": "Authentication failed. Please try again.",
+      "oauthProviderError": "The authentication provider encountered an error. Please try again.",
+      "oauthMissingCode": "Authorization code is missing. Please try signing in again.",
+      "oauthStateMismatch": "Security validation failed. Please try signing in again.",
+      "oauthExchangeFailed": "Failed to complete authentication. Please try again.",
+      "oauthInvalidSession": "Invalid session received. Please try signing in again.",
+      "oauthSessionMismatch": "Session validation failed. Please try signing in again.",
+      "oauthCodeReused": "This authorization has already been used. Please sign in again.",
+      "oauthUnexpectedError": "An unexpected error occurred. Please try again."
     }
   },
   "dashboard": {

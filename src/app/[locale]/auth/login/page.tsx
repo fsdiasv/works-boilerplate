@@ -2,9 +2,11 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { AuthLayout } from '@/components/auth/auth-layout'
@@ -24,10 +26,49 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
   const t = useTranslations('auth.loginPage')
+  const tError = useTranslations('auth.errors')
   const locale = useLocale()
+  const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const { signIn } = useAuth()
+
+  // Handle OAuth callback errors
+  useEffect(() => {
+    const error = searchParams.get('error')
+    if (error !== null && error !== '') {
+      let errorMessage = tError('generic')
+
+      switch (error) {
+        case 'oauth_error':
+          errorMessage = tError('oauthProviderError')
+          break
+        case 'missing_code':
+          errorMessage = tError('oauthMissingCode')
+          break
+        case 'state_mismatch':
+          errorMessage = tError('oauthStateMismatch')
+          break
+        case 'exchange_failed':
+          errorMessage = tError('oauthExchangeFailed')
+          break
+        case 'invalid_session':
+          errorMessage = tError('oauthInvalidSession')
+          break
+        case 'session_mismatch':
+          errorMessage = tError('oauthSessionMismatch')
+          break
+        case 'code_reused':
+          errorMessage = tError('oauthCodeReused')
+          break
+        case 'unexpected_error':
+          errorMessage = tError('oauthUnexpectedError')
+          break
+      }
+
+      toast.error(errorMessage)
+    }
+  }, [searchParams, tError])
 
   const {
     register,
