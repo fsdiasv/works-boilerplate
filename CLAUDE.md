@@ -201,6 +201,54 @@ src/
   or any AI attribution in commit messages. `pnpm commit` ensures a clean,
   professional format.
 
+### Commit Message Format (CRITICAL)
+
+When creating commits manually with `git commit -m`, you MUST follow this exact
+format to pass commitlint validation:
+
+1. **Type**: Must be one of: `feat`, `fix`, `docs`, `style`, `refactor`, `perf`,
+   `test`, `build`, `ci`, `chore`, `revert`, `wip`
+2. **Scope**: Must be one of: `app`, `components`, `hooks`, `lib`, `server`,
+   `api`, `mobile`, `pwa`, `offline`, `touch`, `responsive`, `config`, `deps`,
+   `scripts`, `types`, `lint`, `format`, `auth`, `db`, `ui`, `i18n`, `cache`,
+   `analytics`, `build`, `deploy`, `test`, `docs`, `dx`
+3. **Subject**:
+   - Use sentence-case (first letter capitalized)
+   - Maximum 72 characters
+   - No period at the end
+4. **Body**:
+   - Each line maximum 100 characters
+   - Use bullet points for multiple items
+   - Separate from subject with blank line
+
+**Examples:**
+
+```bash
+# ✅ CORRECT - Single scope
+git commit -m "fix(auth): Fix timing attack vulnerability in delete-auth-user route"
+
+# ✅ CORRECT - With body
+git commit -m "feat(components): Add new dashboard widget
+
+- Implement real-time data updates
+- Add responsive design for mobile
+- Include error handling"
+
+# ❌ INCORRECT - Multiple scopes
+git commit -m "fix(security,perf): Address vulnerabilities"  # Use single scope
+
+# ❌ INCORRECT - Wrong scope
+git commit -m "fix(security): Fix auth issue"  # 'security' is not a valid scope
+
+# ❌ INCORRECT - Body line too long
+git commit -m "fix(lib): Update function
+
+This is a very long line that exceeds 100 characters and will fail validation because it's too long"
+```
+
+**Best Practice:** Always use `pnpm commit` for interactive commit creation to
+avoid format errors.
+
 ## 8\. Definition of Done
 
 A task is only considered complete when ALL of the following criteria are met:
