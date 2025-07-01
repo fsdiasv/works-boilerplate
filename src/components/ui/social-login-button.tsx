@@ -1,7 +1,9 @@
 'use client'
 
+import { useTranslations } from 'next-intl'
 import { ButtonHTMLAttributes, forwardRef } from 'react'
 
+import { useAuth } from '@/hooks/use-auth'
 import { cn } from '@/lib/utils'
 
 export interface SocialLoginButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -57,6 +59,17 @@ const providerIcons = {
 
 const SocialLoginButton = forwardRef<HTMLButtonElement, SocialLoginButtonProps>(
   ({ className, provider, ...props }, ref) => {
+    const { signInWithProvider } = useAuth()
+    const t = useTranslations('auth.socialLogin')
+
+    const handleClick = async () => {
+      try {
+        await signInWithProvider(provider === 'twitter' ? 'github' : provider)
+      } catch {
+        // Error is handled by auth context
+      }
+    }
+
     return (
       <button
         ref={ref}
@@ -67,7 +80,8 @@ const SocialLoginButton = forwardRef<HTMLButtonElement, SocialLoginButtonProps>(
           'min-h-[44px] min-w-[44px]', // Ensure 44px minimum touch target
           className
         )}
-        aria-label={`Sign in with ${provider}`}
+        aria-label={t('signInWith', { provider })}
+        onClick={() => void handleClick()}
         {...props}
       >
         {providerIcons[provider]}

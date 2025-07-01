@@ -1,292 +1,89 @@
 'use client'
 
-import type React from 'react'
-import type { ComponentProps } from 'react'
-import { forwardRef, useEffect, useState } from 'react'
+import { motion } from 'framer-motion'
 
-import type { BeforeInstallPromptEvent } from '@/lib/pwa'
+import { isStandalone as checkIsStandalone } from '@/lib/pwa'
 import { cn } from '@/lib/utils'
 
-interface PWALayoutProps extends ComponentProps<'div'> {
+interface PWALayoutProps {
   children: React.ReactNode
-  safeArea?: boolean | 'all' | 'top' | 'bottom' | 'horizontal'
-  fullScreen?: boolean
-  preventPullToRefresh?: boolean
-  showInstallPrompt?: boolean
-  navigationBarColor?: string
-  statusBarColor?: string
-}
-
-/**
- * PWA-optimized layout component with safe area handling and standalone mode support
- */
-export const PWALayout = forwardRef<HTMLDivElement, PWALayoutProps>(
-  (
-    {
-      children,
-      className,
-      safeArea = true,
-      fullScreen = false,
-      preventPullToRefresh = true,
-      showInstallPrompt = true,
-      navigationBarColor,
-      ...props
-    },
-    ref
-  ) => {
-    const [isStandalone, setIsStandalone] = useState(false)
-    const [isPWAInstalled, setIsPWAInstalled] = useState(false)
-    const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
-
-    useEffect(() => {
-      // Check if running in standalone mode
-      const checkStandalone = () => {
-        const standalone = window.matchMedia('(display-mode: standalone)').matches
-        setIsStandalone(standalone)
-        const navigatorWithStandalone = window.navigator as typeof window.navigator & {
-          standalone?: boolean
-        }
-        setIsPWAInstalled(standalone || navigatorWithStandalone.standalone === true)
-      }
-
-      checkStandalone()
-
-      // Listen for display mode changes
-      const mediaQuery = window.matchMedia('(display-mode: standalone)')
-      mediaQuery.addEventListener('change', checkStandalone)
-
-      return () => mediaQuery.removeEventListener('change', checkStandalone)
-    }, [])
-
-    useEffect(() => {
-      // Prevent pull-to-refresh on mobile
-      if (!preventPullToRefresh) {
-        return undefined
-      }
-
-      let touchStartY = 0
-
-      const preventPull = (e: TouchEvent) => {
-        if (e.touches.length > 0 && e.touches[0] !== undefined) {
-          const touchY = e.touches[0].clientY
-          const touchDiff = touchY - touchStartY
-
-          if (window.scrollY === 0 && touchDiff > 0 && e.cancelable) {
-            e.preventDefault()
-          }
-        }
-      }
-
-      const handleTouchStart = (e: TouchEvent) => {
-        if (e.touches.length > 0 && e.touches[0] !== undefined) {
-          touchStartY = e.touches[0].clientY
-        }
-      }
-
-      document.addEventListener('touchstart', handleTouchStart, { passive: false })
-      document.addEventListener('touchmove', preventPull, { passive: false })
-
-      return () => {
-        document.removeEventListener('touchstart', handleTouchStart)
-        document.removeEventListener('touchmove', preventPull)
-      }
-    }, [preventPullToRefresh])
-
-    useEffect(() => {
-      // Listen for install prompt
-      const handleBeforeInstallPrompt = (e: Event) => {
-        e.preventDefault()
-        setDeferredPrompt(e as BeforeInstallPromptEvent)
-      }
-
-      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-
-      return () => {
-        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt)
-      }
-    }, [])
-
-    useEffect(() => {
-      // Set theme colors for PWA
-      if (navigationBarColor !== undefined && navigationBarColor.length > 0) {
-        const meta = document.querySelector('meta[name="theme-color"]')
-        if (meta) {
-          meta.setAttribute('content', navigationBarColor)
-        }
-      }
-    }, [navigationBarColor])
-
-    const handleInstallClick = async () => {
-      if (!deferredPrompt) return
-
-      await deferredPrompt.prompt()
-      const { outcome } = await deferredPrompt.userChoice
-
-      if (outcome === 'accepted') {
-        setDeferredPrompt(null)
-      }
-    }
-
-    const getSafeAreaClass = () => {
-      if (safeArea === false) return ''
-
-      const safeAreaClasses = {
-        all: 'p-safe-top p-safe-bottom p-safe-left p-safe-right',
-        top: 'pt-safe-top',
-        bottom: 'pb-safe-bottom',
-        horizontal: 'px-safe-left px-safe-right',
-      }
-
-      return typeof safeArea === 'boolean' ? safeAreaClasses.all : safeAreaClasses[safeArea]
-    }
-
-    return (
-      <div
-        ref={ref}
-        className={cn(
-          // Mobile-first base styles
-          'relative min-h-screen w-full',
-          // Responsive layout adjustments
-          'flex flex-col',
-          // Full screen mode
-          fullScreen && 'fixed inset-0',
-          // Safe area padding
-          getSafeAreaClass(),
-          // Standalone mode specific styles
-          isStandalone && 'standalone-mode',
-          // Ensure proper touch scrolling on mobile
-          'overflow-x-hidden overflow-y-auto',
-          '-webkit-overflow-scrolling-touch',
-          className
-        )}
-        {...props}
-      >
-        {children}
-
-        {/* Install prompt for PWA - Mobile-first responsive design */}
-        {showInstallPrompt && deferredPrompt && !isPWAInstalled && (
-          <div className='animate-slide-up fixed right-4 bottom-20 left-4 z-50 mx-auto w-full max-w-sm md:right-8 md:bottom-8 md:left-auto md:w-96'>
-            <div className='bg-background rounded-lg border p-4 shadow-lg md:p-6'>
-              <h3 className='mb-2 text-base font-semibold md:text-lg'>Install App</h3>
-              <p className='text-muted-foreground mb-3 text-sm md:mb-4'>
-                Install this app on your device for a better experience
-              </p>
-              <div className='flex flex-col gap-2 sm:flex-row'>
-                <button
-                  onClick={() => {
-                    void handleInstallClick()
-                  }}
-                  className='bg-primary text-primary-foreground hover:bg-primary/90 min-h-[44px] w-full touch-manipulation rounded-md px-4 py-3 text-sm font-medium transition-colors active:scale-95 sm:flex-1 sm:py-2'
-                  aria-label='Install the app'
-                >
-                  Install
-                </button>
-                <button
-                  onClick={() => setDeferredPrompt(null)}
-                  className='hover:bg-muted min-h-[44px] w-full touch-manipulation rounded-md border px-4 py-3 text-sm font-medium transition-colors active:scale-95 sm:w-auto sm:py-2'
-                  aria-label='Dismiss install prompt'
-                >
-                  Not now
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-      </div>
-    )
-  }
-)
-
-PWALayout.displayName = 'PWALayout'
-
-/**
- * Safe area inset component
- */
-interface SafeAreaInsetProps {
-  position: 'top' | 'bottom' | 'left' | 'right'
   className?: string
-}
-
-export function SafeAreaInset({ position, className }: SafeAreaInsetProps) {
-  const insetClasses = {
-    top: 'h-safe-top',
-    bottom: 'h-safe-bottom',
-    left: 'w-safe-left',
-    right: 'w-safe-right',
-  }
-
-  return <div className={cn(insetClasses[position], className)} aria-hidden='true' />
+  variant?: 'default' | 'standalone' | 'fullscreen'
 }
 
 /**
- * Viewport meta tag manager for PWA with mobile-first defaults
+ * PWALayout - A responsive layout component optimized for Progressive Web Apps
+ *
+ * This component provides:
+ * - Automatic PWA standalone mode detection
+ * - Safe area padding for devices with notches/rounded corners
+ * - Smooth fade-in animations
+ * - Container query support
+ * - Variant-based styling for different layout modes
  */
-export function useViewportMeta(
-  options: {
-    width?: string
-    height?: string
-    initialScale?: number
-    minimumScale?: number
-    maximumScale?: number
-    userScalable?: boolean
-    viewportFit?: 'auto' | 'contain' | 'cover'
-  } = {}
-) {
-  useEffect(() => {
-    let viewport = document.querySelector('meta[name="viewport"]')
+export function PWALayout({ children, className, variant = 'default' }: PWALayoutProps) {
+  const isStandaloneMode = checkIsStandalone()
 
-    // Create viewport meta tag if it doesn't exist
-    if (!viewport) {
-      viewport = document.createElement('meta')
-      viewport.setAttribute('name', 'viewport')
-      document.head.appendChild(viewport)
-    }
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.3, ease: 'easeOut' }}
+      className={cn(
+        // Base layout styles
+        'flex min-h-screen w-full flex-col',
 
-    // Mobile-first viewport settings with sensible defaults
-    const content = [
-      options.width !== undefined && options.width.length > 0
-        ? `width=${options.width}`
-        : 'width=device-width',
-      options.height !== undefined && options.height.length > 0 ? `height=${options.height}` : null,
-      options.initialScale !== undefined
-        ? `initial-scale=${options.initialScale}`
-        : 'initial-scale=1',
-      options.minimumScale !== undefined
-        ? `minimum-scale=${options.minimumScale}`
-        : 'minimum-scale=1',
-      options.maximumScale !== undefined
-        ? `maximum-scale=${options.maximumScale}`
-        : 'maximum-scale=5',
-      options.userScalable !== undefined
-        ? `user-scalable=${options.userScalable ? 'yes' : 'no'}`
-        : 'user-scalable=yes', // Allow zooming by default for accessibility
-      options.viewportFit ? `viewport-fit=${options.viewportFit}` : 'viewport-fit=cover',
-      // Add shrink-to-fit=no for iOS 9+ compatibility
-      'shrink-to-fit=no',
-    ]
-      .filter((item): item is string => item !== null)
-      .join(', ')
+        /**
+         * PWA Safe Area Support
+         * These styles ensure proper padding for devices with notches or rounded corners.
+         * Uses CSS environment variables to respect device-specific safe areas:
+         * - safe-area-inset-left/right: Handles side notches (landscape orientation)
+         * - safe-area-inset-top: Handles top notch/status bar area
+         * - safe-area-inset-bottom: Handles bottom home indicator area
+         * The max() function ensures minimum 16px padding even without safe areas.
+         * The supports query ensures these styles only apply on compatible browsers.
+         */
+        'supports-[padding:max(0px)]:px-[max(16px,env(safe-area-inset-left))]',
+        'supports-[padding:max(0px)]:pr-[max(16px,env(safe-area-inset-right))]',
+        'supports-[padding:max(0px)]:pt-[max(0px,env(safe-area-inset-top))]',
+        'supports-[padding:max(0px)]:pb-[max(0px,env(safe-area-inset-bottom))]',
 
-    viewport.setAttribute('content', content)
+        /**
+         * Container Queries Support
+         * Enables this element to be a container for container queries,
+         * allowing child components to style themselves based on this
+         * container's dimensions rather than the viewport.
+         */
+        '@container/app',
 
-    // Return cleanup function to restore original viewport if component unmounts
-    return () => {
-      // Only reset to default if we created the viewport tag
-      const currentViewport = document.querySelector('meta[name="viewport"]')
-      if (
-        currentViewport?.parentNode !== null &&
-        document.querySelector('meta[name="viewport"][data-original]') === null
-      ) {
-        currentViewport?.setAttribute('content', 'width=device-width, initial-scale=1')
-      }
-    }
-  }, [
-    options.width,
-    options.height,
-    options.initialScale,
-    options.minimumScale,
-    options.maximumScale,
-    options.userScalable,
-    options.viewportFit,
-  ])
+        /**
+         * Variant-Specific Styles
+         * Different visual treatments based on the layout variant:
+         * - default: Standard background and text colors
+         * - standalone: Special PWA-specific styling with light/dark mode support
+         * - fullscreen: Full viewport height with hidden overflow for immersive views
+         */
+        {
+          'bg-background text-foreground': variant === 'default',
+          'bg-background text-foreground standalone:bg-gray-50 dark:standalone:bg-gray-900':
+            variant === 'standalone',
+          'h-screen overflow-hidden': variant === 'fullscreen',
+        },
+
+        /**
+         * PWA Standalone Mode Adjustments
+         * Removes top padding when running as an installed PWA to maximize
+         * screen real estate since the browser chrome is not present.
+         */
+        {
+          'standalone:pt-0': isStandaloneMode,
+        },
+
+        className
+      )}
+      data-standalone={isStandaloneMode}
+    >
+      {children}
+    </motion.div>
+  )
 }

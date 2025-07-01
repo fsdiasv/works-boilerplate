@@ -4,8 +4,11 @@ import { getMessages } from 'next-intl/server'
 import type { ReactNode } from 'react'
 
 import { Toaster } from '@/components/ui/toaster'
+import { AuthProvider } from '@/contexts/auth-context'
 import { locales } from '@/i18n/config'
+import { createClient } from '@/lib/supabase/server'
 import { ThemeProvider } from '@/lib/theme-provider'
+import { TRPCReactProvider } from '@/trpc/react'
 
 /**
  * Maps internal locale codes to standard OpenGraph locale codes
@@ -147,12 +150,22 @@ export default async function LocaleLayout({ children, params }: Props) {
   const { locale } = await params
   const messages = await getMessages({ locale })
 
+  // Get initial session for SSR
+  const supabase = await createClient()
+  const {
+    data: { session },
+  } = await supabase.auth.getSession()
+
   return (
     <NextIntlClientProvider locale={locale} messages={messages}>
-      <ThemeProvider>
-        {children}
-        <Toaster />
-      </ThemeProvider>
+      <TRPCReactProvider>
+        <AuthProvider initialSession={session ?? undefined}>
+          <ThemeProvider>
+            {children}
+            <Toaster />
+          </ThemeProvider>
+        </AuthProvider>
+      </TRPCReactProvider>
     </NextIntlClientProvider>
   )
 }

@@ -1,83 +1,50 @@
 {
   "mcpServers": {
-    "filesystem": {
+    "supabase": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-filesystem", "/home/fsdias/vibe/works-boilerplate"],
-      "description": "Access to project filesystem"
-    },
-    "web-search": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-google-search"],
-      "env": {
-        "GOOGLE_SEARCH_API_KEY": "${GOOGLE_SEARCH_API_KEY}",
-        "GOOGLE_SEARCH_ENGINE_ID": "${GOOGLE_SEARCH_ENGINE_ID}"
-      },
-      "description": "Google search capabilities"
-    },
-    "github": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-github"],
-      "env": {
-        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
-      },
-      "description": "GitHub repository access"
-    },
-    "postgres": {
-      "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-postgres", "postgresql://user:password@localhost:5432/database"],
-      "description": "PostgreSQL database access"
-    },
-    "playwright": {
-      "command": "npx",
-      "args": ["@playwright/mcp@latest", "--vision"],
-      "description": "Playwright browser automation with vision capabilities"
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase@latest",
+        "--access-token",
+        "sb_publishable_nKa92m6y8ReFhKFpdsX1PA_uNlvsSX8"
+      ]
     },
     "sequential-thinking": {
       "command": "npx",
-      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
-      "description": "Sequential thinking and reasoning capabilities"
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--vision"]
     },
     "Context7": {
       "command": "npx",
-      "args": ["-y", "@upstash/context7-mcp"],
-      "description": "Context management with Upstash"
+      "args": ["-y", "@upstash/context7-mcp"]
     },
     "tavily-mcp": {
       "command": "npx",
       "args": ["-y", "tavily-mcp@0.1.2"],
       "env": {
-        "TAVILY_API_KEY": "${TAVILY_API_KEY}"
-      },
-      "description": "Tavily search API integration"
+        "TAVILY_API_KEY": "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"
+      }
     },
     "firecrawl-mcp": {
       "command": "npx",
       "args": ["-y", "firecrawl-mcp"],
       "env": {
-        "FIRECRAWL_API_KEY": "${FIRECRAWL_API_KEY}"
-      },
-      "description": "Web scraping and crawling capabilities"
+        "FIRECRAWL_API_KEY": "fc-b695da3d11a045d48367536936af5168"
+      }
     },
-    "stripe": {
+    "brave-search": {
       "command": "npx",
-      "args": ["-y", "@stripe/mcp", "--tools=all", "--api-key=${STRIPE_API_KEY}"],
-      "description": "Stripe payment integration tools"
-    },
-    "taskmaster-ai": {
-      "command": "npx",
-      "args": ["-y", "--package=task-master-ai", "task-master-ai"],
+      "args": ["-y", "@modelcontextprotocol/server-brave-search"],
       "env": {
-        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}",
-        "PERPLEXITY_API_KEY": "${PERPLEXITY_API_KEY}",
-        "OPENAI_API_KEY": "${OPENAI_API_KEY}",
-        "GOOGLE_API_KEY": "${GOOGLE_API_KEY}"
-      },
-      "description": "Task management AI assistant"
+        "BRAVE_API_KEY": "BSAluP0cEK7WowuZVeVuKdHnCNFAagq"
+      }
     },
-    "markdownify": {
-      "command": "node",
-      "args": ["/home/fsdias/markdownify-mcp/dist/index.js"],
-      "description": "Markdown conversion utilities"
+    "zen": {
+      "command": "/home/fsdias/mcps/zen-mcp-server/.zen_venv/bin/python",
+      "args": ["/home/fsdias/mcps/zen-mcp-server/server.py"]
     }
   }
 }

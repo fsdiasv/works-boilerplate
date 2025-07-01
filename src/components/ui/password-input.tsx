@@ -16,19 +16,19 @@ const PasswordInput = forwardRef<HTMLInputElement, FormInputProps>(
         <FormInput
           ref={ref}
           type={showPassword ? 'text' : 'password'}
-          className={cn('pr-10', className)}
+          className={cn('pr-12', className)}
           {...props}
         />
         <button
           type='button'
           onClick={() => setShowPassword(!showPassword)}
-          className='absolute top-[50%] right-3 -translate-y-[50%] text-slate-500 hover:text-slate-700 focus:text-slate-700 focus:outline-none'
+          className='absolute top-[50%] right-0 flex h-[44px] w-[44px] -translate-y-[50%] items-center justify-center rounded-r-md text-slate-500 hover:text-slate-700 focus:text-slate-700 focus:ring-2 focus:ring-blue-600 focus:ring-offset-2 focus:outline-none'
           aria-label={showPassword ? 'Hide password' : 'Show password'}
         >
           {showPassword ? (
-            <EyeOff className='h-4 w-4' aria-hidden='true' />
+            <EyeOff className='h-5 w-5' aria-hidden='true' />
           ) : (
-            <Eye className='h-4 w-4' aria-hidden='true' />
+            <Eye className='h-5 w-5' aria-hidden='true' />
           )}
         </button>
       </div>

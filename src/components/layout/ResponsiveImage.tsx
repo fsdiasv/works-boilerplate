@@ -2,7 +2,7 @@
 
 import Image from 'next/image'
 import type React from 'react'
-import { forwardRef, useEffect, useRef, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 
 import { cn } from '@/lib/utils'
 
@@ -86,7 +86,7 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
     }
 
     // Adaptive loading strategy
-    const getLoadingStrategy = () => {
+    const getLoadingStrategy = useCallback(() => {
       if (loading !== 'adaptive') return loading
 
       // High priority images always eager
@@ -99,7 +99,7 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
       if (isMobile) return 'lazy'
 
       return 'lazy'
-    }
+    }, [loading, priority, networkSpeed, isMobile])
 
     // Responsive sizes if not provided
     const getResponsiveSizes = () => {
@@ -113,7 +113,7 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
     }
 
     // Get responsive source
-    const getResponsiveSrc = () => {
+    const getResponsiveSrc = useCallback(() => {
       if (!srcSet) return src
 
       if (isMobile && srcSet.mobile !== undefined && srcSet.mobile.length > 0) return srcSet.mobile
@@ -121,7 +121,7 @@ export const ResponsiveImage = forwardRef<HTMLDivElement, ResponsiveImageProps>(
       if (srcSet.desktop !== undefined && srcSet.desktop.length > 0) return srcSet.desktop
 
       return src
-    }
+    }, [srcSet, src, isMobile, isTablet])
 
     // Intersection observer for lazy loading
     useEffect(() => {

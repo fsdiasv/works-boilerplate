@@ -100,7 +100,22 @@ const nextConfig = {
     // reactCompiler: true, // React Compiler - requires additional setup
 
     // Mobile optimizations
-    optimizePackageImports: ['@/components', '@/lib', 'lucide-react', 'framer-motion'],
+    optimizePackageImports: [
+      '@/components',
+      '@/lib',
+      'lucide-react',
+      'framer-motion',
+      'recharts',
+      '@supabase/supabase-js',
+      '@supabase/ssr',
+      'react-hook-form',
+      '@hookform/resolvers',
+      'sonner',
+      'next-themes',
+      'class-variance-authority',
+      'clsx',
+      'tailwind-merge',
+    ],
   },
 
   // Mobile-first image optimization
@@ -132,6 +147,46 @@ const nextConfig = {
       use: ['@svgr/webpack'],
     })
 
+    // Code splitting optimization
+    if (!isServer) {
+      config.optimization = {
+        ...config.optimization,
+        splitChunks: {
+          chunks: 'all',
+          cacheGroups: {
+            default: false,
+            vendors: false,
+            // Split large vendor libraries
+            supabase: {
+              test: /[\\/]node_modules[\\/](@supabase)[\\/]/,
+              name: 'supabase',
+              priority: 10,
+            },
+            framer: {
+              test: /[\\/]node_modules[\\/](framer-motion)[\\/]/,
+              name: 'framer',
+              priority: 10,
+            },
+            recharts: {
+              test: /[\\/]node_modules[\\/](recharts|d3-.*|victory-.*)[\\/]/,
+              name: 'charts',
+              priority: 10,
+            },
+            ui: {
+              test: /[\\/]components[\\/]ui[\\/]/,
+              name: 'ui',
+              priority: 5,
+            },
+            commons: {
+              minChunks: 2,
+              priority: -10,
+              reuseExistingChunk: true,
+            },
+          },
+        },
+      }
+    }
+
     // Bundle analyzer integration handled by withBundleAnalyzer
 
     return config
@@ -145,6 +200,8 @@ const nextConfig = {
 
   // Security headers
   async headers() {
+    // CSP is now handled in middleware with nonce support for better security
+
     return [
       {
         source: '/(.*)',
@@ -165,11 +222,7 @@ const nextConfig = {
             key: 'Strict-Transport-Security',
             value: 'max-age=31536000; includeSubDomains',
           },
-          {
-            key: 'Content-Security-Policy',
-            value:
-              "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:;",
-          },
+          // CSP is now handled in middleware with nonce support
           {
             key: 'Referrer-Policy',
             value: 'strict-origin-when-cross-origin',

@@ -102,6 +102,9 @@
       "submitButton": "Iniciar sesión",
       "divider": "O continúa con"
     },
+    "socialLogin": {
+      "signInWith": "Iniciar sesión con {provider}"
+    },
     "forgotPasswordPage": {
       "title": "¿Olvidaste tu contraseña?",
       "description": "No te preocupes. Ingresa tu dirección de correo electrónico a continuación y te enviaremos un enlace para restablecerla.",
@@ -117,6 +120,51 @@
         "title": "Fundador de Copytime y Tweetsiu"
       },
       "quote": "¡Works-Boilerplate ha sido un <highlight>cambio radical</highlight> para mí! Es increíblemente intuitivo y ha transformado la forma en que abordo el diseño. No puedo imaginar trabajar sin él. 🚀"
+    },
+    "verifyEmail": {
+      "title": {
+        "loading": "Verificando Correo",
+        "success": "¡Correo Verificado!",
+        "error": "Error de Verificación"
+      },
+      "description": {
+        "loading": "Por favor, espera mientras verificamos tu correo...",
+        "success": "Tu correo ha sido verificado exitosamente.",
+        "error": "No pudimos verificar tu dirección de correo."
+      },
+      "redirecting": "Redirigiendo al panel...",
+      "backToLogin": "Volver a Iniciar Sesión",
+      "invalidLink": "Enlace de verificación inválido"
+    },
+    "deleteAccount": {
+      "confirmationText": "ELIMINAR MI CUENTA"
+    },
+    "toast": {
+      "checkEmail": "Revisa tu correo para confirmar tu cuenta",
+      "signedOut": "Has cerrado sesión exitosamente",
+      "signOutError": "Error al cerrar sesión",
+      "resetPasswordEmail": "Revisa tu correo para el enlace de restablecimiento de contraseña",
+      "passwordUpdated": "Contraseña actualizada exitosamente",
+      "checkNewEmail": "Revisa tu nuevo correo para confirmar el cambio",
+      "profileUpdated": "Perfil actualizado exitosamente"
+    },
+    "validation": {
+      "invalidEmail": "Dirección de correo electrónico inválida",
+      "nameMinLength": "El nombre debe tener al menos 2 caracteres",
+      "currentPasswordRequired": "La contraseña actual es obligatoria",
+      "urlInvalid": "URL inválida",
+      "bioMaxLength": "La biografía no debe exceder 500 caracteres"
+    },
+    "errors": {
+      "generic": "Fallo en la autenticación. Por favor, inténtalo de nuevo.",
+      "oauthProviderError": "El proveedor de autenticación encontró un error. Por favor, inténtalo de nuevo.",
+      "oauthMissingCode": "Código de autorización ausente. Por favor, intenta iniciar sesión de nuevo.",
+      "oauthStateMismatch": "Fallo en la validación de seguridad. Por favor, intenta iniciar sesión de nuevo.",
+      "oauthExchangeFailed": "No se pudo completar la autenticación. Por favor, inténtalo de nuevo.",
+      "oauthInvalidSession": "Sesión inválida recibida. Por favor, intenta iniciar sesión de nuevo.",
+      "oauthSessionMismatch": "Fallo en la validación de la sesión. Por favor, intenta iniciar sesión de nuevo.",
+      "oauthCodeReused": "Esta autorización ya ha sido utilizada. Por favor, inicia sesión de nuevo.",
+      "oauthUnexpectedError": "Ocurrió un error inesperado. Por favor, inténtalo de nuevo."
     }
   },
   "dashboard": {
@@ -167,7 +215,13 @@
     "min": "Mínimo {min} caracteres",
     "max": "Máximo {max} caracteres",
     "passwordMatch": "Las contraseñas no coinciden",
-    "itemCount": "{count, plural, =0 {Sin elementos} =1 {1 elemento} other {# elementos}}"
+    "itemCount": "{count, plural, =0 {Sin elementos} =1 {1 elemento} other {# elementos}}",
+    "passwordMinLength": "La contraseña debe tener al menos 8 caracteres",
+    "passwordUppercase": "La contraseña debe contener al menos una letra mayúscula",
+    "passwordLowercase": "La contraseña debe contener al menos una letra minúscula",
+    "passwordNumber": "La contraseña debe contener al menos un número",
+    "validInput": "Entrada válida",
+    "invalidInput": "Entrada inválida"
   },
   "formatting": {
     "currency": "{amount, number, ::currency/EUR}",

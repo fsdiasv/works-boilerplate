@@ -26,6 +26,7 @@ const FormInput = forwardRef<HTMLInputElement, FormInputProps>(
             'placeholder:text-slate-500',
             'focus:border-blue-600 focus:ring-2 focus:ring-blue-600 focus:outline-none',
             'disabled:cursor-not-allowed disabled:opacity-50',
+            'min-h-[44px]', // Ensure 44px minimum touch target
             error != null &&
               error !== '' &&
               'border-red-500 focus:border-red-500 focus:ring-red-500',

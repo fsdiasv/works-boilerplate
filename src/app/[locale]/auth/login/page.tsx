@@ -2,16 +2,20 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { AuthLayout } from '@/components/auth/auth-layout'
 import { FormInput } from '@/components/ui/form-input'
 import { PasswordInput } from '@/components/ui/password-input'
 import { PrimaryButton } from '@/components/ui/primary-button'
+import { RememberMeCheckbox } from '@/components/ui/remember-me-checkbox'
 import { SocialLoginButton } from '@/components/ui/social-login-button'
+import { useAuth } from '@/hooks/use-auth'
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address').min(1, 'Email is required'),
@@ -22,8 +26,49 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
   const t = useTranslations('auth.loginPage')
+  const tError = useTranslations('auth.errors')
   const locale = useLocale()
+  const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
+  const { signIn } = useAuth()
+
+  // Handle OAuth callback errors
+  useEffect(() => {
+    const error = searchParams.get('error')
+    if (error !== null && error !== '') {
+      let errorMessage = tError('generic')
+
+      switch (error) {
+        case 'oauth_error':
+          errorMessage = tError('oauthProviderError')
+          break
+        case 'missing_code':
+          errorMessage = tError('oauthMissingCode')
+          break
+        case 'state_mismatch':
+          errorMessage = tError('oauthStateMismatch')
+          break
+        case 'exchange_failed':
+          errorMessage = tError('oauthExchangeFailed')
+          break
+        case 'invalid_session':
+          errorMessage = tError('oauthInvalidSession')
+          break
+        case 'session_mismatch':
+          errorMessage = tError('oauthSessionMismatch')
+          break
+        case 'code_reused':
+          errorMessage = tError('oauthCodeReused')
+          break
+        case 'unexpected_error':
+          errorMessage = tError('oauthUnexpectedError')
+          break
+      }
+
+      toast.error(errorMessage)
+    }
+  }, [searchParams, tError])
 
   const {
     register,
@@ -33,11 +78,23 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
   })
 
-  const onSubmit = async () => {
+  const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true)
-    // TODO: Implement actual login API call with form data
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setIsLoading(false)
+    try {
+      // Store remember me preference
+      if (rememberMe) {
+        localStorage.setItem('rememberMe', 'true')
+      } else {
+        localStorage.removeItem('rememberMe')
+      }
+
+      await signIn(data.email, data.password)
+      // Redirect is handled by auth context
+    } catch {
+      // Error is handled by auth context with toast
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -85,6 +142,12 @@ export default function LoginPage() {
               </Link>
             </div>
           </div>
+
+          <RememberMeCheckbox
+            checked={rememberMe}
+            onCheckedChange={setRememberMe}
+            showTrustBadge={false}
+          />
 
           <PrimaryButton type='submit' isLoading={isLoading}>
             {t('submitButton')}

@@ -68,11 +68,13 @@
     "confirmPassword": "Confirm password",
     "forgotPassword": "Forgot password?",
     "rememberMe": "Remember me",
+    "trustedDevice": "Trusted device",
     "emailRequired": "Email is required",
     "passwordRequired": "Password is required",
     "invalidCredentials": "Invalid credentials",
     "accountCreated": "Account created successfully",
     "welcomeBack": "Welcome back!",
+    "genericSignupError": "Unable to create account. Please check your email for further instructions.",
     "signupPage": {
       "title": "Sign up to Copy UI.",
       "subtitle": "Already have an account?",
@@ -102,6 +104,9 @@
       "submitButton": "Sign in",
       "divider": "Or continue with"
     },
+    "socialLogin": {
+      "signInWith": "Sign in with {provider}"
+    },
     "forgotPasswordPage": {
       "title": "Forgot your password?",
       "description": "No worries. Enter your email address below and we'll send you a link to reset it.",
@@ -111,12 +116,70 @@
       "backToLogin": "Back to",
       "backToLoginLink": "Sign in"
     },
+    "resetPasswordPage": {
+      "title": "Reset your password",
+      "subtitle": "Enter your new password below",
+      "passwordLabel": "New password",
+      "passwordPlaceholder": "Enter your new password",
+      "confirmPasswordLabel": "Confirm password",
+      "confirmPasswordPlaceholder": "Confirm your new password",
+      "submitButton": "Reset password",
+      "backToLogin": "Back to login",
+      "invalidTokenTitle": "Invalid or expired link",
+      "invalidTokenMessage": "This password reset link is invalid or has expired. Please request a new one.",
+      "requestNewLink": "Request new link"
+    },
     "testimonial": {
       "author": {
         "name": "Peter Mick",
         "title": "Founder of Copytime and Tweetsiu"
       },
       "quote": "Works-Boilerplate has been a <highlight>game-changer</highlight> for me! It's incredibly intuitive and has transformed the way I approach design. I can't imagine working without it. 🚀"
+    },
+    "verifyEmail": {
+      "title": {
+        "loading": "Verifying Email",
+        "success": "Email Verified!",
+        "error": "Verification Failed"
+      },
+      "description": {
+        "loading": "Please wait while we verify your email...",
+        "success": "Your email has been successfully verified.",
+        "error": "We could not verify your email address."
+      },
+      "redirecting": "Redirecting to dashboard...",
+      "backToLogin": "Back to Login",
+      "invalidLink": "Invalid verification link"
+    },
+    "deleteAccount": {
+      "confirmationText": "DELETE MY ACCOUNT"
+    },
+    "toast": {
+      "checkEmail": "Check your email to confirm your account",
+      "signedOut": "You have been signed out successfully",
+      "signOutError": "Failed to sign out",
+      "resetPasswordEmail": "Check your email for the password reset link",
+      "passwordUpdated": "Password updated successfully",
+      "checkNewEmail": "Check your new email to confirm the change",
+      "profileUpdated": "Profile updated successfully"
+    },
+    "validation": {
+      "invalidEmail": "Invalid email address",
+      "nameMinLength": "Name must be at least 2 characters",
+      "currentPasswordRequired": "Current password is required",
+      "urlInvalid": "Invalid URL",
+      "bioMaxLength": "Bio must not exceed 500 characters"
+    },
+    "errors": {
+      "generic": "Authentication failed. Please try again.",
+      "oauthProviderError": "The authentication provider encountered an error. Please try again.",
+      "oauthMissingCode": "Authorization code is missing. Please try signing in again.",
+      "oauthStateMismatch": "Security validation failed. Please try signing in again.",
+      "oauthExchangeFailed": "Failed to complete authentication. Please try again.",
+      "oauthInvalidSession": "Invalid session received. Please try signing in again.",
+      "oauthSessionMismatch": "Session validation failed. Please try signing in again.",
+      "oauthCodeReused": "This authorization has already been used. Please sign in again.",
+      "oauthUnexpectedError": "An unexpected error occurred. Please try again."
     }
   },
   "dashboard": {
@@ -141,6 +204,24 @@
     "updateProfile": "Update profile",
     "changePassword": "Change password",
     "avatar": "Profile picture"
+  },
+  "components": {
+    "passwordStrength": {
+      "strength": "Strength",
+      "strengthLevel": "Password strength: {level}",
+      "weak": "Weak",
+      "fair": "Fair",
+      "good": "Good",
+      "strong": "Strong",
+      "veryStrong": "Very Strong",
+      "hint": "Add more characters",
+      "requirements": {
+        "length": "At least 8 characters",
+        "uppercase": "One uppercase letter",
+        "lowercase": "One lowercase letter",
+        "number": "One number"
+      }
+    }
   },
   "settings": {
     "title": "Settings",
@@ -167,7 +248,13 @@
     "min": "Minimum {min} characters",
     "max": "Maximum {max} characters",
     "passwordMatch": "Passwords do not match",
-    "itemCount": "{count, plural, =0 {No items} =1 {1 item} other {# items}}"
+    "itemCount": "{count, plural, =0 {No items} =1 {1 item} other {# items}}",
+    "passwordMinLength": "Password must be at least 8 characters",
+    "passwordUppercase": "Password must contain at least one uppercase letter",
+    "passwordLowercase": "Password must contain at least one lowercase letter",
+    "passwordNumber": "Password must contain at least one number",
+    "validInput": "Valid input",
+    "invalidInput": "Invalid input"
   },
   "formatting": {
     "currency": "{amount, number, ::currency/USD}",
@@ -377,8 +464,11 @@
     },
     "toast": {
       "languageChanged": "Language Changed",
-      "languageChangedDescription": "Language switched to {language}."
+      "languageChangedDescription": "Language switched to {language}.",
+      "signOutError": "Sign Out Failed",
+      "signOutErrorDescription": "There was a problem signing out. Please try again."
     },
-    "signOut": "Sign Out"
+    "signOut": "Sign Out",
+    "signingOut": "Signing Out..."
   }
 }

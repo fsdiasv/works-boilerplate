@@ -5,13 +5,16 @@ import Link from 'next/link'
 import { useTranslations, useLocale } from 'next-intl'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { AuthLayout } from '@/components/auth/auth-layout'
 import { FormInput } from '@/components/ui/form-input'
 import { PasswordInput } from '@/components/ui/password-input'
+import { PasswordStrengthIndicator } from '@/components/ui/password-strength-indicator'
 import { PrimaryButton } from '@/components/ui/primary-button'
 import { SocialLoginButton } from '@/components/ui/social-login-button'
+import { useAuth } from '@/hooks/use-auth'
 
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name is too long'),
@@ -30,20 +33,32 @@ export default function SignUpPage() {
   const t = useTranslations('auth.signupPage')
   const locale = useLocale()
   const [isLoading, setIsLoading] = useState(false)
+  const { signUp } = useAuth()
 
   const {
     register,
     handleSubmit,
+    watch,
     formState: { errors },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   })
 
-  const onSubmit = async () => {
+  const passwordValue = watch('password', '')
+
+  const onSubmit = async (data: SignupFormData) => {
     setIsLoading(true)
-    // TODO: Implement actual signup API call with form data
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    setIsLoading(false)
+    try {
+      await signUp(data.email, data.password, {
+        full_name: data.name,
+        locale,
+      })
+      toast.success(t('verificationEmailSent'))
+    } catch {
+      // Error is handled by auth context with toast
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -82,14 +97,17 @@ export default function SignUpPage() {
             {...register('email')}
           />
 
-          <PasswordInput
-            id='password'
-            label={t('passwordLabel')}
-            placeholder={t('passwordPlaceholder')}
-            autoComplete='new-password'
-            {...(errors.password && { error: errors.password.message })}
-            {...register('password')}
-          />
+          <div>
+            <PasswordInput
+              id='password'
+              label={t('passwordLabel')}
+              placeholder={t('passwordPlaceholder')}
+              autoComplete='new-password'
+              {...(errors.password && { error: errors.password.message })}
+              {...register('password')}
+            />
+            <PasswordStrengthIndicator password={passwordValue} className='mt-2' />
+          </div>
 
           <PrimaryButton type='submit' isLoading={isLoading}>
             {t('submitButton')}

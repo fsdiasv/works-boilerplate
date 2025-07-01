@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next'
 
 import { locales } from '@/i18n/config'
-import { getRouteModificationTimes, getChangeFrequency } from '@/lib/sitemap-utils'
+import { getRouteModificationTimes, getChangeFrequency } from 'src/lib/sitemap-utils'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://localhost:3000'
