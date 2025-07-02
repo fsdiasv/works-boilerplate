@@ -59,14 +59,23 @@ export const authRouter = createTRPCRouter({
       where: { id: user.id },
       include: {
         profile: true,
+        activeWorkspace: true,
+        workspaceMemberships: {
+          where:
+            ctx.activeWorkspace?.id !== undefined ? { workspaceId: ctx.activeWorkspace.id } : {},
+          select: {
+            role: true,
+          },
+        },
       },
     })
 
+    const membership = dbUser?.workspaceMemberships[0]
+
     return {
-      user: {
-        ...user,
-        profile: dbUser?.profile,
-      },
+      user,
+      activeWorkspace: ctx.activeWorkspace,
+      userRole: membership?.role ?? ctx.userRole,
     }
   }),
 
