@@ -13,10 +13,20 @@ const intlMiddleware = createMiddleware({
 })
 
 // Define protected routes patterns
-const protectedRoutes = ['/dashboard', '/profile', '/settings', '/admin']
+const protectedRoutes = [
+  '/dashboard',
+  '/profile',
+  '/settings',
+  '/admin',
+  '/workspace',
+  '/faturamento',
+]
 
 // Define auth routes (where authenticated users shouldn't be)
 const authRoutes = ['/login', '/signup', '/forgot-password']
+
+// Define routes that require an active workspace
+const workspaceRequiredRoutes = ['/dashboard', '/faturamento', '/workspace/settings']
 
 function isProtectedRoute(pathname: string): boolean {
   return protectedRoutes.some(route => pathname.includes(route))
@@ -24,6 +34,10 @@ function isProtectedRoute(pathname: string): boolean {
 
 function isAuthRoute(pathname: string): boolean {
   return authRoutes.some(route => pathname.includes(route))
+}
+
+function requiresWorkspace(pathname: string): boolean {
+  return workspaceRequiredRoutes.some(route => pathname.includes(route))
 }
 
 /**
@@ -85,6 +99,32 @@ export default async function middleware(request: NextRequest) {
       const redirectUrl = new URL(`/${locale}/login`, request.url)
       redirectUrl.searchParams.set('redirectTo', pathname)
       return NextResponse.redirect(redirectUrl)
+    }
+
+    // Check if route requires workspace and user has no active workspace
+    if (requiresWorkspace(pathnameWithoutLocale)) {
+      // Get user's active workspace
+      const {
+        data: { session },
+      } = await supabase.auth.getSession()
+      if (session?.user) {
+        // Query database to check if user has any workspace
+        const { data: userData } = await supabase
+          .from('users')
+          .select('active_workspace_id')
+          .eq('id', session.user.id)
+          .single()
+
+        // If no active workspace, redirect to workspace creation
+        if (
+          userData === null ||
+          !('active_workspace_id' in userData) ||
+          userData.active_workspace_id === null
+        ) {
+          const createWorkspaceUrl = new URL(`/${locale}/onboarding/workspace`, request.url)
+          return NextResponse.redirect(createWorkspaceUrl)
+        }
+      }
     }
   }
 

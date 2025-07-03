@@ -41,7 +41,12 @@ See [MCP Setup Guide](docs/MCP_SETUP.md) for detailed instructions.
 
 ### Standard Setup
 
-1. **Clone and install dependencies**
+1. **Prerequisites**
+   - Node.js 18+ installed
+   - pnpm package manager (`npm install -g pnpm`)
+   - Supabase account (free tier works)
+
+2. **Clone and install dependencies**
 
    ```bash
    git clone <repository-url>
@@ -49,23 +54,74 @@ See [MCP Setup Guide](docs/MCP_SETUP.md) for detailed instructions.
    pnpm install
    ```
 
-2. **Set up environment variables**
+3. **Set up Supabase**
+
+   a. Create a new project at [app.supabase.com](https://app.supabase.com)
+
+   b. Get your credentials:
+   - Go to Settings > Database > Connection string
+   - Go to Settings > API for keys
+
+4. **Set up environment variables**
 
    ```bash
    cp .env.example .env.local
-   # Edit .env.local with your values
    ```
 
-3. **Start development server**
+   Edit `.env.local` with your Supabase credentials:
+
+   ```bash
+   # Database URLs from Supabase Dashboard > Settings > Database
+   DATABASE_URL="postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:6543/postgres?pgbouncer=true"
+   DIRECT_URL="postgresql://postgres.[project-ref]:[password]@aws-0-[region].pooler.supabase.com:5432/postgres"
+
+   # From Supabase Dashboard > Settings > API
+   NEXT_PUBLIC_SUPABASE_URL="https://[project-ref].supabase.co"
+   NEXT_PUBLIC_SUPABASE_ANON_KEY="[anon-key]"
+   SUPABASE_SERVICE_ROLE_KEY="[service-role-key]"
+
+   # Generate a random 32+ character string
+   INTERNAL_API_SECRET="your-random-secret-here"
+
+   # Keep these as-is for development
+   NODE_ENV="development"
+   NEXT_PUBLIC_APP_URL="http://localhost:3000"
+   ```
+
+5. **Set up the database**
+
+   ```bash
+   # Generate Prisma client
+   pnpm db:generate
+
+   # Push schema to database
+   pnpm db:push
+
+   # (Optional) Seed with sample data
+   pnpm db:seed
+   ```
+
+6. **Start development server**
 
    ```bash
    pnpm dev
    ```
 
-4. **Open your browser**
+7. **Open your browser**
    ```
    http://localhost:3000
    ```
+
+### First Time Setup Checklist
+
+- [ ] Installed Node.js 18+ and pnpm
+- [ ] Created Supabase project
+- [ ] Copied `.env.example` to `.env.local`
+- [ ] Added all required environment variables
+- [ ] Ran `pnpm install` successfully
+- [ ] Ran `pnpm db:push` without errors
+- [ ] Started dev server with `pnpm dev`
+- [ ] Can access http://localhost:3000
 
 ## 📜 Available Scripts
 

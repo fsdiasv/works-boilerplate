@@ -104,7 +104,7 @@ export default async function HomePage({ params }: Props) {
             </div>
             <div className='flex items-center gap-4'>
               <LocaleSwitcher />
-              <Link href={`/${locale}/auth/signin`}>
+              <Link href={`/${locale}/auth/login`}>
                 <Button variant='ghost' size='sm'>
                   {t('nav.signin')}
                 </Button>

@@ -9,7 +9,23 @@ import { type AppRouter } from '@/server/api/root'
 
 import { getUrl, transformer } from './shared'
 
-const createQueryClient = () => new QueryClient()
+const createQueryClient = () =>
+  new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: failureCount => {
+          // Retry up to 2 times for network errors
+          return failureCount < 2
+        },
+        retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 30000),
+        staleTime: 0,
+        refetchOnWindowFocus: false,
+      },
+      mutations: {
+        retry: false,
+      },
+    },
+  })
 
 let clientQueryClientSingleton: QueryClient | undefined = undefined
 
