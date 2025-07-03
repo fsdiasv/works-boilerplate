@@ -269,8 +269,57 @@
     "createSuccess": "¡Workspace creado con éxito!",
     "settings": {
       "general": "General",
-      "members": "Miembros",
-      "billing": "Facturación",
+      "members": {
+        "title": "Miembros",
+        "cancel": "Cancelar",
+        "remove": "Eliminar",
+        "leave": "Salir",
+        "removing": "Eliminando...",
+        "noMembersFound": "No se encontraron miembros",
+        "noMembersYet": "Aún no hay miembros",
+        "changing": "Cambiando...",
+        "change": "Cambiar Rol",
+        "changeRoleDescription": "Cambiar rol para {name}",
+        "selectNewRole": "Seleccionar nuevo rol",
+        "updating": "Actualizando...",
+        "updateRole": "Actualizar Rol",
+        "selectMemberPrompt": "Selecciona un miembro para transferir la propiedad",
+        "selectNewOwner": "Seleccionar nuevo propietario",
+        "selectMemberPlaceholder": "Seleccionar un miembro",
+        "transferring": "Transfiriendo...",
+        "updateSuccess": "Miembro actualizado exitosamente",
+        "removeSuccess": "Miembro eliminado exitosamente",
+        "transferSuccess": "Propiedad transferida exitosamente",
+        "leaveSuccess": "Has salido del workspace",
+        "removeConfirmTitle": "Eliminar Miembro",
+        "removeConfirmDescription": "¿Estás seguro de que deseas eliminar a {name} de este workspace?",
+        "transferConfirmTitle": "Transferir Propiedad",
+        "transferConfirmDescription": "¿Estás seguro de que deseas transferir la propiedad a {name}? Te convertirás en administrador.",
+        "leaveConfirmTitle": "Salir del Workspace",
+        "leaveConfirmDescription": "¿Estás seguro de que deseas salir de este workspace?"
+      },
+      "billing": {
+        "title": "Facturación",
+        "description": "Gestiona la suscripción y facturación de tu workspace",
+        "currentPlan": {
+          "title": "Plan Actual",
+          "description": "Actualmente estás en el plan Gratuito",
+          "freePlan": "Plan Gratuito",
+          "freePlanDescription": "Hasta 3 miembros",
+          "upgradePlan": "Mejorar Plan"
+        },
+        "paymentMethod": {
+          "title": "Método de Pago",
+          "description": "Gestiona tus métodos de pago",
+          "noPaymentMethod": "No hay método de pago registrado",
+          "addPaymentMethod": "Agregar Método de Pago"
+        },
+        "billingHistory": {
+          "title": "Historial de Facturación",
+          "description": "Ver tus facturas anteriores",
+          "noBillingHistory": "No hay historial de facturación disponible"
+        }
+      },
       "dangerZone": "Zona de peligro"
     },
     "form": {
@@ -578,37 +627,5 @@
     },
     "signOut": "Cerrar Sesión",
     "signingOut": "Cerrando sesión..."
-  },
-  "workspace": {
-    "settings": {
-      "members": {
-        "cancel": "Cancelar",
-        "remove": "Eliminar",
-        "leave": "Salir",
-        "removing": "Eliminando..."
-      },
-      "billing": {
-        "title": "Facturación",
-        "description": "Gestiona la suscripción y facturación de tu workspace",
-        "currentPlan": {
-          "title": "Plan Actual",
-          "description": "Actualmente estás en el plan Gratuito",
-          "freePlan": "Plan Gratuito",
-          "freePlanDescription": "Hasta 3 miembros",
-          "upgradePlan": "Mejorar Plan"
-        },
-        "paymentMethod": {
-          "title": "Método de Pago",
-          "description": "Gestiona tus métodos de pago",
-          "noPaymentMethod": "No hay método de pago registrado",
-          "addPaymentMethod": "Agregar Método de Pago"
-        },
-        "billingHistory": {
-          "title": "Historial de Facturación",
-          "description": "Ver tus facturas anteriores",
-          "noBillingHistory": "No hay historial de facturación disponible"
-        }
-      }
-    }
   }
 }

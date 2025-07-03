@@ -312,6 +312,7 @@
         "transferSuccess": "Ownership transferred successfully",
         "leaveSuccess": "You have left the workspace",
         "noMembersFound": "No members found",
+        "noMembersYet": "No members yet",
         "cancel": "Cancel",
         "changing": "Changing...",
         "change": "Change Role",

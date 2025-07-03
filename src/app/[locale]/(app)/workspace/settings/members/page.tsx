@@ -165,7 +165,7 @@ export default function WorkspaceMembersPage() {
             ) : filteredMembers.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={isAdmin ? 4 : 3} className='text-muted-foreground text-center'>
-                  {searchQuery ? 'No members found' : 'No members yet'}
+                  {searchQuery ? t('noMembersFound') : t('noMembersYet')}
                 </TableCell>
               </TableRow>
             ) : (

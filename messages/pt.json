@@ -681,7 +681,9 @@
         "cancel": "Cancelar",
         "remove": "Remover",
         "leave": "Sair",
-        "removing": "Removendo..."
+        "removing": "Removendo...",
+        "noMembersFound": "Nenhum membro encontrado",
+        "noMembersYet": "Ainda não há membros"
       },
       "billing": {
         "title": "Faturamento",

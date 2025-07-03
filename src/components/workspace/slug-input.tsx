@@ -1,7 +1,6 @@
 'use client'
 
 import { Check, X, Loader2 } from 'lucide-react'
-import { useTranslations } from 'next-intl'
 import { useState, useEffect, forwardRef } from 'react'
 import { useDebouncedCallback } from 'use-debounce'
 
@@ -17,7 +16,6 @@ interface SlugInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const SlugInput = forwardRef<HTMLInputElement, SlugInputProps>(
   ({ workspaceId, currentSlug, onAvailabilityCheck, className, ...props }, ref) => {
-    const _t = useTranslations('workspace.settings.general')
     const [isChecking, setIsChecking] = useState(false)
     const [isAvailable, setIsAvailable] = useState<boolean | null>(null)
 
