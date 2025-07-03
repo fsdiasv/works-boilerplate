@@ -47,6 +47,7 @@
       "close": "Cerrar",
       "retry": "Intentar de nuevo"
     },
+    "save": "Guardar",
     "status": {
       "online": "En línea",
       "offline": "Sin conexión",
@@ -68,11 +69,13 @@
     "confirmPassword": "Confirmar contraseña",
     "forgotPassword": "¿Olvidaste tu contraseña?",
     "rememberMe": "Recuérdame",
+    "trustedDevice": "Dispositivo confiable",
     "emailRequired": "El correo electrónico es obligatorio",
     "passwordRequired": "La contraseña es obligatoria",
     "invalidCredentials": "Credenciales inválidas",
     "accountCreated": "Cuenta creada exitosamente",
     "welcomeBack": "¡Bienvenido de vuelta!",
+    "genericSignupError": "No se pudo crear la cuenta. Por favor revisa tu correo para más instrucciones.",
     "signupPage": {
       "title": "Regístrate en Copy UI.",
       "subtitle": "¿Ya tienes una cuenta?",
@@ -88,7 +91,8 @@
       "legalText": "Al crear una cuenta aceptas nuestros",
       "termsOfService": "Términos de Servicio",
       "and": "y nuestra",
-      "privacyPolicy": "Política de Privacidad"
+      "privacyPolicy": "Política de Privacidad",
+      "verificationEmailSent": "¡Correo de verificación enviado! Revisa tu bandeja de entrada para confirmar tu cuenta."
     },
     "loginPage": {
       "title": "¡Bienvenido de vuelta!",
@@ -113,6 +117,19 @@
       "submitButton": "Enviar enlace de restablecimiento",
       "backToLogin": "Volver a",
       "backToLoginLink": "Iniciar sesión"
+    },
+    "resetPasswordPage": {
+      "title": "Restablecer tu contraseña",
+      "subtitle": "Ingresa tu nueva contraseña a continuación",
+      "passwordLabel": "Nueva contraseña",
+      "passwordPlaceholder": "Ingresa tu nueva contraseña",
+      "confirmPasswordLabel": "Confirmar contraseña",
+      "confirmPasswordPlaceholder": "Confirma tu nueva contraseña",
+      "submitButton": "Restablecer contraseña",
+      "backToLogin": "Volver al inicio de sesión",
+      "invalidTokenTitle": "Enlace inválido o expirado",
+      "invalidTokenMessage": "Este enlace de restablecimiento de contraseña es inválido o ha expirado. Por favor solicita uno nuevo.",
+      "requestNewLink": "Solicitar nuevo enlace"
     },
     "testimonial": {
       "author": {
@@ -190,6 +207,24 @@
     "changePassword": "Cambiar contraseña",
     "avatar": "Foto de perfil"
   },
+  "components": {
+    "passwordStrength": {
+      "strength": "Fortaleza",
+      "strengthLevel": "Fortaleza de la contraseña: {level}",
+      "weak": "Débil",
+      "fair": "Regular",
+      "good": "Buena",
+      "strong": "Fuerte",
+      "veryStrong": "Muy Fuerte",
+      "hint": "Agrega más caracteres",
+      "requirements": {
+        "length": "Al menos 8 caracteres",
+        "uppercase": "Una letra mayúscula",
+        "lowercase": "Una letra minúscula",
+        "number": "Un número"
+      }
+    }
+  },
   "settings": {
     "title": "Configuración",
     "general": "General",
@@ -218,11 +253,20 @@
     "switchSuccess": "Cambiado a {name}",
     "workspaceSettings": "Configuración del espacio de trabajo",
     "memberCount": "{count, plural, =0 {Sin miembros} =1 {1 miembro} other {# miembros}}",
+    "slug": {
+      "label": "URL del Workspace",
+      "placeholder": "tu-workspace",
+      "hint": "Tu workspace será accesible en {url}",
+      "minLength": "La URL debe tener al menos 3 caracteres",
+      "invalid": "Solo se permiten letras minúsculas, números y guiones",
+      "unavailable": "Esta URL de workspace ya está en uso"
+    },
     "roles": {
       "owner": "Propietario",
       "admin": "Administrador",
       "member": "Miembro"
     },
+    "createSuccess": "¡Workspace creado con éxito!",
     "settings": {
       "general": "General",
       "members": "Miembros",
@@ -528,120 +572,42 @@
     },
     "toast": {
       "languageChanged": "Idioma Cambiado",
-      "languageChangedDescription": "Idioma cambiado a {language}."
+      "languageChangedDescription": "Idioma cambiado a {language}.",
+      "signOutError": "Error al Cerrar Sesión",
+      "signOutErrorDescription": "Hubo un problema al cerrar sesión. Por favor intenta de nuevo."
     },
-    "signOut": "Cerrar Sesión"
+    "signOut": "Cerrar Sesión",
+    "signingOut": "Cerrando sesión..."
   },
   "workspace": {
-    "validation": {
-      "nameMinLength": "El nombre debe tener al menos 2 caracteres",
-      "nameMaxLength": "El nombre debe tener menos de 50 caracteres",
-      "slugMinLength": "El slug debe tener al menos 3 caracteres",
-      "slugMaxLength": "El slug debe tener menos de 50 caracteres",
-      "slugInvalid": "El slug solo puede contener letras minúsculas, números y guiones",
-      "invalidWorkspaceId": "ID de workspace inválido",
-      "logoInvalid": "El logo debe ser una URL válida"
-    },
     "settings": {
-      "title": "Configuración de {workspace}",
-      "description": "Administra la configuración y preferencias de tu workspace",
-      "back": "Volver al panel",
-      "nav": {
-        "general": "General",
-        "members": "Miembros",
-        "invitations": "Invitaciones",
-        "billing": "Facturación",
-        "dangerZone": "Zona de Peligro",
-        "comingSoon": "Próximamente"
-      },
-      "general": {
-        "title": "Configuración General",
-        "description": "Actualiza la información y preferencias de tu workspace",
-        "workspaceInfo": "Información del Workspace",
-        "workspaceInfoDescription": "Información básica sobre tu workspace",
-        "name": "Nombre del Workspace",
-        "nameDescription": "Este es el nombre de visualización de tu workspace",
-        "slug": "URL del Workspace",
-        "slugDescription": "Este es el identificador único de URL de tu workspace",
-        "slugTaken": "Esta URL ya está en uso",
-        "workspaceLogo": "Logo del Workspace",
-        "workspaceLogoDescription": "Sube un logo para tu workspace",
-        "uploadLogo": "Subir Logo",
-        "changeLogo": "Cambiar Logo",
-        "removeLogo": "Eliminar Logo",
-        "logoRequirements": "PNG, JPG o GIF. Máx 2MB.",
-        "updateSuccess": "Configuración del workspace actualizada exitosamente"
-      },
       "members": {
-        "title": "Miembros",
-        "description": "Administra los miembros del workspace y sus roles",
-        "searchPlaceholder": "Buscar miembros...",
-        "inviteMember": "Invitar Miembro",
-        "role": "Rol",
-        "owner": "Propietario",
-        "admin": "Administrador",
-        "member": "Miembro",
-        "joinedAt": "Se unió el",
-        "actions": "Acciones",
-        "changeRole": "Cambiar Rol",
-        "removeMember": "Eliminar Miembro",
-        "leaveWorkspace": "Salir del Workspace",
-        "transferOwnership": "Transferir Propiedad",
-        "removeConfirmTitle": "Eliminar Miembro",
-        "removeConfirmDescription": "¿Estás seguro de que quieres eliminar a {name} de este workspace?",
-        "transferConfirmTitle": "Transferir Propiedad",
-        "transferConfirmDescription": "¿Estás seguro de que quieres transferir la propiedad a {name}? Te convertirás en administrador.",
-        "leaveConfirmTitle": "Salir del Workspace",
-        "leaveConfirmDescription": "¿Estás seguro de que quieres salir de este workspace?",
-        "updateSuccess": "Miembro actualizado exitosamente",
-        "removeSuccess": "Miembro eliminado exitosamente",
-        "transferSuccess": "Propiedad transferida exitosamente",
-        "leaveSuccess": "Has salido del workspace"
-      },
-      "invitations": {
-        "title": "Invitaciones",
-        "description": "Administra las invitaciones pendientes",
-        "sendInvitation": "Enviar Invitación",
-        "bulkInvite": "Invitación Masiva",
-        "pending": "Pendiente",
-        "expired": "Expirada",
-        "resend": "Reenviar",
         "cancel": "Cancelar",
-        "copyLink": "Copiar Enlace",
-        "email": "Correo",
-        "role": "Rol",
-        "invitedBy": "Invitado por",
-        "expiresAt": "Expira el",
-        "noInvitations": "No hay invitaciones pendientes",
-        "inviteTitle": "Invitar Miembro",
-        "inviteDescription": "Envía una invitación para unirse a este workspace",
-        "emailPlaceholder": "colega@ejemplo.com",
-        "bulkTitle": "Invitación Masiva",
-        "bulkDescription": "Invita a varios miembros a la vez",
-        "bulkPlaceholder": "Sube archivo CSV o pega correos",
-        "sendSuccess": "Invitación enviada exitosamente",
-        "resendSuccess": "Invitación reenviada exitosamente",
-        "cancelSuccess": "Invitación cancelada",
-        "linkCopied": "Enlace de invitación copiado al portapapeles"
+        "remove": "Eliminar",
+        "leave": "Salir",
+        "removing": "Eliminando..."
       },
-      "danger": {
-        "title": "Zona de Peligro",
-        "description": "Acciones irreversibles y destructivas",
-        "deleteWorkspace": "Eliminar Workspace",
-        "deleteDescription": "Una vez eliminado, este workspace y todos sus datos serán eliminados permanentemente.",
-        "deleteButton": "Eliminar Workspace",
-        "deleteConfirmTitle": "Eliminar Workspace",
-        "deleteConfirmDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente el workspace {workspace} y todos los datos asociados.",
-        "deleteConfirmInput": "Escribe DELETE para confirmar",
-        "archiveWorkspace": "Archivar Workspace",
-        "archiveDescription": "Archiva este workspace. Puede ser restaurado más tarde.",
-        "archiveButton": "Archivar Workspace",
-        "exportData": "Exportar Datos",
-        "exportDescription": "Exporta todos los datos del workspace",
-        "exportButton": "Exportar Datos",
-        "deleteSuccess": "Workspace eliminado exitosamente",
-        "archiveSuccess": "Workspace archivado exitosamente",
-        "exportSuccess": "Exportación iniciada. Recibirás un correo cuando esté lista."
+      "billing": {
+        "title": "Facturación",
+        "description": "Gestiona la suscripción y facturación de tu workspace",
+        "currentPlan": {
+          "title": "Plan Actual",
+          "description": "Actualmente estás en el plan Gratuito",
+          "freePlan": "Plan Gratuito",
+          "freePlanDescription": "Hasta 3 miembros",
+          "upgradePlan": "Mejorar Plan"
+        },
+        "paymentMethod": {
+          "title": "Método de Pago",
+          "description": "Gestiona tus métodos de pago",
+          "noPaymentMethod": "No hay método de pago registrado",
+          "addPaymentMethod": "Agregar Método de Pago"
+        },
+        "billingHistory": {
+          "title": "Historial de Facturación",
+          "description": "Ver tus facturas anteriores",
+          "noBillingHistory": "No hay historial de facturación disponible"
+        }
       }
     }
   }

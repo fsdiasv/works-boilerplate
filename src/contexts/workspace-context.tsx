@@ -3,6 +3,7 @@
 import { type Workspace, type WorkspaceRole } from '@prisma/client'
 import { createContext, useContext, type ReactNode } from 'react'
 
+import { useAuth } from '@/hooks/use-auth'
 import { api } from '@/trpc/react'
 
 interface WorkspaceContextValue {
@@ -14,12 +15,19 @@ interface WorkspaceContextValue {
 const WorkspaceContext = createContext<WorkspaceContextValue | undefined>(undefined)
 
 export function WorkspaceProvider({ children }: { children: ReactNode }) {
-  const { data: session, isLoading } = api.auth.getSession.useQuery()
+  const { user } = useAuth()
+
+  // Only query when we have a user to avoid unnecessary calls
+  const { data: session, isLoading } = api.auth.getSession.useQuery(undefined, {
+    enabled: !!user,
+    staleTime: 1000 * 60 * 5, // Cache for 5 minutes
+    refetchOnWindowFocus: false,
+  })
 
   const value: WorkspaceContextValue = {
     activeWorkspace: session?.activeWorkspace ?? null,
     userRole: session?.userRole ?? null,
-    isLoading,
+    isLoading: !user ? false : isLoading,
   }
 
   return <WorkspaceContext.Provider value={value}>{children}</WorkspaceContext.Provider>

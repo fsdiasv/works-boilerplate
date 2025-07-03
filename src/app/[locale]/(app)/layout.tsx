@@ -4,6 +4,7 @@ import { AppSidebar } from '@/components/dashboard/app-sidebar'
 import { PageTransitionWrapper } from '@/components/dashboard/page-transition-wrapper'
 import { TopNav } from '@/components/dashboard/top-nav'
 import { SidebarProvider } from '@/components/ui/sidebar'
+import { WorkspaceProvider } from '@/contexts/workspace-context'
 
 export default function AppLayout({
   children,
@@ -11,16 +12,18 @@ export default function AppLayout({
   children: React.ReactNode
 }>) {
   return (
-    <SidebarProvider>
-      <div className='bg-sw-content-background flex h-screen w-full overflow-hidden'>
-        <AppSidebar />
-        <div className='bg-sw-content-background flex flex-1 flex-col overflow-hidden'>
-          <TopNav />
-          <main className='bg-sw-content-background flex-1 overflow-y-auto p-4 sm:p-6'>
-            <PageTransitionWrapper>{children}</PageTransitionWrapper>
-          </main>
+    <WorkspaceProvider>
+      <SidebarProvider>
+        <div className='bg-sw-content-background flex h-screen w-full overflow-hidden'>
+          <AppSidebar />
+          <div className='bg-sw-content-background flex flex-1 flex-col overflow-hidden'>
+            <TopNav />
+            <main className='bg-sw-content-background flex-1 overflow-y-auto p-4 sm:p-6'>
+              <PageTransitionWrapper>{children}</PageTransitionWrapper>
+            </main>
+          </div>
         </div>
-      </div>
-    </SidebarProvider>
+      </SidebarProvider>
+    </WorkspaceProvider>
   )
 }

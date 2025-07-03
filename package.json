@@ -26,6 +26,9 @@
     "db:studio": "prisma studio",
     "db:seed": "tsx src/server/db/seed.ts",
     "db:generate": "prisma generate",
+    "db:setup-prisma": "echo '📋 Run prisma/sql/setup-prisma-user.sql in Supabase SQL Editor'",
+    "db:pull": "prisma db pull",
+    "db:diff": "prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script",
     "test": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
@@ -153,6 +156,7 @@
     "shadcn": "2.7.0",
     "sharp": "^0.34.2",
     "tailwindcss": "^4.1.11",
+    "tsx": "^4.20.3",
     "typescript": "5.8.3",
     "webpack-bundle-analyzer": "4.10.2",
     "zod": "3.25.67"

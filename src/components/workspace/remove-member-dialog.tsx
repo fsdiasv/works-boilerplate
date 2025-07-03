@@ -39,9 +39,20 @@ export function RemoveMemberDialog({
   const t = useTranslations('workspace.settings.members')
   const utils = api.useUtils()
 
-  const removeMember = api.members.remove.useMutation({
+  const removeMutation = api.members.remove.useMutation({
     onSuccess: () => {
-      toast.success(isLeavingWorkspace ? t('leaveSuccess') : t('removeSuccess'))
+      toast.success(t('removeSuccess'))
+      void utils.members.list.invalidate()
+      onOpenChange(false)
+    },
+    onError: error => {
+      toast.error(error.message)
+    },
+  })
+
+  const leaveMutation = api.members.leave.useMutation({
+    onSuccess: () => {
+      toast.success(t('leaveSuccess'))
       void utils.members.list.invalidate()
       onOpenChange(false)
     },
@@ -53,10 +64,16 @@ export function RemoveMemberDialog({
   const handleRemove = () => {
     if (!member) return
 
-    removeMember.mutate({
-      workspaceId,
-      userId: member.userId,
-    })
+    if (isLeavingWorkspace) {
+      leaveMutation.mutate({
+        workspaceId,
+      })
+    } else {
+      removeMutation.mutate({
+        workspaceId,
+        userId: member.userId,
+      })
+    }
   }
 
   if (!member) return null
@@ -74,13 +91,17 @@ export function RemoveMemberDialog({
           <AlertDialogDescription>{description}</AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t('cancel')}</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleRemove}
-            disabled={removeMember.isPending}
+            disabled={removeMutation.isPending || leaveMutation.isPending}
             className='bg-destructive text-destructive-foreground hover:bg-destructive/90'
           >
-            {removeMember.isPending ? 'Removing...' : 'Remove'}
+            {removeMutation.isPending || leaveMutation.isPending
+              ? t('removing')
+              : isLeavingWorkspace
+                ? t('leave')
+                : t('remove')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

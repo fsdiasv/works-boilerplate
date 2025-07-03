@@ -1,45 +1,38 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-// Core user model synced with Supabase Auth
 model User {
-  id               String    @id @default(uuid()) // Use UUID to match Supabase
-  email            String    @unique
-  fullName         String?   @map("full_name")
-  avatarUrl        String?   @map("avatar_url")
-  emailVerified    Boolean   @default(false) @map("email_verified")
-  phone            String?
-  locale           String    @default("en")
-  timezone         String    @default("UTC")
-  metadata         Json?
-  activeWorkspaceId String?  @map("active_workspace_id")
-  lastActiveAt     DateTime  @default(now()) @map("last_active_at")
-  createdAt        DateTime  @default(now()) @map("created_at")
-  updatedAt        DateTime  @updatedAt @map("updated_at")
-
-  // Relations
-  profile           Profile?
-  sessions          Session[]
+  id                   String            @id @default(uuid())
+  email                String            @unique
+  fullName             String?           @map("full_name")
+  avatarUrl            String?           @map("avatar_url")
+  emailVerified        Boolean           @default(false) @map("email_verified")
+  phone                String?
+  locale               String            @default("en")
+  timezone             String            @default("UTC")
+  metadata             Json?
+  activeWorkspaceId    String?           @map("active_workspace_id")
+  lastActiveAt         DateTime          @default(now()) @map("last_active_at")
+  createdAt            DateTime          @default(now()) @map("created_at")
+  updatedAt            DateTime          @updatedAt @map("updated_at")
+  invitationsSent      Invitation[]
+  profile              Profile?
+  sessions             Session[]
+  activeWorkspace      Workspace?        @relation("UserActiveWorkspace", fields: [activeWorkspaceId], references: [id])
   workspaceMemberships WorkspaceMember[]
-  invitationsSent   Invitation[]
-  activeWorkspace   Workspace? @relation("UserActiveWorkspace", fields: [activeWorkspaceId], references: [id], onDelete: SetNull)
 
   @@map("users")
 }
 
-// Extended user profile
 model Profile {
-  id        String   @id @default(cuid())
+  id        String   @id @default(uuid())
   userId    String   @unique @map("user_id")
   bio       String?
   website   String?
@@ -47,16 +40,13 @@ model Profile {
   jobTitle  String?  @map("job_title")
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
-
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("profiles")
 }
 
-// Session tracking for security and analytics
 model Session {
-  id           String   @id @default(cuid())
+  id           String   @id @default(uuid())
   userId       String   @map("user_id")
   token        String   @unique
   expiresAt    DateTime @map("expires_at")
@@ -64,45 +54,37 @@ model Session {
   userAgent    String?  @map("user_agent")
   createdAt    DateTime @default(now()) @map("created_at")
   lastActiveAt DateTime @default(now()) @map("last_active_at")
-
-  // Relations
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([expiresAt])
   @@map("sessions")
 }
 
-// Workspace model for multi-tenancy
 model Workspace {
-  id          String    @id @default(uuid())
+  id          String            @id @default(uuid())
   name        String
-  slug        String    @unique
+  slug        String            @unique
   logo        String?
-  settings    Json      @default("{}")
-  createdAt   DateTime  @default(now()) @map("created_at")
-  updatedAt   DateTime  @updatedAt @map("updated_at")
-  deletedAt   DateTime? @map("deleted_at") // Soft delete
-
-  // Relations
-  members     WorkspaceMember[]
+  settings    Json              @default("{}")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+  deletedAt   DateTime?         @map("deleted_at")
   invitations Invitation[]
-  activeUsers User[]    @relation("UserActiveWorkspace")
+  activeUsers User[]            @relation("UserActiveWorkspace")
+  members     WorkspaceMember[]
 
   @@index([slug])
   @@map("workspaces")
 }
 
-// Junction table for user-workspace relationships
 model WorkspaceMember {
   userId      String        @map("user_id")
   workspaceId String        @map("workspace_id")
   role        WorkspaceRole
   joinedAt    DateTime      @default(now()) @map("joined_at")
-
-  // Relations
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@id([userId, workspaceId])
   @@index([workspaceId])
@@ -110,21 +92,18 @@ model WorkspaceMember {
   @@map("workspace_members")
 }
 
-// Workspace invitation model
 model Invitation {
   id          String        @id @default(uuid())
   workspaceId String        @map("workspace_id")
   email       String
   role        WorkspaceRole
   invitedById String        @map("invited_by_id")
-  token       String        @unique @default(cuid())
+  token       String        @unique @default(uuid())
   expiresAt   DateTime      @map("expires_at")
   acceptedAt  DateTime?     @map("accepted_at")
   createdAt   DateTime      @default(now()) @map("created_at")
-
-  // Relations
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
-  invitedBy User      @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+  invitedBy   User          @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   @@index([token])
   @@index([email])
@@ -132,7 +111,6 @@ model Invitation {
   @@map("invitations")
 }
 
-// Enum for workspace roles
 enum WorkspaceRole {
   owner
   admin

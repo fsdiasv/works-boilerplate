@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 import {
   createTRPCRouter,
+  publicProcedure,
   protectedProcedure,
   workspaceAdminProcedure,
   workspaceOwnerProcedure,
@@ -381,6 +382,22 @@ export const workspaceRouter = createTRPCRouter({
       return { available: existing === null }
     }),
 
+  // Check if slug is available (public version for signup)
+  checkSlugPublic: publicProcedure
+    .input(
+      z.object({
+        slug: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const existing = await ctx.db.workspace.findUnique({
+        where: { slug: input.slug },
+        select: { id: true },
+      })
+
+      return { available: existing === null }
+    }),
+
   // Check if slug is available (mutation version for form usage)
   checkSlugAvailability: protectedProcedure
     .input(
@@ -409,6 +426,40 @@ export const workspaceRouter = createTRPCRouter({
 
   // Generate slug from name
   generateSlug: protectedProcedure
+    .input(
+      z.object({
+        name: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      // Generate base slug from name
+      const slug = input.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .substring(0, 40)
+
+      // Check if slug exists and add suffix if needed
+      let suffix = 0
+      let finalSlug = slug
+
+      while (suffix < 100) {
+        const existing = await ctx.db.workspace.findUnique({
+          where: { slug: finalSlug },
+          select: { id: true },
+        })
+
+        if (existing === null) break
+
+        suffix++
+        finalSlug = `${slug}-${suffix}`
+      }
+
+      return { slug: finalSlug }
+    }),
+
+  // Generate slug from name (public version for signup)
+  generateSlugPublic: publicProcedure
     .input(
       z.object({
         name: z.string(),

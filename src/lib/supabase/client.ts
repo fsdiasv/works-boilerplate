@@ -19,7 +19,7 @@ export function createClient() {
         autoRefreshToken: true,
         detectSessionInUrl: true,
         flowType: 'pkce',
-        debug: process.env.NODE_ENV === 'development',
+        debug: env.NODE_ENV === 'development',
       },
       global: {
         headers: {

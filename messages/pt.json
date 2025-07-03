@@ -47,6 +47,7 @@
       "close": "Fechar",
       "retry": "Tentar novamente"
     },
+    "save": "Salvar",
     "status": {
       "online": "Online",
       "offline": "Offline",
@@ -68,11 +69,13 @@
     "confirmPassword": "Confirmar senha",
     "forgotPassword": "Esqueceu a senha?",
     "rememberMe": "Lembrar de mim",
+    "trustedDevice": "Dispositivo confiável",
     "emailRequired": "E-mail é obrigatório",
     "passwordRequired": "Senha é obrigatória",
     "invalidCredentials": "Credenciais inválidas",
     "accountCreated": "Conta criada com sucesso",
     "welcomeBack": "Bem-vindo de volta!",
+    "genericSignupError": "Não foi possível criar a conta. Por favor, verifique seu e-mail para mais instruções.",
     "signupPage": {
       "title": "Cadastre-se no Copy UI.",
       "subtitle": "Já tem uma conta?",
@@ -88,7 +91,8 @@
       "legalText": "Ao criar uma conta você concorda com nossos",
       "termsOfService": "Termos de Serviço",
       "and": "e nossa",
-      "privacyPolicy": "Política de Privacidade"
+      "privacyPolicy": "Política de Privacidade",
+      "verificationEmailSent": "E-mail de verificação enviado! Verifique sua caixa de entrada para confirmar sua conta."
     },
     "loginPage": {
       "title": "Bem-vindo de volta!",
@@ -113,6 +117,19 @@
       "submitButton": "Enviar link de redefinição",
       "backToLogin": "Voltar para",
       "backToLoginLink": "Entrar"
+    },
+    "resetPasswordPage": {
+      "title": "Redefinir sua senha",
+      "subtitle": "Digite sua nova senha abaixo",
+      "passwordLabel": "Nova senha",
+      "passwordPlaceholder": "Digite sua nova senha",
+      "confirmPasswordLabel": "Confirmar senha",
+      "confirmPasswordPlaceholder": "Confirme sua nova senha",
+      "submitButton": "Redefinir senha",
+      "backToLogin": "Voltar para o login",
+      "invalidTokenTitle": "Link inválido ou expirado",
+      "invalidTokenMessage": "Este link de redefinição de senha é inválido ou expirou. Por favor, solicite um novo.",
+      "requestNewLink": "Solicitar novo link"
     },
     "testimonial": {
       "author": {
@@ -190,6 +207,24 @@
     "changePassword": "Alterar senha",
     "avatar": "Foto de perfil"
   },
+  "components": {
+    "passwordStrength": {
+      "strength": "Força",
+      "strengthLevel": "Força da senha: {level}",
+      "weak": "Fraca",
+      "fair": "Regular",
+      "good": "Boa",
+      "strong": "Forte",
+      "veryStrong": "Muito Forte",
+      "hint": "Adicione mais caracteres",
+      "requirements": {
+        "length": "Pelo menos 8 caracteres",
+        "uppercase": "Uma letra maiúscula",
+        "lowercase": "Uma letra minúscula",
+        "number": "Um número"
+      }
+    }
+  },
   "settings": {
     "title": "Configurações",
     "general": "Geral",
@@ -218,11 +253,20 @@
     "switchSuccess": "Mudou para {name}",
     "workspaceSettings": "Configurações da área de trabalho",
     "memberCount": "{count, plural, =0 {Sem membros} =1 {1 membro} other {# membros}}",
+    "slug": {
+      "label": "URL do Workspace",
+      "placeholder": "seu-workspace",
+      "hint": "Seu workspace será acessível em {url}",
+      "minLength": "URL deve ter pelo menos 3 caracteres",
+      "invalid": "Apenas letras minúsculas, números e hífens são permitidos",
+      "unavailable": "Esta URL de workspace já está em uso"
+    },
     "roles": {
       "owner": "Proprietário",
       "admin": "Administrador",
       "member": "Membro"
     },
+    "createSuccess": "Workspace criado com sucesso!",
     "settings": {
       "title": "Configurações de {workspace}",
       "description": "Gerencie as configurações e preferências do seu workspace",
@@ -624,8 +668,43 @@
     },
     "toast": {
       "languageChanged": "Idioma Alterado",
-      "languageChangedDescription": "Idioma alterado para {language}."
+      "languageChangedDescription": "Idioma alterado para {language}.",
+      "signOutError": "Falha ao Sair",
+      "signOutErrorDescription": "Houve um problema ao sair. Por favor, tente novamente."
     },
-    "signOut": "Sair"
+    "signOut": "Sair",
+    "signingOut": "Saindo..."
+  },
+  "workspace": {
+    "settings": {
+      "members": {
+        "cancel": "Cancelar",
+        "remove": "Remover",
+        "leave": "Sair",
+        "removing": "Removendo..."
+      },
+      "billing": {
+        "title": "Faturamento",
+        "description": "Gerencie a assinatura e faturamento do seu workspace",
+        "currentPlan": {
+          "title": "Plano Atual",
+          "description": "Você está atualmente no plano Gratuito",
+          "freePlan": "Plano Gratuito",
+          "freePlanDescription": "Até 3 membros",
+          "upgradePlan": "Fazer Upgrade"
+        },
+        "paymentMethod": {
+          "title": "Método de Pagamento",
+          "description": "Gerencie seus métodos de pagamento",
+          "noPaymentMethod": "Nenhum método de pagamento cadastrado",
+          "addPaymentMethod": "Adicionar Método de Pagamento"
+        },
+        "billingHistory": {
+          "title": "Histórico de Faturamento",
+          "description": "Veja suas faturas anteriores",
+          "noBillingHistory": "Nenhum histórico de faturamento disponível"
+        }
+      }
+    }
   }
 }

@@ -679,6 +679,28 @@
         "deleteSuccess": "Workspace deleted successfully",
         "archiveSuccess": "Workspace archived successfully",
         "exportSuccess": "Export started. You'll receive an email when it's ready."
+      },
+      "billing": {
+        "title": "Billing",
+        "description": "Manage your workspace subscription and billing",
+        "currentPlan": {
+          "title": "Current Plan",
+          "description": "You're currently on the Free plan",
+          "freePlan": "Free Plan",
+          "freePlanDescription": "Up to 3 members",
+          "upgradePlan": "Upgrade Plan"
+        },
+        "paymentMethod": {
+          "title": "Payment Method",
+          "description": "Manage your payment methods",
+          "noPaymentMethod": "No payment method on file",
+          "addPaymentMethod": "Add Payment Method"
+        },
+        "billingHistory": {
+          "title": "Billing History",
+          "description": "View your past invoices",
+          "noBillingHistory": "No billing history available"
+        }
       }
     }
   }
