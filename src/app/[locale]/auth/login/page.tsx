@@ -33,9 +33,17 @@ export default function LoginPage() {
   const [rememberMe, setRememberMe] = useState(false)
   const { signIn } = useAuth()
 
-  // Handle OAuth callback errors
+  // Handle OAuth callback errors and verification success
   useEffect(() => {
     const error = searchParams.get('error')
+    const verified = searchParams.get('verified')
+
+    // Handle successful email verification
+    if (verified === 'true') {
+      toast.success(t('emailVerified'))
+    }
+
+    // Handle errors
     if (error !== null && error !== '') {
       let errorMessage = tError('generic')
 
@@ -68,7 +76,7 @@ export default function LoginPage() {
 
       toast.error(errorMessage)
     }
-  }, [searchParams, tError])
+  }, [searchParams, tError, t])
 
   const {
     register,
@@ -76,6 +84,9 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: searchParams.get('email') ?? '',
+    },
   })
 
   const onSubmit = async (data: LoginFormData) => {

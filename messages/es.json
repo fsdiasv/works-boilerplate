@@ -104,7 +104,8 @@
       "passwordPlaceholder": "Ingresa tu contraseña",
       "forgotPasswordLink": "¿Olvidaste tu contraseña?",
       "submitButton": "Iniciar sesión",
-      "divider": "O continúa con"
+      "divider": "O continúa con",
+      "emailVerified": "¡Correo verificado exitosamente! Ahora puedes iniciar sesión."
     },
     "socialLogin": {
       "signInWith": "Iniciar sesión con {provider}"
@@ -150,8 +151,19 @@
         "error": "No pudimos verificar tu dirección de correo."
       },
       "redirecting": "Redirigiendo al panel...",
+      "redirectingToLogin": "Redirigiendo al inicio de sesión...",
+      "continueButton": "Continuar",
       "backToLogin": "Volver a Iniciar Sesión",
       "invalidLink": "Enlace de verificación inválido"
+    },
+    "checkEmail": {
+      "title": "Revisa Tu Correo",
+      "description": "Hemos enviado un enlace de verificación a tu dirección de correo. Por favor, haz clic en el enlace para confirmar tu cuenta.",
+      "checkSpam": "¿No encuentras el correo?",
+      "notReceived": "Revisa tu carpeta de spam o correo no deseado. Los correos de verificación a veces pueden terminar allí.",
+      "backToLogin": "Volver a Iniciar Sesión",
+      "havingTrouble": "¿Tienes problemas?",
+      "contactSupport": "Contactar soporte"
     },
     "deleteAccount": {
       "confirmationText": "ELIMINAR MI CUENTA"

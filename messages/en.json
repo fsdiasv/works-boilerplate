@@ -102,7 +102,8 @@
       "passwordPlaceholder": "Enter your password",
       "forgotPasswordLink": "Forgot your password?",
       "submitButton": "Sign in",
-      "divider": "Or continue with"
+      "divider": "Or continue with",
+      "emailVerified": "Email verified successfully! You can now log in."
     },
     "socialLogin": {
       "signInWith": "Sign in with {provider}"
@@ -148,8 +149,19 @@
         "error": "We could not verify your email address."
       },
       "redirecting": "Redirecting to dashboard...",
+      "redirectingToLogin": "Redirecting to login...",
+      "continueButton": "Continue",
       "backToLogin": "Back to Login",
       "invalidLink": "Invalid verification link"
+    },
+    "checkEmail": {
+      "title": "Check Your Email",
+      "description": "We've sent a verification link to your email address. Please click the link to confirm your account.",
+      "checkSpam": "Can't find the email?",
+      "notReceived": "Check your spam or junk folder. Verification emails can sometimes end up there.",
+      "backToLogin": "Back to Login",
+      "havingTrouble": "Having trouble?",
+      "contactSupport": "Contact support"
     },
     "deleteAccount": {
       "confirmationText": "DELETE MY ACCOUNT"

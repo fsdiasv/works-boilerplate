@@ -437,7 +437,16 @@ export const authRouter = createTRPCRouter({
         })
       }
 
-      return { success: true }
+      // After successful verification, check if user is now logged in
+      const {
+        data: { session },
+      } = await ctx.supabase.auth.getSession()
+
+      return {
+        success: true,
+        isLoggedIn: session !== null,
+        email: session?.user.email,
+      }
     }),
 
   // Sign out

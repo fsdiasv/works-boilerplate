@@ -104,7 +104,8 @@
       "passwordPlaceholder": "Digite sua senha",
       "forgotPasswordLink": "Esqueceu sua senha?",
       "submitButton": "Entrar",
-      "divider": "Ou continue com"
+      "divider": "Ou continue com",
+      "emailVerified": "E-mail verificado com sucesso! Agora você pode fazer login."
     },
     "socialLogin": {
       "signInWith": "Entrar com {provider}"
@@ -150,8 +151,19 @@
         "error": "Não foi possível verificar seu endereço de e-mail."
       },
       "redirecting": "Redirecionando para o painel...",
+      "redirectingToLogin": "Redirecionando para login...",
+      "continueButton": "Continuar",
       "backToLogin": "Voltar para Login",
       "invalidLink": "Link de verificação inválido"
+    },
+    "checkEmail": {
+      "title": "Verifique Seu E-mail",
+      "description": "Enviamos um link de verificação para o seu endereço de e-mail. Por favor, clique no link para confirmar sua conta.",
+      "checkSpam": "Não encontrou o e-mail?",
+      "notReceived": "Verifique sua pasta de spam ou lixo eletrônico. E-mails de verificação às vezes podem ir parar lá.",
+      "backToLogin": "Voltar para Login",
+      "havingTrouble": "Está tendo problemas?",
+      "contactSupport": "Entre em contato com o suporte"
     },
     "deleteAccount": {
       "confirmationText": "DELETAR MINHA CONTA"
@@ -247,7 +259,7 @@
   "workspace": {
     "title": "Área de trabalho",
     "createWorkspace": "Criar área de trabalho",
-    "createFirst": "Criar área de trabalho",
+    "createFirst": "Crie sua primeira área de trabalho",
     "selectWorkspace": "Selecionar área de trabalho",
     "yourWorkspaces": "Suas áreas de trabalho",
     "switchSuccess": "Mudou para {name}",
@@ -444,6 +456,38 @@
       "cannotRemoveOwner": "Não é possível remover o proprietário da área de trabalho",
       "cannotLeaveAsOwner": "Transfira a propriedade antes de sair",
       "noWorkspaces": "Nenhuma área de trabalho encontrada"
+    },
+    "settings": {
+      "members": {
+        "cancel": "Cancelar",
+        "remove": "Remover",
+        "leave": "Sair",
+        "removing": "Removendo...",
+        "noMembersFound": "Nenhum membro encontrado",
+        "noMembersYet": "Ainda não há membros"
+      },
+      "billing": {
+        "title": "Faturamento",
+        "description": "Gerencie a assinatura e faturamento do seu workspace",
+        "currentPlan": {
+          "title": "Plano Atual",
+          "description": "Você está atualmente no plano Gratuito",
+          "freePlan": "Plano Gratuito",
+          "freePlanDescription": "Até 3 membros",
+          "upgradePlan": "Fazer Upgrade"
+        },
+        "paymentMethod": {
+          "title": "Método de Pagamento",
+          "description": "Gerencie seus métodos de pagamento",
+          "noPaymentMethod": "Nenhum método de pagamento cadastrado",
+          "addPaymentMethod": "Adicionar Método de Pagamento"
+        },
+        "billingHistory": {
+          "title": "Histórico de Faturamento",
+          "description": "Veja suas faturas anteriores",
+          "noBillingHistory": "Nenhum histórico de faturamento disponível"
+        }
+      }
     }
   },
   "validation": {
@@ -674,39 +718,5 @@
     },
     "signOut": "Sair",
     "signingOut": "Saindo..."
-  },
-  "workspace": {
-    "settings": {
-      "members": {
-        "cancel": "Cancelar",
-        "remove": "Remover",
-        "leave": "Sair",
-        "removing": "Removendo...",
-        "noMembersFound": "Nenhum membro encontrado",
-        "noMembersYet": "Ainda não há membros"
-      },
-      "billing": {
-        "title": "Faturamento",
-        "description": "Gerencie a assinatura e faturamento do seu workspace",
-        "currentPlan": {
-          "title": "Plano Atual",
-          "description": "Você está atualmente no plano Gratuito",
-          "freePlan": "Plano Gratuito",
-          "freePlanDescription": "Até 3 membros",
-          "upgradePlan": "Fazer Upgrade"
-        },
-        "paymentMethod": {
-          "title": "Método de Pagamento",
-          "description": "Gerencie seus métodos de pagamento",
-          "noPaymentMethod": "Nenhum método de pagamento cadastrado",
-          "addPaymentMethod": "Adicionar Método de Pagamento"
-        },
-        "billingHistory": {
-          "title": "Histórico de Faturamento",
-          "description": "Veja suas faturas anteriores",
-          "noBillingHistory": "Nenhum histórico de faturamento disponível"
-        }
-      }
-    }
   }
 }

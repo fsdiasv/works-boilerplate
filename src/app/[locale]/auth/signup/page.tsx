@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -43,6 +44,7 @@ export default function SignUpPage() {
   const t = useTranslations('auth.signupPage')
   const tWorkspace = useTranslations('workspace')
   const locale = useLocale()
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [isSlugValid, setIsSlugValid] = useState(false)
 
@@ -62,6 +64,8 @@ export default function SignUpPage() {
   const signUpMutation = api.auth.signUp.useMutation({
     onSuccess: () => {
       toast.success(t('verificationEmailSent'))
+      // Redirect to a page that tells the user to check their email
+      router.push(`/${locale}/auth/check-email`)
     },
     onError: error => {
       toast.error(error.message)
