@@ -22,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { getInitials } from '@/lib/utils/get-initials'
 import { api } from '@/trpc/react'
 
 interface TransferOwnershipDialogProps {
@@ -73,18 +74,6 @@ export function TransferOwnershipDialog({
     })
   }
 
-  const getInitials = (name: string | null, email: string) => {
-    if (name !== null && name !== '') {
-      return name
-        .split(' ')
-        .map(word => word[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
-    }
-    return email.slice(0, 2).toUpperCase()
-  }
-
   const selectedMember = members.find(m => m.userId === selectedUserId)
 
   return (
@@ -97,16 +86,16 @@ export function TransferOwnershipDialog({
               ? t('transferConfirmDescription', {
                   name: selectedMember.user.fullName ?? selectedMember.user.email,
                 })
-              : 'Select a member to transfer ownership to'}
+              : t('selectMemberPrompt')}
           </DialogDescription>
         </DialogHeader>
 
         <div className='space-y-4 py-4'>
           <div className='space-y-2'>
-            <Label htmlFor='new-owner'>Select new owner</Label>
+            <Label htmlFor='new-owner'>{t('selectNewOwner')}</Label>
             <Select value={selectedUserId} onValueChange={setSelectedUserId}>
               <SelectTrigger id='new-owner'>
-                <SelectValue placeholder='Select a member' />
+                <SelectValue placeholder={t('selectMemberPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {members.map(member => (
@@ -129,14 +118,14 @@ export function TransferOwnershipDialog({
 
         <DialogFooter>
           <Button variant='outline' onClick={() => onOpenChange(false)}>
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             onClick={handleTransfer}
             disabled={!selectedUserId || transferOwnership.isPending}
             variant='destructive'
           >
-            {transferOwnership.isPending ? 'Transferring...' : 'Transfer Ownership'}
+            {transferOwnership.isPending ? t('transferring') : t('transferOwnership')}
           </Button>
         </DialogFooter>
       </DialogContent>

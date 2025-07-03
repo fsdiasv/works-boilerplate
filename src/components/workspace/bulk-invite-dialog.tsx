@@ -46,10 +46,10 @@ export function BulkInviteDialog({ open, onOpenChange, workspaceId }: BulkInvite
       const failCount = data.filter(r => !r.success).length
 
       if (successCount > 0) {
-        toast.success(`${successCount} invitations sent successfully`)
+        toast.success(t('bulkSendSuccess', { count: successCount }))
       }
       if (failCount > 0) {
-        toast.error(`${failCount} invitations failed`)
+        toast.error(t('bulkSendError', { count: failCount }))
       }
 
       void utils.invitation.list.invalidate()
@@ -65,8 +65,12 @@ export function BulkInviteDialog({ open, onOpenChange, workspaceId }: BulkInvite
     const file = e.target.files?.[0]
     if (!file) return
 
-    if (!file.name.endsWith('.csv')) {
-      toast.error('Please upload a CSV file')
+    // Check file extension and MIME type
+    if (
+      !file.name.endsWith('.csv') ||
+      (file.type && file.type !== 'text/csv' && file.type !== 'application/vnd.ms-excel')
+    ) {
+      toast.error(t('invalidFileType'))
       return
     }
 
@@ -76,11 +80,15 @@ export function BulkInviteDialog({ open, onOpenChange, workspaceId }: BulkInvite
       const lines = text.split('\n').filter(line => line.trim())
       const emailList = lines
         .map(line => line.split(',')[0]?.trim())
-        .filter((email): email is string => email?.includes('@') === true)
+        .filter((email): email is string => {
+          // Enhanced email validation
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+          return email !== undefined && emailRegex.test(email)
+        })
 
       setEmails(emailList.join('\n'))
     } catch {
-      toast.error('Failed to read file')
+      toast.error(t('fileReadError'))
     } finally {
       setIsProcessing(false)
     }
@@ -90,10 +98,14 @@ export function BulkInviteDialog({ open, onOpenChange, workspaceId }: BulkInvite
     const emailList = emails
       .split(/[\n,]/)
       .map(email => email.trim())
-      .filter((email): email is string => email.includes('@'))
+      .filter((email): email is string => {
+        // Enhanced email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        return email !== '' && emailRegex.test(email)
+      })
 
     if (emailList.length === 0) {
-      toast.error('Please enter at least one valid email')
+      toast.error(t('enterValidEmail'))
       return
     }
 
@@ -113,7 +125,7 @@ export function BulkInviteDialog({ open, onOpenChange, workspaceId }: BulkInvite
 
         <div className='space-y-4'>
           <div className='space-y-2'>
-            <Label htmlFor='csv-upload'>Upload CSV</Label>
+            <Label htmlFor='csv-upload'>{t('uploadCSV')}</Label>
             <div className='flex items-center gap-2'>
               <Input
                 id='csv-upload'
@@ -128,7 +140,7 @@ export function BulkInviteDialog({ open, onOpenChange, workspaceId }: BulkInvite
           </div>
 
           <div className='space-y-2'>
-            <Label htmlFor='emails'>Or paste emails</Label>
+            <Label htmlFor='emails'>{t('orPasteEmails')}</Label>
             <Textarea
               id='emails'
               placeholder={t('bulkPlaceholder')}
@@ -137,11 +149,11 @@ export function BulkInviteDialog({ open, onOpenChange, workspaceId }: BulkInvite
               rows={6}
               className='resize-none'
             />
-            <p className='text-muted-foreground text-xs'>One email per line or comma-separated</p>
+            <p className='text-muted-foreground text-xs'>{t('emailFormatHelp')}</p>
           </div>
 
           <div className='space-y-2'>
-            <Label htmlFor='bulk-role'>Default role</Label>
+            <Label htmlFor='bulk-role'>{t('defaultRole')}</Label>
             <Select value={role} onValueChange={value => setRole(value as 'admin' | 'member')}>
               <SelectTrigger id='bulk-role'>
                 <SelectValue />
@@ -156,13 +168,13 @@ export function BulkInviteDialog({ open, onOpenChange, workspaceId }: BulkInvite
 
         <DialogFooter>
           <Button variant='outline' onClick={() => onOpenChange(false)}>
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             onClick={handleSubmit}
             disabled={!emails.trim() || inviteMembers.isPending || isProcessing}
           >
-            {inviteMembers.isPending ? 'Sending...' : 'Send Invitations'}
+            {inviteMembers.isPending ? t('sending') : t('sendInvitations')}
           </Button>
         </DialogFooter>
       </DialogContent>

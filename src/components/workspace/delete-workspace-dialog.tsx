@@ -68,7 +68,7 @@ export function DeleteWorkspaceDialog({
                 id='confirm-delete'
                 value={confirmText}
                 onChange={e => setConfirmText(e.target.value)}
-                placeholder='DELETE'
+                placeholder={t('deleteConfirmationPlaceholder')}
                 className='font-mono'
               />
             </div>
@@ -82,14 +82,14 @@ export function DeleteWorkspaceDialog({
               onOpenChange(false)
             }}
           >
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             variant='destructive'
             onClick={handleDelete}
             disabled={confirmText !== 'DELETE' || deleteWorkspace.isPending}
           >
-            {deleteWorkspace.isPending ? 'Deleting...' : 'Delete Workspace'}
+            {deleteWorkspace.isPending ? t('deleting') : t('deleteButton')}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

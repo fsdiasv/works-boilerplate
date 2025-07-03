@@ -133,10 +133,10 @@ export function InviteMemberDialog({ open, onOpenChange, workspaceId }: InviteMe
 
             <DialogFooter>
               <Button type='button' variant='outline' onClick={() => onOpenChange(false)}>
-                Cancel
+                {t('cancel')}
               </Button>
               <Button type='submit' disabled={inviteMember.isPending}>
-                {inviteMember.isPending ? 'Sending...' : t('sendInvitation')}
+                {inviteMember.isPending ? t('sending') : t('sendInvitation')}
               </Button>
             </DialogFooter>
           </form>

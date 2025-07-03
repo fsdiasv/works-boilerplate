@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 import { TRPCError } from '@trpc/server'
 import { getTranslations } from 'next-intl/server'
 import { z } from 'zod'
@@ -11,6 +9,11 @@ import {
   workspaceAdminProcedure,
   workspaceOwnerProcedure,
 } from '@/server/api/trpc'
+
+// Note: The protected procedures guarantee non-null user via middleware
+// TypeScript requires non-null assertions due to type inference limitations
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+/* eslint-disable @typescript-eslint/no-unnecessary-type-assertion */
 
 // Validation schemas
 async function createWorkspaceSchema(locale: string) {
@@ -56,13 +59,13 @@ export const workspaceRouter = createTRPCRouter({
       where: {
         id: ctx.activeWorkspace.id,
         members: {
-          some: { userId: ctx.user.id },
+          some: { userId: ctx.user!.id },
         },
         deletedAt: null,
       },
       include: {
         members: {
-          where: { userId: ctx.user.id },
+          where: { userId: ctx.user!.id },
           select: { role: true },
         },
         _count: {
@@ -79,13 +82,13 @@ export const workspaceRouter = createTRPCRouter({
     return ctx.db.workspace.findMany({
       where: {
         members: {
-          some: { userId: ctx.user.id },
+          some: { userId: ctx.user!.id },
         },
         deletedAt: null,
       },
       include: {
         members: {
-          where: { userId: ctx.user.id },
+          where: { userId: ctx.user!.id },
           select: { role: true },
         },
         _count: {
@@ -108,13 +111,13 @@ export const workspaceRouter = createTRPCRouter({
         where: {
           id: input.workspaceId,
           members: {
-            some: { userId: ctx.user.id },
+            some: { userId: ctx.user!.id },
           },
           deletedAt: null,
         },
         include: {
           members: {
-            where: { userId: ctx.user.id },
+            where: { userId: ctx.user!.id },
             select: { role: true },
           },
           _count: {
@@ -172,7 +175,7 @@ export const workspaceRouter = createTRPCRouter({
         },
         include: {
           members: {
-            where: { userId: ctx.user.id },
+            where: { userId: ctx.user!.id },
             select: { role: true },
           },
         },
@@ -180,7 +183,7 @@ export const workspaceRouter = createTRPCRouter({
 
       // Set as active workspace
       await ctx.db.user.update({
-        where: { id: ctx.user.id },
+        where: { id: ctx.user!.id },
         data: { activeWorkspaceId: workspace.id },
       })
 
@@ -349,7 +352,7 @@ export const workspaceRouter = createTRPCRouter({
 
       // Update active workspace and last active timestamp
       const updatedUser = await ctx.db.user.update({
-        where: { id: ctx.user.id },
+        where: { id: ctx.user!.id },
         data: {
           activeWorkspaceId: input.workspaceId,
           lastActiveAt: new Date(),

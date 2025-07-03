@@ -82,13 +82,13 @@ export function ChangeRoleDialog({
         <DialogHeader>
           <DialogTitle>{t('changeRole')}</DialogTitle>
           <DialogDescription>
-            Change role for {member.user.fullName ?? member.user.email}
+            {t('changeRoleDescription', { name: member.user.fullName ?? member.user.email })}
           </DialogDescription>
         </DialogHeader>
 
         <div className='space-y-4 py-4'>
           <div className='space-y-2'>
-            <Label htmlFor='role'>Select new role</Label>
+            <Label htmlFor='role'>{t('selectNewRole')}</Label>
             <Select
               value={selectedRole}
               onValueChange={value => setSelectedRole(value as 'admin' | 'member')}
@@ -106,13 +106,13 @@ export function ChangeRoleDialog({
 
         <DialogFooter>
           <Button variant='outline' onClick={() => onOpenChange(false)}>
-            Cancel
+            {t('cancel')}
           </Button>
           <Button
             onClick={handleUpdateRole}
             disabled={selectedRole === member.role || updateRole.isPending}
           >
-            {updateRole.isPending ? 'Updating...' : 'Update Role'}
+            {updateRole.isPending ? t('updating') : t('updateRole')}
           </Button>
         </DialogFooter>
       </DialogContent>

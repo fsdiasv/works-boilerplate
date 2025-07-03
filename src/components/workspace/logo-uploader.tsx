@@ -6,6 +6,7 @@ import { useTranslations } from 'next-intl'
 import { useState, useRef } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { getInitials } from '@/lib/utils/get-initials'
 
 interface LogoUploaderProps {
   value: string | null | undefined
@@ -55,15 +56,6 @@ export function LogoUploader({ value, onChange, workspaceName }: LogoUploaderPro
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
-  }
-
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
   }
 
   return (

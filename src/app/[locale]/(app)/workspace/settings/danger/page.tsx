@@ -70,7 +70,7 @@ export default function WorkspaceDangerPage() {
         </CardHeader>
         <CardContent>
           <Button variant='outline' onClick={handleExport} disabled={exportData.isPending}>
-            {exportData.isPending ? 'Exporting...' : t('exportButton')}
+            {exportData.isPending ? t('exporting') : t('exportButton')}
           </Button>
         </CardContent>
       </Card>
@@ -94,7 +94,7 @@ export default function WorkspaceDangerPage() {
                 disabled={archiveWorkspace.isPending}
                 className='border-warning text-warning hover:bg-warning/10'
               >
-                {archiveWorkspace.isPending ? 'Archiving...' : t('archiveButton')}
+                {archiveWorkspace.isPending ? t('archiving') : t('archiveButton')}
               </Button>
             </CardContent>
           </Card>

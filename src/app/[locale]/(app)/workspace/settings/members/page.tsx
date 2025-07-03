@@ -36,6 +36,7 @@ import {
   useIsWorkspaceOwner,
   useIsWorkspaceAdmin,
 } from '@/contexts/workspace-context'
+import { getInitials } from '@/lib/utils/get-initials'
 import { api } from '@/trpc/react'
 
 export default function WorkspaceMembersPage() {
@@ -74,18 +75,6 @@ export default function WorkspaceMembersPage() {
       (member.user.fullName?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false) ||
       member.user.email.toLowerCase().includes(searchQuery.toLowerCase())
   )
-
-  const getInitials = (name: string | null, email: string) => {
-    if (name !== null && name !== '') {
-      return name
-        .split(' ')
-        .map(word => word[0])
-        .join('')
-        .toUpperCase()
-        .slice(0, 2)
-    }
-    return email.slice(0, 2).toUpperCase()
-  }
 
   const getRoleBadgeVariant = (role: string) => {
     switch (role) {

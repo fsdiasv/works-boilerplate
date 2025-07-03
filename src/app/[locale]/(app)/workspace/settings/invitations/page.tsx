@@ -67,10 +67,31 @@ export default function WorkspaceInvitationsPage() {
   const copyInvitationLink = async (token: string) => {
     const inviteUrl = `${window.location.origin}/invitation/${token}`
     try {
+      // Check if clipboard API is available
+      if (!('clipboard' in navigator)) {
+        // Fallback for browsers without clipboard API
+        const textArea = document.createElement('textarea')
+        textArea.value = inviteUrl
+        textArea.style.position = 'fixed'
+        textArea.style.left = '-999999px'
+        document.body.appendChild(textArea)
+        textArea.focus()
+        textArea.select()
+        try {
+          document.execCommand('copy')
+          toast.success(t('linkCopied'))
+        } catch {
+          toast.error(t('copyLinkError'))
+        } finally {
+          document.body.removeChild(textArea)
+        }
+        return
+      }
+
       await navigator.clipboard.writeText(inviteUrl)
       toast.success(t('linkCopied'))
     } catch {
-      toast.error('Failed to copy link')
+      toast.error(t('copyLinkError'))
     }
   }
 
@@ -119,8 +140,8 @@ export default function WorkspaceInvitationsPage() {
               <TableHead>{t('role')}</TableHead>
               <TableHead>{t('invitedBy')}</TableHead>
               <TableHead>{t('expiresAt')}</TableHead>
-              <TableHead>Status</TableHead>
-              {isAdmin && <TableHead className='w-[70px]'>Actions</TableHead>}
+              <TableHead>{t('status')}</TableHead>
+              {isAdmin && <TableHead className='w-[70px]'>{t('actions')}</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -183,7 +204,7 @@ export default function WorkspaceInvitationsPage() {
                           <DropdownMenuTrigger asChild>
                             <Button variant='ghost' size='icon' className='h-8 w-8'>
                               <MoreHorizontal className='h-4 w-4' />
-                              <span className='sr-only'>Open menu</span>
+                              <span className='sr-only'>{t('openMenu')}</span>
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align='end'>
