@@ -182,10 +182,16 @@
       "nameMinLength": "O nome deve ter pelo menos 2 caracteres",
       "currentPasswordRequired": "A senha atual é obrigatória",
       "urlInvalid": "URL inválida",
-      "bioMaxLength": "A biografia não deve exceder 500 caracteres"
+      "bioMaxLength": "A biografia não deve exceder 500 caracteres",
+      "emailAlreadyExists": "Este e-mail já está cadastrado",
+      "workspaceSlugExists": "Esta URL de workspace já existe",
+      "emailAlreadyRegisteredVerify": "E-mail já cadastrado. Verifique sua caixa de entrada ou tente fazer login.",
+      "failedToCreateUser": "Falha ao criar usuário"
     },
     "errors": {
       "generic": "Falha na autenticação. Por favor, tente novamente.",
+      "emailAlreadyRegistered": "Este e-mail já está cadastrado. Se você esqueceu sua senha, clique em 'Esqueceu a senha?' na tela de login.",
+      "emailNotVerified": "Seu e-mail ainda não foi verificado. Verifique sua caixa de entrada e spam.",
       "oauthProviderError": "O provedor de autenticação encontrou um erro. Por favor, tente novamente.",
       "oauthMissingCode": "Código de autorização ausente. Por favor, tente fazer login novamente.",
       "oauthStateMismatch": "Falha na validação de segurança. Por favor, tente fazer login novamente.",
@@ -194,7 +200,8 @@
       "oauthSessionMismatch": "Falha na validação da sessão. Por favor, tente fazer login novamente.",
       "oauthCodeReused": "Esta autorização já foi usada. Por favor, faça login novamente.",
       "oauthUnexpectedError": "Ocorreu um erro inesperado. Por favor, tente novamente."
-    }
+    },
+    "resendVerification": "Reenviar e-mail"
   },
   "dashboard": {
     "title": "Painel",
@@ -283,7 +290,9 @@
       "title": "Configurações de {workspace}",
       "description": "Gerencie as configurações e preferências do seu workspace",
       "back": "Voltar ao painel",
+      "openMenu": "Abrir menu de navegação",
       "nav": {
+        "title": "Navegação de Configurações",
         "general": "Geral",
         "members": "Membros",
         "invitations": "Convites",
@@ -319,7 +328,10 @@
         "admin": "Administrador",
         "member": "Membro",
         "joinedAt": "Entrou em",
+        "joined": "Entrou",
         "actions": "Ações",
+        "openMenu": "Abrir menu de ações",
+        "invite": "Convidar",
         "changeRole": "Alterar Função",
         "removeMember": "Remover Membro",
         "leaveWorkspace": "Sair do Workspace",

@@ -16,6 +16,7 @@ import { PrimaryButton } from '@/components/ui/primary-button'
 import { RememberMeCheckbox } from '@/components/ui/remember-me-checkbox'
 import { SocialLoginButton } from '@/components/ui/social-login-button'
 import { useAuth } from '@/hooks/use-auth'
+import { api } from '@/trpc/react'
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address').min(1, 'Email is required'),
@@ -27,11 +28,21 @@ type LoginFormData = z.infer<typeof loginSchema>
 export default function LoginPage() {
   const t = useTranslations('auth.loginPage')
   const tError = useTranslations('auth.errors')
+  const tAuth = useTranslations('auth')
   const locale = useLocale()
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)
   const { signIn } = useAuth()
+
+  const resendVerificationMutation = api.auth.resendVerificationEmail.useMutation({
+    onSuccess: () => {
+      toast.success(tAuth('signupPage.verificationEmailSent'))
+    },
+    onError: () => {
+      toast.error(tError('generic'))
+    },
+  })
 
   // Handle OAuth callback errors and verification success
   useEffect(() => {
@@ -77,6 +88,18 @@ export default function LoginPage() {
       toast.error(errorMessage)
     }
   }, [searchParams, tError, t])
+
+  // Handle resend verification event
+  useEffect(() => {
+    const handleResendVerification = (event: CustomEvent<{ email: string }>) => {
+      void resendVerificationMutation.mutate({ email: event.detail.email })
+    }
+
+    window.addEventListener('resendVerification', handleResendVerification as EventListener)
+    return () => {
+      window.removeEventListener('resendVerification', handleResendVerification as EventListener)
+    }
+  }, [resendVerificationMutation])
 
   const {
     register,
@@ -130,7 +153,7 @@ export default function LoginPage() {
             type='email'
             label={t('emailLabel')}
             placeholder={t('emailPlaceholder')}
-            autoComplete='email'
+            autoComplete='username email'
             {...(errors.email && { error: errors.email.message })}
             {...register('email')}
           />

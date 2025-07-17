@@ -180,10 +180,16 @@
       "nameMinLength": "Name must be at least 2 characters",
       "currentPasswordRequired": "Current password is required",
       "urlInvalid": "Invalid URL",
-      "bioMaxLength": "Bio must not exceed 500 characters"
+      "bioMaxLength": "Bio must not exceed 500 characters",
+      "emailAlreadyExists": "User with this email already exists",
+      "workspaceSlugExists": "A workspace with this URL already exists",
+      "emailAlreadyRegisteredVerify": "Email already registered. Please check your email for verification or try logging in.",
+      "failedToCreateUser": "Failed to create user"
     },
     "errors": {
       "generic": "Authentication failed. Please try again.",
+      "emailAlreadyRegistered": "This email is already registered. If you forgot your password, click 'Forgot password?' on the login screen.",
+      "emailNotVerified": "Your email has not been verified yet. Please check your inbox and spam folder.",
       "oauthProviderError": "The authentication provider encountered an error. Please try again.",
       "oauthMissingCode": "Authorization code is missing. Please try signing in again.",
       "oauthStateMismatch": "Security validation failed. Please try signing in again.",
@@ -192,7 +198,8 @@
       "oauthSessionMismatch": "Session validation failed. Please try signing in again.",
       "oauthCodeReused": "This authorization has already been used. Please sign in again.",
       "oauthUnexpectedError": "An unexpected error occurred. Please try again."
-    }
+    },
+    "resendVerification": "Resend email"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -272,7 +279,9 @@
       "title": "{workspace} Settings",
       "description": "Manage your workspace settings and preferences",
       "back": "Back to dashboard",
+      "openMenu": "Open navigation menu",
       "nav": {
+        "title": "Settings Navigation",
         "general": "General",
         "members": "Members",
         "invitations": "Invitations",
@@ -308,7 +317,10 @@
         "admin": "Admin",
         "member": "Member",
         "joinedAt": "Joined",
+        "joined": "Joined",
         "actions": "Actions",
+        "openMenu": "Open actions menu",
+        "invite": "Invite",
         "changeRole": "Change Role",
         "removeMember": "Remove Member",
         "leaveWorkspace": "Leave Workspace",

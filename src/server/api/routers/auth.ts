@@ -115,7 +115,10 @@ export const authRouter = createTRPCRouter({
       const { email, password, fullName, locale, timezone, workspaceName, workspaceSlug } =
         validatedInput
 
-      // Check if user already exists
+      // Get translations for error messages
+      const tAuth = await getTranslations({ locale: ctx.locale, namespace: 'auth.validation' })
+
+      // Check if user already exists in database
       const existingUser = await ctx.db.user.findUnique({
         where: { email },
       })
@@ -123,7 +126,7 @@ export const authRouter = createTRPCRouter({
       if (existingUser) {
         throw new TRPCError({
           code: 'CONFLICT',
-          message: 'Unable to create account. Please check your email for further instructions.',
+          message: tAuth('emailAlreadyExists'),
         })
       }
 
@@ -135,7 +138,7 @@ export const authRouter = createTRPCRouter({
       if (existingWorkspace) {
         throw new TRPCError({
           code: 'CONFLICT',
-          message: 'A workspace with this URL already exists',
+          message: tAuth('workspaceSlugExists'),
         })
       }
 
@@ -153,6 +156,13 @@ export const authRouter = createTRPCRouter({
       })
 
       if (error) {
+        // Check if error is due to existing user
+        if (error.message.toLowerCase().includes('already registered')) {
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: tAuth('emailAlreadyRegisteredVerify'),
+          })
+        }
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: error.message,
@@ -162,7 +172,7 @@ export const authRouter = createTRPCRouter({
       if (!data.user) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to create user',
+          message: tAuth('failedToCreateUser'),
         })
       }
 
@@ -462,4 +472,39 @@ export const authRouter = createTRPCRouter({
 
     return { success: true }
   }),
+
+  // Resend verification email
+  resendVerificationEmail: authRateLimitedProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { email } = input
+
+      // Check if user exists in database
+      const existingUser = await ctx.db.user.findUnique({
+        where: { email },
+      })
+
+      // Always return success to prevent email enumeration
+      // but only send email if user exists
+      if (!existingUser) {
+        return { success: true }
+      }
+
+      // Resend verification email
+      const { error } = await ctx.supabase.auth.resend({
+        type: 'signup',
+        email,
+      })
+
+      if (error) {
+        // Log error but still return success to prevent enumeration
+        console.error('Failed to resend verification email:', error)
+      }
+
+      return { success: true }
+    }),
 })

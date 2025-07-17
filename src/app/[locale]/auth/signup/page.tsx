@@ -42,6 +42,7 @@ type SignupFormData = z.infer<typeof signupSchema>
 
 export default function SignUpPage() {
   const t = useTranslations('auth.signupPage')
+  const tAuth = useTranslations('auth')
   const tWorkspace = useTranslations('workspace')
   const locale = useLocale()
   const router = useRouter()
@@ -64,11 +65,24 @@ export default function SignUpPage() {
   const signUpMutation = api.auth.signUp.useMutation({
     onSuccess: () => {
       toast.success(t('verificationEmailSent'))
-      // Redirect to a page that tells the user to check their email
-      router.push(`/${locale}/auth/check-email`)
+      // Small delay to ensure all operations complete before navigation
+      setTimeout(() => {
+        router.push(`/${locale}/auth/check-email`)
+      }, 100)
     },
     onError: error => {
-      toast.error(error.message)
+      // Handle specific error cases
+      if (error.data?.code === 'CONFLICT') {
+        if (error.message.includes('Email already registered')) {
+          toast.error(tAuth('errors.emailAlreadyRegistered'))
+        } else if (error.message.includes('workspace with this URL')) {
+          toast.error(tWorkspace('slug.unavailable'))
+        } else {
+          toast.error(error.message)
+        }
+      } else {
+        toast.error(error.message)
+      }
     },
   })
 
@@ -124,7 +138,7 @@ export default function SignUpPage() {
             type='email'
             label={t('emailLabel')}
             placeholder={t('emailPlaceholder')}
-            autoComplete='email'
+            autoComplete='username email'
             {...(errors.email && { error: errors.email.message })}
             {...register('email')}
           />
