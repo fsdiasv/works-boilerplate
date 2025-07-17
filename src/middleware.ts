@@ -96,7 +96,7 @@ export default async function middleware(request: NextRequest) {
   if (isProtectedRoute(pathnameWithoutLocale)) {
     if (!user) {
       // Redirect to login with return URL
-      const redirectUrl = new URL(`/${locale}/login`, request.url)
+      const redirectUrl = new URL(`/${locale}/auth/login`, request.url)
       redirectUrl.searchParams.set('redirectTo', pathname)
       return NextResponse.redirect(redirectUrl)
     }
@@ -143,24 +143,31 @@ export default async function middleware(request: NextRequest) {
     const state = request.nextUrl.searchParams.get('state')
     const error = request.nextUrl.searchParams.get('error')
     const errorDescription = request.nextUrl.searchParams.get('error_description')
+    const token = request.nextUrl.searchParams.get('token')
+    const type = request.nextUrl.searchParams.get('type')
     const next = request.nextUrl.searchParams.get('next') ?? `/${locale}/dashboard`
+
+    // If this is an email confirmation callback (has token and type), let the route handler handle it
+    if (token !== null && token !== '' && type !== null && type !== '') {
+      // Let the route handler process email confirmations
+      return authResponse
+    }
 
     // Handle OAuth errors from provider
     if (error !== null && error !== '') {
       console.error('[OAuth Callback] Provider error:', { error, errorDescription })
-      const errorUrl = new URL(`/${locale}/login`, request.url)
+      const errorUrl = new URL(`/${locale}/auth/login`, request.url)
       errorUrl.searchParams.set('error', 'oauth_error')
       return NextResponse.redirect(errorUrl)
     }
 
-    // Validate required parameters
+    // For OAuth callbacks, code is required
     if (code === null || code === '') {
-      console.error('[OAuth Callback] Missing authorization code')
-      const errorUrl = new URL(`/${locale}/login`, request.url)
-      errorUrl.searchParams.set('error', 'missing_code')
-      return NextResponse.redirect(errorUrl)
+      // Let the route handler handle other types of callbacks
+      return authResponse
     }
 
+    // From here on, we're only handling OAuth callbacks with authorization codes
     // Validate state parameter for CSRF protection
     if (state !== null && state !== '') {
       // Retrieve stored state from cookies
@@ -172,7 +179,7 @@ export default async function middleware(request: NextRequest) {
       // Validate state matches
       if (storedState === undefined || storedState === '' || storedState !== state) {
         console.error('[OAuth Callback] State mismatch - possible CSRF attack')
-        const errorUrl = new URL(`/${locale}/login`, request.url)
+        const errorUrl = new URL(`/${locale}/auth/login`, request.url)
         errorUrl.searchParams.set('error', 'state_mismatch')
         return NextResponse.redirect(errorUrl)
       }
@@ -184,7 +191,7 @@ export default async function middleware(request: NextRequest) {
 
       if (exchangeError) {
         console.error('[OAuth Callback] Code exchange failed:', exchangeError)
-        const errorUrl = new URL(`/${locale}/login`, request.url)
+        const errorUrl = new URL(`/${locale}/auth/login`, request.url)
         errorUrl.searchParams.set('error', 'exchange_failed')
         return NextResponse.redirect(errorUrl)
       }
@@ -193,7 +200,7 @@ export default async function middleware(request: NextRequest) {
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions
       if (!data.session || !data.user) {
         console.error('[OAuth Callback] Invalid session data received')
-        const errorUrl = new URL(`/${locale}/login`, request.url)
+        const errorUrl = new URL(`/${locale}/auth/login`, request.url)
         errorUrl.searchParams.set('error', 'invalid_session')
         return NextResponse.redirect(errorUrl)
       }
@@ -203,7 +210,7 @@ export default async function middleware(request: NextRequest) {
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions
       if (!sessionData.session || sessionData.session.user.id !== data.user.id) {
         console.error('[OAuth Callback] Session user mismatch')
-        const errorUrl = new URL(`/${locale}/login`, request.url)
+        const errorUrl = new URL(`/${locale}/auth/login`, request.url)
         errorUrl.searchParams.set('error', 'session_mismatch')
         return NextResponse.redirect(errorUrl)
       }
@@ -217,7 +224,7 @@ export default async function middleware(request: NextRequest) {
       if (usedCodeCookie !== undefined && usedCodeCookie !== '') {
         console.error('[OAuth Callback] Authorization code already used - possible replay attack')
         await supabase.auth.signOut() // Sign out the potentially compromised session
-        const errorUrl = new URL(`/${locale}/login`, request.url)
+        const errorUrl = new URL(`/${locale}/auth/login`, request.url)
         errorUrl.searchParams.set('error', 'code_reused')
         return NextResponse.redirect(errorUrl)
       }
@@ -237,7 +244,7 @@ export default async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL(validatedNext, request.url))
     } catch (err) {
       console.error('[OAuth Callback] Unexpected error:', err)
-      const errorUrl = new URL(`/${locale}/login`, request.url)
+      const errorUrl = new URL(`/${locale}/auth/login`, request.url)
       errorUrl.searchParams.set('error', 'unexpected_error')
       return NextResponse.redirect(errorUrl)
     }

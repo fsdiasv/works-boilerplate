@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/table'
 import { ChangeRoleDialog } from '@/components/workspace/change-role-dialog'
 import { InviteMemberDialog } from '@/components/workspace/invite-member-dialog'
+import { MemberCard } from '@/components/workspace/member-card'
 import { RemoveMemberDialog } from '@/components/workspace/remove-member-dialog'
 import { TransferOwnershipDialog } from '@/components/workspace/transfer-ownership-dialog'
 import { useAuth } from '@/contexts/auth-context'
@@ -108,25 +109,63 @@ export default function WorkspaceMembersPage() {
         <p className='text-muted-foreground text-sm'>{t('description')}</p>
       </div>
 
-      <div className='flex items-center justify-between gap-4'>
-        <div className='relative max-w-sm flex-1'>
+      <div className='flex flex-col items-stretch justify-between gap-4 sm:flex-row sm:items-center'>
+        <div className='relative flex-1 sm:max-w-sm'>
           <Search className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
           <Input
             placeholder={t('searchPlaceholder')}
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className='pl-9'
+            className='h-11 pl-9'
           />
         </div>
         {isAdmin && (
-          <Button onClick={() => openDialog('invite')}>
+          <Button onClick={() => openDialog('invite')} className='h-11'>
             <UserPlus className='mr-2 h-4 w-4' />
-            {t('inviteMember')}
+            <span className='hidden sm:inline'>{t('inviteMember')}</span>
+            <span className='sm:hidden'>{t('invite')}</span>
           </Button>
         )}
       </div>
 
-      <div className='rounded-md border'>
+      {/* Mobile: Member Cards */}
+      <div className='space-y-3 md:hidden'>
+        {isLoading ? (
+          Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className='rounded-lg border p-4'>
+              <div className='flex items-center gap-3'>
+                <Skeleton className='h-12 w-12 rounded-full' />
+                <div className='flex-1 space-y-2'>
+                  <Skeleton className='h-4 w-32' />
+                  <Skeleton className='h-3 w-24' />
+                  <Skeleton className='h-5 w-16' />
+                </div>
+              </div>
+            </div>
+          ))
+        ) : filteredMembers.length === 0 ? (
+          <div className='text-muted-foreground py-8 text-center'>
+            {searchQuery ? t('noMembersFound') : t('noMembersYet')}
+          </div>
+        ) : (
+          filteredMembers.map(member => (
+            <MemberCard
+              key={`${member.userId}-${member.workspaceId}`}
+              member={member}
+              isOwner={isOwner}
+              isAdmin={isAdmin}
+              currentUserId={session?.user.id}
+              onChangeRole={() => openDialog('changeRole', member)}
+              onRemove={() => openDialog('remove', member)}
+              onTransferOwnership={() => openDialog('transfer', member)}
+              canTransferOwnership={members.length > 1}
+            />
+          ))
+        )}
+      </div>
+
+      {/* Desktop: Table */}
+      <div className='hidden rounded-md border md:block'>
         <Table>
           <TableHeader>
             <TableRow>
@@ -199,15 +238,22 @@ export default function WorkspaceMembersPage() {
                     <TableCell>
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant='ghost' size='icon' className='h-8 w-8'>
+                          <Button
+                            variant='ghost'
+                            size='icon'
+                            className='h-10 min-h-[44px] w-10 min-w-[44px]'
+                          >
                             <MoreHorizontal className='h-4 w-4' />
-                            <span className='sr-only'>Open menu</span>
+                            <span className='sr-only'>{t('openMenu')}</span>
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align='end'>
                           {isOwner && member.role !== 'owner' && (
                             <>
-                              <DropdownMenuItem onClick={() => openDialog('changeRole', member)}>
+                              <DropdownMenuItem
+                                onClick={() => openDialog('changeRole', member)}
+                                className='flex min-h-[44px] items-center'
+                              >
                                 {t('changeRole')}
                               </DropdownMenuItem>
                               <DropdownMenuSeparator />
@@ -216,13 +262,16 @@ export default function WorkspaceMembersPage() {
                           {isOwner && member.role !== 'owner' && (
                             <DropdownMenuItem
                               onClick={() => openDialog('remove', member)}
-                              className='text-destructive'
+                              className='text-destructive flex min-h-[44px] items-center'
                             >
                               {t('removeMember')}
                             </DropdownMenuItem>
                           )}
                           {isOwner && member.role === 'owner' && members.length > 1 && (
-                            <DropdownMenuItem onClick={() => openDialog('transfer', member)}>
+                            <DropdownMenuItem
+                              onClick={() => openDialog('transfer', member)}
+                              className='flex min-h-[44px] items-center'
+                            >
                               {t('transferOwnership')}
                             </DropdownMenuItem>
                           )}
@@ -231,7 +280,7 @@ export default function WorkspaceMembersPage() {
                             member.userId === session.user.id && (
                               <DropdownMenuItem
                                 onClick={() => openDialog('remove', member)}
-                                className='text-destructive'
+                                className='text-destructive flex min-h-[44px] items-center'
                               >
                                 {t('leaveWorkspace')}
                               </DropdownMenuItem>

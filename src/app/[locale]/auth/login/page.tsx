@@ -83,6 +83,9 @@ export default function LoginPage() {
         case 'unexpected_error':
           errorMessage = tError('oauthUnexpectedError')
           break
+        case 'expired_link':
+          errorMessage = tError('expiredLink')
+          break
       }
 
       toast.error(errorMessage)

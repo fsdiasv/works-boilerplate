@@ -192,6 +192,7 @@
       "generic": "Falha na autenticação. Por favor, tente novamente.",
       "emailAlreadyRegistered": "Este e-mail já está cadastrado. Se você esqueceu sua senha, clique em 'Esqueceu a senha?' na tela de login.",
       "emailNotVerified": "Seu e-mail ainda não foi verificado. Verifique sua caixa de entrada e spam.",
+      "expiredLink": "O link de verificação expirou. Por favor, solicite um novo link.",
       "oauthProviderError": "O provedor de autenticação encontrou um erro. Por favor, tente novamente.",
       "oauthMissingCode": "Código de autorização ausente. Por favor, tente fazer login novamente.",
       "oauthStateMismatch": "Falha na validação de segurança. Por favor, tente fazer login novamente.",

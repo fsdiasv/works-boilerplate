@@ -47,9 +47,23 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
     api.createClient({
       links: [
         loggerLink({
-          enabled: op =>
-            process.env.NODE_ENV === 'development' ||
-            (op.direction === 'down' && op.result instanceof Error),
+          enabled: op => {
+            // Skip logging for aborted requests
+            if (
+              op.direction === 'down' &&
+              op.result instanceof Error &&
+              (op.result.message === 'The user aborted a request.' ||
+                op.result.name === 'AbortError' ||
+                op.result.message.includes('AbortError'))
+            ) {
+              return false
+            }
+
+            return (
+              process.env.NODE_ENV === 'development' ||
+              (op.direction === 'down' && op.result instanceof Error)
+            )
+          },
         }),
         unstable_httpBatchStreamLink({
           transformer,
