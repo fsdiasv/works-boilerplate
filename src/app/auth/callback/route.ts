@@ -3,7 +3,25 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
-  const { searchParams } = new URL(request.url)
+  let { searchParams } = new URL(request.url)
+
+  // Check if the URL has double-encoded parameters (Supabase email issue)
+  const rawToken = searchParams.get('token')
+  if (rawToken !== null && rawToken !== '' && rawToken.includes('=') && rawToken.includes('&')) {
+    // The parameters are encoded as a single 'token' parameter
+    // Decode and reconstruct the URL
+    const decodedParams = decodeURIComponent(rawToken)
+    const properUrl = new URL(request.url)
+    properUrl.search = `?${decodedParams}`
+
+    // Add any other parameters that might exist
+    const redirectTo = searchParams.get('redirect_to')
+    if (redirectTo !== null && redirectTo !== '') {
+      properUrl.searchParams.set('redirect_to', redirectTo)
+    }
+
+    searchParams = properUrl.searchParams
+  }
 
   // Get parameters from the URL
   const token = searchParams.get('token')
@@ -18,11 +36,19 @@ export async function GET(request: NextRequest) {
 
   // Handle errors from Supabase
   if (error !== null && error !== '') {
-    console.error('Auth callback error:', error, error_description, error_code)
-
     // Handle specific error codes
     if (error_code === 'otp_expired') {
-      return NextResponse.redirect(new URL(`/${locale}/auth/login?error=expired_link`, request.url))
+      // Extract email from error_description if possible
+      const emailMatch = error_description?.match(/([^\s]+@[^\s]+)/)
+      const email = emailMatch?.[1]
+
+      // Redirect to resend verification page
+      const resendUrl = new URL(`/${locale}/auth/resend-verification`, request.url)
+      if (email !== undefined && email !== '') {
+        resendUrl.searchParams.set('email', email)
+      }
+      resendUrl.searchParams.set('reason', 'expired_link')
+      return NextResponse.redirect(resendUrl)
     }
 
     return NextResponse.redirect(
@@ -44,7 +70,6 @@ export async function GET(request: NextRequest) {
       })
 
       if (verifyError) {
-        console.error('Token verification error:', verifyError)
         return NextResponse.redirect(
           new URL(
             `/${locale}/auth/login?error=${encodeURIComponent(verifyError.message)}`,
@@ -65,8 +90,7 @@ export async function GET(request: NextRequest) {
 
       // For other types, redirect to the next URL or dashboard
       return NextResponse.redirect(new URL(`/${locale}${next}`, request.url))
-    } catch (err) {
-      console.error('Unexpected error during token verification:', err)
+    } catch {
       return NextResponse.redirect(
         new URL(
           `/${locale}/auth/login?error=${encodeURIComponent('An unexpected error occurred')}`,
@@ -85,7 +109,6 @@ export async function GET(request: NextRequest) {
       const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(code)
 
       if (exchangeError) {
-        console.error('Code exchange error:', exchangeError)
         return NextResponse.redirect(
           new URL(`/${locale}/auth/login?error=oauth_error`, request.url)
         )
@@ -93,8 +116,7 @@ export async function GET(request: NextRequest) {
 
       // Successful OAuth login
       return NextResponse.redirect(new URL(`/${locale}/dashboard`, request.url))
-    } catch (err) {
-      console.error('Unexpected error during code exchange:', err)
+    } catch {
       return NextResponse.redirect(
         new URL(`/${locale}/auth/login?error=unexpected_error`, request.url)
       )

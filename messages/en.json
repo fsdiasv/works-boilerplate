@@ -200,7 +200,19 @@
       "oauthCodeReused": "This authorization has already been used. Please sign in again.",
       "oauthUnexpectedError": "An unexpected error occurred. Please try again."
     },
-    "resendVerification": "Resend email"
+    "resendVerification": "Resend email",
+    "resendVerificationPage": {
+      "title": "Resend Verification Email",
+      "description": "Enter your email to receive a new verification link",
+      "subtitle": "We'll send you a new verification email",
+      "emailLabel": "Email",
+      "emailPlaceholder": "Enter your email",
+      "submitButton": "Resend Email",
+      "backToLogin": {
+        "text": "Remember your password?",
+        "link": "Sign in"
+      }
+    }
   },
   "dashboard": {
     "title": "Dashboard",

@@ -202,7 +202,19 @@
       "oauthCodeReused": "Esta autorização já foi usada. Por favor, faça login novamente.",
       "oauthUnexpectedError": "Ocorreu um erro inesperado. Por favor, tente novamente."
     },
-    "resendVerification": "Reenviar e-mail"
+    "resendVerification": "Reenviar e-mail",
+    "resendVerificationPage": {
+      "title": "Reenviar E-mail de Verificação",
+      "description": "Digite seu e-mail para receber um novo link de verificação",
+      "subtitle": "Enviaremos um novo e-mail de verificação",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "Digite seu e-mail",
+      "submitButton": "Reenviar E-mail",
+      "backToLogin": {
+        "text": "Lembra da sua senha?",
+        "link": "Entrar"
+      }
+    }
   },
   "dashboard": {
     "title": "Painel",
