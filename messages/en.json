@@ -283,6 +283,14 @@
     "switchSuccess": "Switched to {name}",
     "workspaceSettings": "Workspace settings",
     "memberCount": "{count, plural, =0 {No members} =1 {1 member} other {# members}}",
+    "slug": {
+      "label": "Workspace URL",
+      "placeholder": "your-workspace",
+      "hint": "Your workspace will be accessible at {url}",
+      "minLength": "URL must be at least 3 characters",
+      "invalid": "Only lowercase letters, numbers and hyphens are allowed",
+      "unavailable": "This workspace URL is already taken"
+    },
     "roles": {
       "owner": "Owner",
       "admin": "Admin",
