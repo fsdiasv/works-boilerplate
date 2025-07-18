@@ -15,6 +15,7 @@ import {
 async function createSignUpSchema(locale: string) {
   const tAuth = await getTranslations({ locale, namespace: 'auth.validation' })
   const tValidation = await getTranslations({ locale, namespace: 'validation' })
+  const tWorkspace = await getTranslations({ locale, namespace: 'workspace.validation' })
 
   return z.object({
     email: z.string().email(tAuth('invalidEmail')),
@@ -22,6 +23,17 @@ async function createSignUpSchema(locale: string) {
     fullName: z.string().min(2, tAuth('nameMinLength')).optional(),
     locale: z.string().optional(),
     timezone: z.string().optional(),
+    workspaceName: z
+      .string()
+      .min(2, tWorkspace('nameMinLength'))
+      .max(50, tWorkspace('nameMaxLength'))
+      .trim(),
+    workspaceSlug: z
+      .string()
+      .min(3, tWorkspace('slugMinLength'))
+      .max(50, tWorkspace('slugMaxLength'))
+      .regex(/^[a-z0-9-]+$/, tWorkspace('slugInvalid'))
+      .trim(),
   })
 }
 
@@ -59,14 +71,27 @@ export const authRouter = createTRPCRouter({
       where: { id: user.id },
       include: {
         profile: true,
+        activeWorkspace: true,
+        workspaceMemberships:
+          ctx.activeWorkspace?.id !== undefined
+            ? {
+                where: { workspaceId: ctx.activeWorkspace.id },
+                select: { role: true },
+                take: 1,
+              }
+            : false,
       },
     })
 
+    const membership =
+      dbUser?.workspaceMemberships && Array.isArray(dbUser.workspaceMemberships)
+        ? dbUser.workspaceMemberships[0]
+        : undefined
+
     return {
-      user: {
-        ...user,
-        profile: dbUser?.profile,
-      },
+      user,
+      activeWorkspace: ctx.activeWorkspace,
+      userRole: membership?.role ?? ctx.userRole,
     }
   }),
 
@@ -79,15 +104,21 @@ export const authRouter = createTRPCRouter({
         fullName: z.string().optional(),
         locale: z.string().optional(),
         timezone: z.string().optional(),
+        workspaceName: z.string(),
+        workspaceSlug: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       // Validate with translations
       const schema = await createSignUpSchema(ctx.locale)
       const validatedInput = schema.parse(input)
-      const { email, password, fullName, locale, timezone } = validatedInput
+      const { email, password, fullName, locale, timezone, workspaceName, workspaceSlug } =
+        validatedInput
 
-      // Check if user already exists
+      // Get translations for error messages
+      const tAuth = await getTranslations({ locale: ctx.locale, namespace: 'auth.validation' })
+
+      // Check if user already exists in database
       const existingUser = await ctx.db.user.findUnique({
         where: { email },
       })
@@ -95,7 +126,19 @@ export const authRouter = createTRPCRouter({
       if (existingUser) {
         throw new TRPCError({
           code: 'CONFLICT',
-          message: 'Unable to create account. Please check your email for further instructions.',
+          message: tAuth('emailAlreadyExists'),
+        })
+      }
+
+      // Check if workspace slug already exists
+      const existingWorkspace = await ctx.db.workspace.findUnique({
+        where: { slug: workspaceSlug },
+      })
+
+      if (existingWorkspace) {
+        throw new TRPCError({
+          code: 'CONFLICT',
+          message: tAuth('workspaceSlugExists'),
         })
       }
 
@@ -113,6 +156,13 @@ export const authRouter = createTRPCRouter({
       })
 
       if (error) {
+        // Check if error is due to existing user
+        if (error.message.toLowerCase().includes('already registered')) {
+          throw new TRPCError({
+            code: 'CONFLICT',
+            message: tAuth('emailAlreadyRegisteredVerify'),
+          })
+        }
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: error.message,
@@ -122,31 +172,58 @@ export const authRouter = createTRPCRouter({
       if (!data.user) {
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
-          message: 'Failed to create user',
+          message: tAuth('failedToCreateUser'),
         })
       }
 
-      // Create user in database
-      const dbUser = await ctx.db.user.create({
-        data: {
-          id: data.user.id,
-          email,
-          fullName: fullName ?? null,
-          locale: locale ?? 'en',
-          timezone: timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
-        },
-      })
+      // Use a transaction to ensure atomicity
+      const result = await ctx.db.$transaction(async tx => {
+        // Create user in database
+        const dbUser = await tx.user.create({
+          data: {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            id: data.user!.id,
+            email,
+            fullName: fullName ?? null,
+            locale: locale ?? 'en',
+            timezone: timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+          },
+        })
 
-      // Create empty profile
-      await ctx.db.profile.create({
-        data: {
-          userId: dbUser.id,
-        },
+        // Create empty profile
+        await tx.profile.create({
+          data: {
+            userId: dbUser.id,
+          },
+        })
+
+        // Create workspace and add user as owner
+        const workspace = await tx.workspace.create({
+          data: {
+            name: workspaceName,
+            slug: workspaceSlug,
+            members: {
+              create: {
+                userId: dbUser.id,
+                role: 'owner',
+              },
+            },
+          },
+        })
+
+        // Set as active workspace
+        await tx.user.update({
+          where: { id: dbUser.id },
+          data: { activeWorkspaceId: workspace.id },
+        })
+
+        return { dbUser, workspace }
       })
 
       return {
         user: data.user,
         session: data.session,
+        workspace: result.workspace,
       }
     }),
 
@@ -370,7 +447,16 @@ export const authRouter = createTRPCRouter({
         })
       }
 
-      return { success: true }
+      // After successful verification, check if user is now logged in
+      const {
+        data: { session },
+      } = await ctx.supabase.auth.getSession()
+
+      return {
+        success: true,
+        isLoggedIn: session !== null,
+        email: session?.user.email,
+      }
     }),
 
   // Sign out
@@ -386,4 +472,39 @@ export const authRouter = createTRPCRouter({
 
     return { success: true }
   }),
+
+  // Resend verification email
+  resendVerificationEmail: authRateLimitedProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const { email } = input
+
+      // Check if user exists in database
+      const existingUser = await ctx.db.user.findUnique({
+        where: { email },
+      })
+
+      // Always return success to prevent email enumeration
+      // but only send email if user exists
+      if (!existingUser) {
+        return { success: true }
+      }
+
+      // Resend verification email
+      const { error } = await ctx.supabase.auth.resend({
+        type: 'signup',
+        email,
+      })
+
+      if (error) {
+        // Log error but still return success to prevent enumeration
+        console.error('Failed to resend verification email:', error)
+      }
+
+      return { success: true }
+    }),
 })

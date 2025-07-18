@@ -47,6 +47,7 @@
       "close": "Fechar",
       "retry": "Tentar novamente"
     },
+    "save": "Salvar",
     "status": {
       "online": "Online",
       "offline": "Offline",
@@ -68,11 +69,13 @@
     "confirmPassword": "Confirmar senha",
     "forgotPassword": "Esqueceu a senha?",
     "rememberMe": "Lembrar de mim",
+    "trustedDevice": "Dispositivo confiável",
     "emailRequired": "E-mail é obrigatório",
     "passwordRequired": "Senha é obrigatória",
     "invalidCredentials": "Credenciais inválidas",
     "accountCreated": "Conta criada com sucesso",
     "welcomeBack": "Bem-vindo de volta!",
+    "genericSignupError": "Não foi possível criar a conta. Por favor, verifique seu e-mail para mais instruções.",
     "signupPage": {
       "title": "Cadastre-se no Copy UI.",
       "subtitle": "Já tem uma conta?",
@@ -88,7 +91,8 @@
       "legalText": "Ao criar uma conta você concorda com nossos",
       "termsOfService": "Termos de Serviço",
       "and": "e nossa",
-      "privacyPolicy": "Política de Privacidade"
+      "privacyPolicy": "Política de Privacidade",
+      "verificationEmailSent": "E-mail de verificação enviado! Verifique sua caixa de entrada para confirmar sua conta."
     },
     "loginPage": {
       "title": "Bem-vindo de volta!",
@@ -100,7 +104,8 @@
       "passwordPlaceholder": "Digite sua senha",
       "forgotPasswordLink": "Esqueceu sua senha?",
       "submitButton": "Entrar",
-      "divider": "Ou continue com"
+      "divider": "Ou continue com",
+      "emailVerified": "E-mail verificado com sucesso! Agora você pode fazer login."
     },
     "socialLogin": {
       "signInWith": "Entrar com {provider}"
@@ -113,6 +118,19 @@
       "submitButton": "Enviar link de redefinição",
       "backToLogin": "Voltar para",
       "backToLoginLink": "Entrar"
+    },
+    "resetPasswordPage": {
+      "title": "Redefinir sua senha",
+      "subtitle": "Digite sua nova senha abaixo",
+      "passwordLabel": "Nova senha",
+      "passwordPlaceholder": "Digite sua nova senha",
+      "confirmPasswordLabel": "Confirmar senha",
+      "confirmPasswordPlaceholder": "Confirme sua nova senha",
+      "submitButton": "Redefinir senha",
+      "backToLogin": "Voltar para o login",
+      "invalidTokenTitle": "Link inválido ou expirado",
+      "invalidTokenMessage": "Este link de redefinição de senha é inválido ou expirou. Por favor, solicite um novo.",
+      "requestNewLink": "Solicitar novo link"
     },
     "testimonial": {
       "author": {
@@ -133,8 +151,19 @@
         "error": "Não foi possível verificar seu endereço de e-mail."
       },
       "redirecting": "Redirecionando para o painel...",
+      "redirectingToLogin": "Redirecionando para login...",
+      "continueButton": "Continuar",
       "backToLogin": "Voltar para Login",
       "invalidLink": "Link de verificação inválido"
+    },
+    "checkEmail": {
+      "title": "Verifique Seu E-mail",
+      "description": "Enviamos um link de verificação para o seu endereço de e-mail. Por favor, clique no link para confirmar sua conta.",
+      "checkSpam": "Não encontrou o e-mail?",
+      "notReceived": "Verifique sua pasta de spam ou lixo eletrônico. E-mails de verificação às vezes podem ir parar lá.",
+      "backToLogin": "Voltar para Login",
+      "havingTrouble": "Está tendo problemas?",
+      "contactSupport": "Entre em contato com o suporte"
     },
     "deleteAccount": {
       "confirmationText": "DELETAR MINHA CONTA"
@@ -153,10 +182,17 @@
       "nameMinLength": "O nome deve ter pelo menos 2 caracteres",
       "currentPasswordRequired": "A senha atual é obrigatória",
       "urlInvalid": "URL inválida",
-      "bioMaxLength": "A biografia não deve exceder 500 caracteres"
+      "bioMaxLength": "A biografia não deve exceder 500 caracteres",
+      "emailAlreadyExists": "Este e-mail já está cadastrado",
+      "workspaceSlugExists": "Esta URL de workspace já existe",
+      "emailAlreadyRegisteredVerify": "E-mail já cadastrado. Verifique sua caixa de entrada ou tente fazer login.",
+      "failedToCreateUser": "Falha ao criar usuário"
     },
     "errors": {
       "generic": "Falha na autenticação. Por favor, tente novamente.",
+      "emailAlreadyRegistered": "Este e-mail já está cadastrado. Se você esqueceu sua senha, clique em 'Esqueceu a senha?' na tela de login.",
+      "emailNotVerified": "Seu e-mail ainda não foi verificado. Verifique sua caixa de entrada e spam.",
+      "expiredLink": "O link de verificação expirou. Por favor, solicite um novo link.",
       "oauthProviderError": "O provedor de autenticação encontrou um erro. Por favor, tente novamente.",
       "oauthMissingCode": "Código de autorização ausente. Por favor, tente fazer login novamente.",
       "oauthStateMismatch": "Falha na validação de segurança. Por favor, tente fazer login novamente.",
@@ -165,6 +201,19 @@
       "oauthSessionMismatch": "Falha na validação da sessão. Por favor, tente fazer login novamente.",
       "oauthCodeReused": "Esta autorização já foi usada. Por favor, faça login novamente.",
       "oauthUnexpectedError": "Ocorreu um erro inesperado. Por favor, tente novamente."
+    },
+    "resendVerification": "Reenviar e-mail",
+    "resendVerificationPage": {
+      "title": "Reenviar E-mail de Verificação",
+      "description": "Digite seu e-mail para receber um novo link de verificação",
+      "subtitle": "Enviaremos um novo e-mail de verificação",
+      "emailLabel": "E-mail",
+      "emailPlaceholder": "Digite seu e-mail",
+      "submitButton": "Reenviar E-mail",
+      "backToLogin": {
+        "text": "Lembra da sua senha?",
+        "link": "Entrar"
+      }
     }
   },
   "dashboard": {
@@ -190,6 +239,24 @@
     "changePassword": "Alterar senha",
     "avatar": "Foto de perfil"
   },
+  "components": {
+    "passwordStrength": {
+      "strength": "Força",
+      "strengthLevel": "Força da senha: {level}",
+      "weak": "Fraca",
+      "fair": "Regular",
+      "good": "Boa",
+      "strong": "Forte",
+      "veryStrong": "Muito Forte",
+      "hint": "Adicione mais caracteres",
+      "requirements": {
+        "length": "Pelo menos 8 caracteres",
+        "uppercase": "Uma letra maiúscula",
+        "lowercase": "Uma letra minúscula",
+        "number": "Um número"
+      }
+    }
+  },
   "settings": {
     "title": "Configurações",
     "general": "Geral",
@@ -208,6 +275,245 @@
     "notFound": "Página não encontrada",
     "unauthorized": "Acesso não autorizado",
     "serverError": "Erro no servidor"
+  },
+  "workspace": {
+    "title": "Área de trabalho",
+    "createWorkspace": "Criar área de trabalho",
+    "createFirst": "Crie sua primeira área de trabalho",
+    "selectWorkspace": "Selecionar área de trabalho",
+    "yourWorkspaces": "Suas áreas de trabalho",
+    "switchSuccess": "Mudou para {name}",
+    "workspaceSettings": "Configurações da área de trabalho",
+    "memberCount": "{count, plural, =0 {Sem membros} =1 {1 membro} other {# membros}}",
+    "slug": {
+      "label": "URL do Workspace",
+      "placeholder": "seu-workspace",
+      "hint": "Seu workspace será acessível em {url}",
+      "minLength": "URL deve ter pelo menos 3 caracteres",
+      "invalid": "Apenas letras minúsculas, números e hífens são permitidos",
+      "unavailable": "Esta URL de workspace já está em uso"
+    },
+    "roles": {
+      "owner": "Proprietário",
+      "admin": "Administrador",
+      "member": "Membro"
+    },
+    "createSuccess": "Workspace criado com sucesso!",
+    "settings": {
+      "title": "Configurações de {workspace}",
+      "description": "Gerencie as configurações e preferências do seu workspace",
+      "back": "Voltar ao painel",
+      "openMenu": "Abrir menu de navegação",
+      "nav": {
+        "title": "Navegação de Configurações",
+        "general": "Geral",
+        "members": "Membros",
+        "invitations": "Convites",
+        "billing": "Cobrança",
+        "dangerZone": "Zona de Perigo",
+        "comingSoon": "Em breve"
+      },
+      "general": {
+        "title": "Configurações Gerais",
+        "description": "Atualize as informações e preferências do seu workspace",
+        "workspaceInfo": "Informações do Workspace",
+        "workspaceInfoDescription": "Informações básicas sobre seu workspace",
+        "name": "Nome do Workspace",
+        "nameDescription": "Este é o nome de exibição do seu workspace",
+        "slug": "URL do Workspace",
+        "slugDescription": "Este é o identificador único da URL do seu workspace",
+        "slugTaken": "Esta URL já está em uso",
+        "workspaceLogo": "Logo do Workspace",
+        "workspaceLogoDescription": "Envie um logo para seu workspace",
+        "uploadLogo": "Enviar Logo",
+        "changeLogo": "Alterar Logo",
+        "removeLogo": "Remover Logo",
+        "logoRequirements": "PNG, JPG ou GIF. Máx 2MB.",
+        "updateSuccess": "Configurações do workspace atualizadas com sucesso"
+      },
+      "members": {
+        "title": "Membros",
+        "description": "Gerencie membros do workspace e suas funções",
+        "searchPlaceholder": "Buscar membros...",
+        "inviteMember": "Convidar Membro",
+        "role": "Função",
+        "owner": "Proprietário",
+        "admin": "Administrador",
+        "member": "Membro",
+        "joinedAt": "Entrou em",
+        "joined": "Entrou",
+        "actions": "Ações",
+        "openMenu": "Abrir menu de ações",
+        "invite": "Convidar",
+        "changeRole": "Alterar Função",
+        "removeMember": "Remover Membro",
+        "leaveWorkspace": "Sair do Workspace",
+        "transferOwnership": "Transferir Propriedade",
+        "removeConfirmTitle": "Remover Membro",
+        "removeConfirmDescription": "Tem certeza que deseja remover {name} deste workspace?",
+        "transferConfirmTitle": "Transferir Propriedade",
+        "transferConfirmDescription": "Tem certeza que deseja transferir a propriedade para {name}? Você se tornará um administrador.",
+        "leaveConfirmTitle": "Sair do Workspace",
+        "leaveConfirmDescription": "Tem certeza que deseja sair deste workspace?",
+        "updateSuccess": "Membro atualizado com sucesso",
+        "removeSuccess": "Membro removido com sucesso",
+        "transferSuccess": "Propriedade transferida com sucesso",
+        "leaveSuccess": "Você saiu do workspace"
+      },
+      "invitations": {
+        "title": "Convites",
+        "description": "Gerencie convites pendentes",
+        "sendInvitation": "Enviar Convite",
+        "bulkInvite": "Convite em Massa",
+        "pending": "Pendente",
+        "expired": "Expirado",
+        "resend": "Reenviar",
+        "cancel": "Cancelar",
+        "copyLink": "Copiar Link",
+        "email": "E-mail",
+        "role": "Função",
+        "invitedBy": "Convidado por",
+        "expiresAt": "Expira em",
+        "noInvitations": "Nenhum convite pendente",
+        "inviteTitle": "Convidar Membro",
+        "inviteDescription": "Envie um convite para entrar neste workspace",
+        "emailPlaceholder": "colega@exemplo.com",
+        "bulkTitle": "Convite em Massa",
+        "bulkDescription": "Convide vários membros de uma vez",
+        "bulkPlaceholder": "Envie arquivo CSV ou cole e-mails",
+        "sendSuccess": "Convite enviado com sucesso",
+        "resendSuccess": "Convite reenviado com sucesso",
+        "cancelSuccess": "Convite cancelado",
+        "linkCopied": "Link do convite copiado para a área de transferência"
+      },
+      "danger": {
+        "title": "Zona de Perigo",
+        "description": "Ações irreversíveis e destrutivas",
+        "deleteWorkspace": "Excluir Workspace",
+        "deleteDescription": "Uma vez excluído, este workspace e todos os seus dados serão permanentemente removidos.",
+        "deleteButton": "Excluir Workspace",
+        "deleteConfirmTitle": "Excluir Workspace",
+        "deleteConfirmDescription": "Esta ação não pode ser desfeita. Isso excluirá permanentemente o workspace {workspace} e todos os dados associados.",
+        "deleteConfirmInput": "Digite DELETE para confirmar",
+        "archiveWorkspace": "Arquivar Workspace",
+        "archiveDescription": "Arquive este workspace. Ele pode ser restaurado mais tarde.",
+        "archiveButton": "Arquivar Workspace",
+        "exportData": "Exportar Dados",
+        "exportDescription": "Exporte todos os dados do workspace",
+        "exportButton": "Exportar Dados",
+        "deleteSuccess": "Workspace excluído com sucesso",
+        "archiveSuccess": "Workspace arquivado com sucesso",
+        "exportSuccess": "Exportação iniciada. Você receberá um e-mail quando estiver pronta."
+      }
+    },
+    "form": {
+      "name": "Nome da área de trabalho",
+      "namePlaceholder": "Digite o nome da área de trabalho",
+      "slug": "URL slug",
+      "slugPlaceholder": "area-de-trabalho-url",
+      "slugHelp": "Isso será usado em URLs",
+      "logo": "Logo",
+      "logoHelp": "Envie um logo para sua área de trabalho",
+      "create": "Criar área de trabalho",
+      "update": "Atualizar área de trabalho",
+      "delete": "Excluir área de trabalho",
+      "deleteConfirmation": "Tem certeza de que deseja excluir esta área de trabalho? Esta ação não pode ser desfeita.",
+      "deleteConfirmationText": "Digite DELETE para confirmar"
+    },
+    "members": {
+      "title": "Membros",
+      "invite": "Convidar membro",
+      "inviteButton": "Enviar convite",
+      "email": "Endereço de e-mail",
+      "emailPlaceholder": "colega@empresa.com",
+      "role": "Função",
+      "actions": "Ações",
+      "remove": "Remover",
+      "removeConfirmation": "Tem certeza de que deseja remover {email} desta área de trabalho?",
+      "changeRole": "Alterar função",
+      "leave": "Sair da área de trabalho",
+      "leaveConfirmation": "Tem certeza de que deseja sair desta área de trabalho?",
+      "transferOwnership": "Transferir propriedade",
+      "transferConfirmation": "Tem certeza de que deseja transferir a propriedade para {email}?",
+      "invitationSent": "Convite enviado com sucesso",
+      "memberRemoved": "Membro removido com sucesso",
+      "roleUpdated": "Função atualizada com sucesso",
+      "leftWorkspace": "Você saiu da área de trabalho"
+    },
+    "invitation": {
+      "title": "Convite para área de trabalho",
+      "invited": "Você foi convidado para participar",
+      "invitedBy": "Convidado por {name}",
+      "accept": "Aceitar convite",
+      "decline": "Recusar",
+      "expired": "Este convite expirou",
+      "invalid": "Convite inválido",
+      "accepted": "Convite aceito",
+      "alreadyMember": "Você já é membro desta área de trabalho"
+    },
+    "onboarding": {
+      "title": "Crie sua área de trabalho",
+      "subtitle": "Uma área de trabalho é onde sua equipe colabora",
+      "nameLabel": "Qual é o nome da sua equipe ou empresa?",
+      "inviteTitle": "Convide sua equipe",
+      "inviteSubtitle": "Traga sua equipe (você pode fazer isso depois)",
+      "skip": "Pular por enquanto",
+      "continue": "Continuar"
+    },
+    "validation": {
+      "nameMinLength": "O nome da área de trabalho deve ter pelo menos 2 caracteres",
+      "nameMaxLength": "O nome da área de trabalho deve ter menos de 50 caracteres",
+      "slugMinLength": "O slug deve ter pelo menos 3 caracteres",
+      "slugMaxLength": "O slug deve ter menos de 50 caracteres",
+      "slugInvalid": "O slug só pode conter letras minúsculas, números e hífens",
+      "invalidWorkspaceId": "ID da área de trabalho inválido",
+      "logoInvalid": "URL do logo inválido"
+    },
+    "errors": {
+      "notFound": "Área de trabalho não encontrada",
+      "noAccess": "Você não tem acesso a esta área de trabalho",
+      "slugExists": "Uma área de trabalho com este slug já existe",
+      "createFailed": "Falha ao criar área de trabalho",
+      "updateFailed": "Falha ao atualizar área de trabalho",
+      "deleteFailed": "Falha ao excluir área de trabalho",
+      "inviteFailed": "Falha ao enviar convite",
+      "removeMemberFailed": "Falha ao remover membro",
+      "cannotRemoveOwner": "Não é possível remover o proprietário da área de trabalho",
+      "cannotLeaveAsOwner": "Transfira a propriedade antes de sair",
+      "noWorkspaces": "Nenhuma área de trabalho encontrada"
+    },
+    "settings": {
+      "members": {
+        "cancel": "Cancelar",
+        "remove": "Remover",
+        "leave": "Sair",
+        "removing": "Removendo...",
+        "noMembersFound": "Nenhum membro encontrado",
+        "noMembersYet": "Ainda não há membros"
+      },
+      "billing": {
+        "title": "Faturamento",
+        "description": "Gerencie a assinatura e faturamento do seu workspace",
+        "currentPlan": {
+          "title": "Plano Atual",
+          "description": "Você está atualmente no plano Gratuito",
+          "freePlan": "Plano Gratuito",
+          "freePlanDescription": "Até 3 membros",
+          "upgradePlan": "Fazer Upgrade"
+        },
+        "paymentMethod": {
+          "title": "Método de Pagamento",
+          "description": "Gerencie seus métodos de pagamento",
+          "noPaymentMethod": "Nenhum método de pagamento cadastrado",
+          "addPaymentMethod": "Adicionar Método de Pagamento"
+        },
+        "billingHistory": {
+          "title": "Histórico de Faturamento",
+          "description": "Veja suas faturas anteriores",
+          "noBillingHistory": "Nenhum histórico de faturamento disponível"
+        }
+      }
+    }
   },
   "validation": {
     "required": "Este campo é obrigatório",
@@ -431,8 +737,11 @@
     },
     "toast": {
       "languageChanged": "Idioma Alterado",
-      "languageChangedDescription": "Idioma alterado para {language}."
+      "languageChangedDescription": "Idioma alterado para {language}.",
+      "signOutError": "Falha ao Sair",
+      "signOutErrorDescription": "Houve um problema ao sair. Por favor, tente novamente."
     },
-    "signOut": "Sair"
+    "signOut": "Sair",
+    "signingOut": "Saindo..."
   }
 }

@@ -2,6 +2,7 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
@@ -14,7 +15,8 @@ import { PasswordInput } from '@/components/ui/password-input'
 import { PasswordStrengthIndicator } from '@/components/ui/password-strength-indicator'
 import { PrimaryButton } from '@/components/ui/primary-button'
 import { SocialLoginButton } from '@/components/ui/social-login-button'
-import { useAuth } from '@/hooks/use-auth'
+import { WorkspaceSlugInput } from '@/components/ui/workspace-slug-input'
+import { api } from '@/trpc/react'
 
 const signupSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name is too long'),
@@ -25,37 +27,81 @@ const signupSchema = z.object({
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number'),
+  workspaceName: z
+    .string()
+    .min(2, 'Workspace name must be at least 2 characters')
+    .max(50, 'Workspace name is too long'),
+  workspaceSlug: z
+    .string()
+    .min(3, 'Workspace URL must be at least 3 characters')
+    .max(50, 'Workspace URL is too long')
+    .regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens allowed'),
 })
 
 type SignupFormData = z.infer<typeof signupSchema>
 
 export default function SignUpPage() {
   const t = useTranslations('auth.signupPage')
+  const tAuth = useTranslations('auth')
+  const tWorkspace = useTranslations('workspace')
   const locale = useLocale()
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const { signUp } = useAuth()
+  const [isSlugValid, setIsSlugValid] = useState(false)
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   })
 
   const passwordValue = watch('password', '')
+  const workspaceNameValue = watch('workspaceName', '')
+
+  const signUpMutation = api.auth.signUp.useMutation({
+    onSuccess: () => {
+      toast.success(t('verificationEmailSent'))
+      // Small delay to ensure all operations complete before navigation
+      setTimeout(() => {
+        router.push(`/${locale}/auth/check-email`)
+      }, 100)
+    },
+    onError: error => {
+      // Handle specific error cases
+      if (error.data?.code === 'CONFLICT') {
+        if (error.message.includes('Email already registered')) {
+          toast.error(tAuth('errors.emailAlreadyRegistered'))
+        } else if (error.message.includes('workspace with this URL')) {
+          toast.error(tWorkspace('slug.unavailable'))
+        } else {
+          toast.error(error.message)
+        }
+      } else {
+        toast.error(error.message)
+      }
+    },
+  })
 
   const onSubmit = async (data: SignupFormData) => {
+    if (!isSlugValid) {
+      toast.error(tWorkspace('slug.unavailable'))
+      return
+    }
+
     setIsLoading(true)
     try {
-      await signUp(data.email, data.password, {
-        full_name: data.name,
+      await signUpMutation.mutateAsync({
+        email: data.email,
+        password: data.password,
+        fullName: data.name,
         locale,
+        workspaceName: data.workspaceName,
+        workspaceSlug: data.workspaceSlug,
       })
-      toast.success(t('verificationEmailSent'))
-    } catch {
-      // Error is handled by auth context with toast
     } finally {
       setIsLoading(false)
     }
@@ -92,7 +138,7 @@ export default function SignUpPage() {
             type='email'
             label={t('emailLabel')}
             placeholder={t('emailPlaceholder')}
-            autoComplete='email'
+            autoComplete='username email'
             {...(errors.email && { error: errors.email.message })}
             {...register('email')}
           />
@@ -109,7 +155,33 @@ export default function SignUpPage() {
             <PasswordStrengthIndicator password={passwordValue} className='mt-2' />
           </div>
 
-          <PrimaryButton type='submit' isLoading={isLoading}>
+          <hr className='border-slate-200' />
+
+          <div className='space-y-4'>
+            <h3 className='text-lg font-semibold text-slate-800'>{tWorkspace('createFirst')}</h3>
+
+            <FormInput
+              id='workspace-name'
+              label={tWorkspace('form.name')}
+              placeholder={tWorkspace('form.namePlaceholder')}
+              {...(errors.workspaceName && { error: errors.workspaceName.message })}
+              {...register('workspaceName')}
+            />
+
+            <WorkspaceSlugInput
+              workspaceName={workspaceNameValue}
+              onChange={slug => setValue('workspaceSlug', slug)}
+              onValidityChange={setIsSlugValid}
+              error={errors.workspaceSlug?.message}
+              isPublic={true}
+            />
+          </div>
+
+          <PrimaryButton
+            type='submit'
+            isLoading={isLoading || signUpMutation.isPending}
+            disabled={!isSlugValid}
+          >
             {t('submitButton')}
           </PrimaryButton>
         </form>

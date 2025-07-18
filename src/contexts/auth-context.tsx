@@ -127,17 +127,36 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
 
         if (signInError) {
           setError(signInError)
+
+          // Check if error is due to unverified email
+          if (signInError.message.toLowerCase().includes('email not confirmed')) {
+            toast.error(t('errors.emailNotVerified'), {
+              action: {
+                label: t('resendVerification'),
+                onClick: () => {
+                  // Emit a custom event to handle resend verification
+                  window.dispatchEvent(new CustomEvent('resendVerification', { detail: { email } }))
+                },
+              },
+            })
+          } else {
+            toast.error(signInError.message)
+          }
+
           throw signInError
         }
       } catch (err) {
         const authError = err as SupabaseAuthError
-        toast.error(authError.message)
+        // Don't show duplicate toast if already shown above
+        if (!authError.message.toLowerCase().includes('email not confirmed')) {
+          toast.error(authError.message)
+        }
         throw authError
       } finally {
         setLoading(false)
       }
     },
-    [supabase]
+    [supabase, t]
   )
 
   const signUp = useCallback(
@@ -154,7 +173,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
               ...metadata,
               locale,
             },
-            emailRedirectTo: `${window.location.origin}/${locale}/auth/callback`,
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
         })
 
@@ -228,7 +247,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
           provider,
           options: {
-            redirectTo: `${window.location.origin}/${locale}/auth/callback`,
+            redirectTo: `${window.location.origin}/auth/callback`,
             queryParams: {
               access_type: 'offline',
               prompt: 'consent',
@@ -261,7 +280,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         setLoading(false)
       }
     },
-    [supabase, locale]
+    [supabase]
   )
 
   const resetPassword = useCallback(

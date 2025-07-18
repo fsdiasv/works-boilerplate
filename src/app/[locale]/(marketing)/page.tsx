@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { Suspense } from 'react'
 
+import { AuthErrorHandler } from '@/components/landing/AuthErrorHandler'
 import { SmoothScrollLink } from '@/components/landing/SmoothScrollLink'
 import { LocaleSwitcher } from '@/components/shared/LocaleSwitcher'
 import { Badge } from '@/components/ui/badge'
@@ -72,6 +73,9 @@ export default async function HomePage({ params }: Props) {
 
   return (
     <div className='min-h-screen'>
+      {/* Auth Error Handler - Process auth errors from URL fragments */}
+      <AuthErrorHandler />
+
       {/* Header - Keep inline for immediate rendering */}
       <header className='bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur'>
         <div className='container mx-auto px-4'>
@@ -104,7 +108,7 @@ export default async function HomePage({ params }: Props) {
             </div>
             <div className='flex items-center gap-4'>
               <LocaleSwitcher />
-              <Link href={`/${locale}/auth/signin`}>
+              <Link href={`/${locale}/auth/login`}>
                 <Button variant='ghost' size='sm'>
                   {t('nav.signin')}
                 </Button>
