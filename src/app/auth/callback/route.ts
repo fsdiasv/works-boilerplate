@@ -64,18 +64,42 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient()
 
     try {
-      const { error: verifyError } = await supabase.auth.verifyOtp({
-        token_hash: token,
-        type: type as 'signup' | 'recovery' | 'invite' | 'email',
-      })
+      // Check if this is a PKCE token (starts with pkce_)
+      if (token.startsWith('pkce_')) {
+        // For PKCE tokens, we need to use exchangeCodeForSession
+        const { error: exchangeError } = await supabase.auth.exchangeCodeForSession(token)
 
-      if (verifyError) {
-        return NextResponse.redirect(
-          new URL(
-            `/${locale}/auth/login?error=${encodeURIComponent(verifyError.message)}`,
-            request.url
+        if (exchangeError) {
+          // Handle specific PKCE errors
+          if (exchangeError.message.includes('expired')) {
+            // Extract email if possible and redirect to resend page
+            const resendUrl = new URL(`/${locale}/auth/resend-verification`, request.url)
+            resendUrl.searchParams.set('reason', 'expired_link')
+            return NextResponse.redirect(resendUrl)
+          }
+
+          return NextResponse.redirect(
+            new URL(
+              `/${locale}/auth/login?error=${encodeURIComponent(exchangeError.message)}`,
+              request.url
+            )
           )
-        )
+        }
+      } else {
+        // For regular tokens, use verifyOtp
+        const { error: verifyError } = await supabase.auth.verifyOtp({
+          token_hash: token,
+          type: type as 'signup' | 'recovery' | 'invite' | 'email',
+        })
+
+        if (verifyError) {
+          return NextResponse.redirect(
+            new URL(
+              `/${locale}/auth/login?error=${encodeURIComponent(verifyError.message)}`,
+              request.url
+            )
+          )
+        }
       }
 
       // Successful verification - redirect based on type
