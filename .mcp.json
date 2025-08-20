@@ -2,12 +2,10 @@
   "mcpServers": {
     "supabase": {
       "command": "npx",
-      "args": [
-        "-y",
-        "@supabase/mcp-server-supabase@latest",
-        "--access-token",
-        "sb_publishable_nKa92m6y8ReFhKFpdsX1PA_uNlvsSX8"
-      ]
+      "args": ["-y", "@supabase/mcp-server-supabase@latest", "--read-only", "--project-ref=frnzvkehqjqbygiqdyxz"],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "sb_publishable_nKa92m6y8ReFhKFpdsX1PA_uNlvsSX8"
+      }
     },
     "sequential-thinking": {
       "command": "npx",

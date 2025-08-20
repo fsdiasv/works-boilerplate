@@ -3,101 +3,141 @@ import { Redis } from '@upstash/redis'
 
 import { env } from '@/lib/env'
 
-// In-memory store for development
-class InMemoryRateLimitStore {
-  private store = new Map<string, { count: number; reset: number }>()
+// Create a simple rate limiter for development
+class SimpleRateLimiter {
+  private store = new Map<string, { count: number; resetAt: number }>()
 
-  get(key: string) {
-    const data = this.store.get(key)
-    if (!data) return null
-    if (Date.now() > data.reset) {
-      this.store.delete(key)
-      return null
+  constructor(
+    private maxRequests: number,
+    private windowMs: number
+  ) {}
+
+  limit(identifier: string) {
+    const now = Date.now()
+    const record = this.store.get(identifier)
+
+    // Clean up expired entries
+    if (record && now > record.resetAt) {
+      this.store.delete(identifier)
     }
-    return data.count
-  }
 
-  set(key: string, count: number, ttl: number) {
-    this.store.set(key, { count, reset: Date.now() + ttl * 1000 })
-  }
+    const current = this.store.get(identifier)
 
-  incr(key: string) {
-    const current = this.get(key)
-    const newCount = (current ?? 0) + 1
-    const data = this.store.get(key)
-    if (data) {
-      data.count = newCount
+    if (!current) {
+      // First request in window
+      this.store.set(identifier, { count: 1, resetAt: now + this.windowMs })
+      return {
+        success: true,
+        limit: this.maxRequests,
+        remaining: this.maxRequests - 1,
+        reset: now + this.windowMs,
+      }
     }
-    return newCount
+
+    if (current.count >= this.maxRequests) {
+      // Rate limit exceeded
+      return {
+        success: false,
+        limit: this.maxRequests,
+        remaining: 0,
+        reset: current.resetAt,
+      }
+    }
+
+    // Increment counter
+    current.count++
+    return {
+      success: true,
+      limit: this.maxRequests,
+      remaining: this.maxRequests - current.count,
+      reset: current.resetAt,
+    }
   }
 }
 
-// Type assertion for Redis-compatible interface
-interface RedisCompatible {
-  get: (key: string) => Promise<number | null>
-  set: (key: string, value: number, options?: { ex?: number }) => Promise<string | null>
-  incr: (key: string) => Promise<number>
+// Helper to parse duration strings (e.g., '1 m', '15 m', '1 h', '24 h')
+function parseDuration(duration: string): number {
+  const match = duration.match(/^(\d+)\s*([mh])$/)
+  if (!match) throw new Error(`Invalid duration: ${duration}`)
+
+  const value = match[1]
+  const unit = match[2]
+  if (value === undefined || unit === undefined) throw new Error(`Invalid duration: ${duration}`)
+
+  const num = parseInt(value, 10)
+
+  switch (unit) {
+    case 'm':
+      return num * 60 * 1000 // minutes to ms
+    case 'h':
+      return num * 60 * 60 * 1000 // hours to ms
+    default:
+      throw new Error(`Invalid duration unit: ${unit}`)
+  }
 }
 
-// Create Redis client or use in-memory store for development
-const redis =
+// Different rate limiters for different endpoints
+export const rateLimiters =
   env.UPSTASH_REDIS_REST_URL !== undefined &&
   env.UPSTASH_REDIS_REST_URL !== '' &&
   env.UPSTASH_REDIS_REST_TOKEN !== undefined &&
   env.UPSTASH_REDIS_REST_TOKEN !== ''
-    ? new Redis({
-        url: env.UPSTASH_REDIS_REST_URL,
-        token: env.UPSTASH_REDIS_REST_TOKEN,
-      })
-    : (new InMemoryRateLimitStore() as unknown as RedisCompatible)
-
-// Different rate limiters for different endpoints
-export const rateLimiters = {
-  // General API rate limiting - 100 requests per minute
-  api: new Ratelimit({
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    redis: redis as any,
-    limiter: Ratelimit.slidingWindow(100, '1 m'),
-    analytics: true,
-    prefix: 'ratelimit:api',
-  }),
-
-  // Auth endpoints - more restrictive
-  auth: new Ratelimit({
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    redis: redis as any,
-    limiter: Ratelimit.slidingWindow(5, '15 m'),
-    analytics: true,
-    prefix: 'ratelimit:auth',
-  }),
-
-  // Password reset - very restrictive to prevent abuse
-  passwordReset: new Ratelimit({
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    redis: redis as any,
-    limiter: Ratelimit.fixedWindow(3, '1 h'),
-    analytics: true,
-    prefix: 'ratelimit:password-reset',
-  }),
-
-  // Account deletion - extremely restrictive
-  accountDeletion: new Ratelimit({
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    redis: redis as any,
-    limiter: Ratelimit.fixedWindow(1, '24 h'),
-    analytics: true,
-    prefix: 'ratelimit:account-deletion',
-  }),
-
-  // Heavy operations (exports, reports, etc)
-  heavy: new Ratelimit({
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-explicit-any
-    redis: redis as any,
-    limiter: Ratelimit.tokenBucket(5, '1 h', 10),
-    analytics: true,
-    prefix: 'ratelimit:heavy',
-  }),
-}
+    ? {
+        // Production rate limiters using Redis
+        api: new Ratelimit({
+          redis: new Redis({
+            url: env.UPSTASH_REDIS_REST_URL,
+            token: env.UPSTASH_REDIS_REST_TOKEN,
+          }),
+          limiter: Ratelimit.slidingWindow(100, '1 m'),
+          analytics: true,
+          prefix: 'ratelimit:api',
+        }),
+        auth: new Ratelimit({
+          redis: new Redis({
+            url: env.UPSTASH_REDIS_REST_URL,
+            token: env.UPSTASH_REDIS_REST_TOKEN,
+          }),
+          limiter: Ratelimit.slidingWindow(5, '15 m'),
+          analytics: true,
+          prefix: 'ratelimit:auth',
+        }),
+        passwordReset: new Ratelimit({
+          redis: new Redis({
+            url: env.UPSTASH_REDIS_REST_URL,
+            token: env.UPSTASH_REDIS_REST_TOKEN,
+          }),
+          limiter: Ratelimit.fixedWindow(3, '1 h'),
+          analytics: true,
+          prefix: 'ratelimit:password-reset',
+        }),
+        accountDeletion: new Ratelimit({
+          redis: new Redis({
+            url: env.UPSTASH_REDIS_REST_URL,
+            token: env.UPSTASH_REDIS_REST_TOKEN,
+          }),
+          limiter: Ratelimit.fixedWindow(1, '24 h'),
+          analytics: true,
+          prefix: 'ratelimit:account-deletion',
+        }),
+        heavy: new Ratelimit({
+          redis: new Redis({
+            url: env.UPSTASH_REDIS_REST_URL,
+            token: env.UPSTASH_REDIS_REST_TOKEN,
+          }),
+          limiter: Ratelimit.tokenBucket(5, '1 h', 10),
+          analytics: true,
+          prefix: 'ratelimit:heavy',
+        }),
+      }
+    : {
+        // Development rate limiters using in-memory storage
+        api: new SimpleRateLimiter(100, parseDuration('1 m')),
+        auth: new SimpleRateLimiter(5, parseDuration('15 m')),
+        passwordReset: new SimpleRateLimiter(3, parseDuration('1 h')),
+        accountDeletion: new SimpleRateLimiter(1, parseDuration('24 h')),
+        heavy: new SimpleRateLimiter(5, parseDuration('1 h')),
+      }
 
 /**
  * Rate limit identifier types
