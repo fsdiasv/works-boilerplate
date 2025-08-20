@@ -27,10 +27,15 @@ export async function POST(request: NextRequest) {
     const secretBuffer = Buffer.from(secret)
     const envSecretBuffer = Buffer.from(env.INTERNAL_API_SECRET)
 
-    // Ensure buffers are the same length for timingSafeEqual
-    const isValidSecret =
-      secretBuffer.length === envSecretBuffer.length &&
-      timingSafeEqual(secretBuffer, envSecretBuffer)
+    // Pad buffers to the same length to prevent length-based timing attacks
+    const maxLength = Math.max(secretBuffer.length, envSecretBuffer.length)
+    const paddedSecretBuffer = Buffer.alloc(maxLength)
+    const paddedEnvSecretBuffer = Buffer.alloc(maxLength)
+    secretBuffer.copy(paddedSecretBuffer)
+    envSecretBuffer.copy(paddedEnvSecretBuffer)
+
+    // Perform constant-time comparison
+    const isValidSecret = timingSafeEqual(paddedSecretBuffer, paddedEnvSecretBuffer)
 
     if (!isValidSecret) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

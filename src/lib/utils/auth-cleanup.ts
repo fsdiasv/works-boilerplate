@@ -107,7 +107,10 @@ export async function clearPWAData(): Promise<void> {
  * Perform a complete cleanup for logout
  * This includes all user data and optionally PWA data
  */
-export async function performLogoutCleanup(options?: { clearPWA?: boolean }): Promise<void> {
+export async function performLogoutCleanup(options?: {
+  clearPWA?: boolean
+  forceReload?: boolean
+}): Promise<void> {
   // Clear user data
   await clearAllUserData()
 
@@ -116,8 +119,8 @@ export async function performLogoutCleanup(options?: { clearPWA?: boolean }): Pr
     await clearPWAData()
   }
 
-  // Force reload any cached resources
-  if ('caches' in window) {
+  // Only force reload if explicitly requested (for troubleshooting)
+  if (options?.forceReload === true && 'caches' in window) {
     // This will cause the service worker to re-fetch resources
     window.location.reload()
   }

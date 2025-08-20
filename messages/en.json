@@ -128,6 +128,9 @@
       "backToLogin": "Back to login",
       "invalidTokenTitle": "Invalid or expired link",
       "invalidTokenMessage": "This password reset link is invalid or has expired. Please request a new one.",
+      "checkingSession": "Verifying your session...",
+      "invalidSession": "Invalid session. Please request a new password reset link.",
+      "passwordResetSuccess": "Password reset successfully! Please log in with your new password.",
       "requestNewLink": "Request new link"
     },
     "testimonial": {
@@ -152,6 +155,7 @@
       "redirectingToLogin": "Redirecting to login...",
       "continueButton": "Continue",
       "backToLogin": "Back to Login",
+      "requestNewLink": "Request New Link",
       "invalidLink": "Invalid verification link"
     },
     "checkEmail": {
@@ -172,6 +176,7 @@
       "signOutError": "Failed to sign out",
       "resetPasswordEmail": "Check your email for the password reset link",
       "passwordUpdated": "Password updated successfully",
+      "passwordResetSuccess": "Password reset successfully! Please log in with your new password.",
       "checkNewEmail": "Check your new email to confirm the change",
       "profileUpdated": "Profile updated successfully"
     },
@@ -208,6 +213,7 @@
       "emailLabel": "Email",
       "emailPlaceholder": "Enter your email",
       "submitButton": "Resend Email",
+      "emailSent": "Verification email resent! Please check your inbox.",
       "backToLogin": {
         "text": "Remember your password?",
         "link": "Sign in"

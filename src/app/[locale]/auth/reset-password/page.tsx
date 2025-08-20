@@ -2,10 +2,11 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
 import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { AuthLayout } from '@/components/auth/auth-layout'
@@ -23,6 +24,11 @@ export default function ResetPasswordPage() {
   const t = useTranslations('auth.resetPasswordPage')
   const tValidation = useTranslations('validation')
   const locale = useLocale()
+  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false)
+  const [isCheckingSession, setIsCheckingSession] = useState(true)
+  const { updatePassword, user } = useAuth()
+
   const resetPasswordSchema = z
     .object({
       password: z
@@ -37,11 +43,6 @@ export default function ResetPasswordPage() {
       message: tValidation('passwordMatch'),
       path: ['confirmPassword'],
     })
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const [isLoading, setIsLoading] = useState(false)
-  const [isValidToken, setIsValidToken] = useState(true)
-  const { updatePassword } = useAuth()
 
   const {
     register,
@@ -54,21 +55,50 @@ export default function ResetPasswordPage() {
 
   const passwordValue = watch('password', '')
 
+  // Check if user has a valid session from password recovery
   useEffect(() => {
-    // Check if we have the required token/code in the URL
-    const token = searchParams.get('token')
-    const type = searchParams.get('type')
+    // Check if we're in recovery flow (cookie set by callback route)
+    const isRecoveryFlow = document.cookie.includes('recovery_flow=true')
+    // console.log('🔍 Reset password page - checking recovery flow:', isRecoveryFlow)
+    // console.log('👤 User present?', !!user)
 
-    if (token === null || token === '' || type !== 'recovery') {
-      setIsValidToken(false)
+    let waitTimer: NodeJS.Timeout | undefined
+
+    // If in recovery flow, wait a bit more for the session to be established
+    if (isRecoveryFlow && user === null) {
+      // console.log('⏳ In recovery flow but no user yet, waiting...')
+      setIsCheckingSession(true)
+      // Give more time for the session to be established
+      waitTimer = setTimeout(() => {
+        // Need to check again in case user state changed
+        setIsCheckingSession(false)
+      }, 1500)
+    } else if (user === null) {
+      // Not in recovery flow and no user - invalid access
+      // console.log('❌ No recovery flow and no user, redirecting')
+      toast.error(t('invalidSession'))
+      router.push(`/${locale}/auth/forgot-password`)
+    } else {
+      // User is present
+      // console.log('✅ User session present')
+      setIsCheckingSession(false)
     }
-  }, [searchParams])
+
+    return () => {
+      if (waitTimer) {
+        clearTimeout(waitTimer)
+      }
+    }
+  }, [user, router, locale, t])
 
   const onSubmit = async (data: ResetPasswordFormData) => {
     setIsLoading(true)
     try {
       await updatePassword(data.password)
+
+      // Success toast is handled by auth context
       // Redirect to login after successful password reset
+      // User needs to log in with new password
       router.push(`/${locale}/auth/login`)
     } catch {
       // Error is handled by auth context with toast
@@ -77,20 +107,13 @@ export default function ResetPasswordPage() {
     }
   }
 
-  if (!isValidToken) {
+  // Show loading state while checking session
+  if (isCheckingSession) {
     return (
       <AuthLayout>
         <div className='w-full text-center'>
-          <h1 className='mb-4 text-2xl font-bold text-slate-800 sm:text-3xl'>
-            {t('invalidTokenTitle')}
-          </h1>
-          <p className='mb-6 text-sm text-slate-500 sm:text-base'>{t('invalidTokenMessage')}</p>
-          <Link
-            href={`/${locale}/auth/forgot-password`}
-            className='font-semibold text-blue-600 hover:text-blue-700'
-          >
-            {t('requestNewLink')}
-          </Link>
+          <div className='mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-b-2 border-blue-600'></div>
+          <p className='text-sm text-slate-500'>{t('checkingSession')}</p>
         </div>
       </AuthLayout>
     )

@@ -130,7 +130,10 @@
       "backToLogin": "Volver al inicio de sesión",
       "invalidTokenTitle": "Enlace inválido o expirado",
       "invalidTokenMessage": "Este enlace de restablecimiento de contraseña es inválido o ha expirado. Por favor solicita uno nuevo.",
-      "requestNewLink": "Solicitar nuevo enlace"
+      "requestNewLink": "Solicitar nuevo enlace",
+      "checkingSession": "Verificando tu sesión...",
+      "invalidSession": "Sesión inválida. Por favor, solicita un nuevo enlace de restablecimiento de contraseña.",
+      "passwordResetSuccess": "¡Contraseña restablecida con éxito! Por favor, inicia sesión con tu nueva contraseña."
     },
     "testimonial": {
       "author": {
@@ -154,6 +157,7 @@
       "redirectingToLogin": "Redirigiendo al inicio de sesión...",
       "continueButton": "Continuar",
       "backToLogin": "Volver a Iniciar Sesión",
+      "requestNewLink": "Solicitar Nuevo Enlace",
       "invalidLink": "Enlace de verificación inválido"
     },
     "checkEmail": {
@@ -174,6 +178,7 @@
       "signOutError": "Error al cerrar sesión",
       "resetPasswordEmail": "Revisa tu correo para el enlace de restablecimiento de contraseña",
       "passwordUpdated": "Contraseña actualizada exitosamente",
+      "passwordResetSuccess": "¡Contraseña restablecida con éxito! Por favor, inicia sesión con tu nueva contraseña.",
       "checkNewEmail": "Revisa tu nuevo correo para confirmar el cambio",
       "profileUpdated": "Perfil actualizado exitosamente"
     },

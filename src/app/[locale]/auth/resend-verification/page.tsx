@@ -52,7 +52,7 @@ export default function ResendVerificationPage() {
 
   const resendVerificationMutation = api.auth.resendVerificationEmail.useMutation({
     onSuccess: () => {
-      toast.success(tAuth('signupPage.verificationEmailSent'))
+      toast.success(t('emailSent'))
       setIsLoading(false)
     },
     onError: error => {

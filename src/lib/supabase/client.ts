@@ -17,7 +17,7 @@ export function createClient() {
         storageKey: 'works-auth',
         storage: typeof window !== 'undefined' ? window.localStorage : undefined,
         autoRefreshToken: true,
-        detectSessionInUrl: true,
+        detectSessionInUrl: false,
         flowType: 'pkce',
         debug: process.env.NODE_ENV === 'development',
       },

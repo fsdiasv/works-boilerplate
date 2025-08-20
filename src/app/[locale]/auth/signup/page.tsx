@@ -15,7 +15,6 @@ import { PasswordInput } from '@/components/ui/password-input'
 import { PasswordStrengthIndicator } from '@/components/ui/password-strength-indicator'
 import { PrimaryButton } from '@/components/ui/primary-button'
 import { SocialLoginButton } from '@/components/ui/social-login-button'
-import { WorkspaceSlugInput } from '@/components/ui/workspace-slug-input'
 import { api } from '@/trpc/react'
 
 const signupSchema = z.object({
@@ -26,16 +25,20 @@ const signupSchema = z.object({
     .min(8, 'Password must be at least 8 characters')
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number'),
-  workspaceName: z
-    .string()
-    .min(2, 'Workspace name must be at least 2 characters')
-    .max(50, 'Workspace name is too long'),
-  workspaceSlug: z
-    .string()
-    .min(3, 'Workspace URL must be at least 3 characters')
-    .max(50, 'Workspace URL is too long')
-    .regex(/^[a-z0-9-]+$/, 'Only lowercase letters, numbers, and hyphens allowed'),
+    .regex(/[0-9]/, 'Password must contain at least one number')
+    .regex(
+      /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>?]/,
+      'Password must contain at least one special character'
+    )
+    .refine(
+      password => {
+        // Check for dictionary words
+        const commonWords = ['password', 'admin', 'user', 'login', 'welcome', 'secret', 'access']
+        const lowerPassword = password.toLowerCase()
+        return !commonWords.some(word => lowerPassword.includes(word))
+      },
+      { message: 'Avoid common words like "password", "admin", "user", etc.' }
+    ),
 })
 
 type SignupFormData = z.infer<typeof signupSchema>
@@ -43,24 +46,20 @@ type SignupFormData = z.infer<typeof signupSchema>
 export default function SignUpPage() {
   const t = useTranslations('auth.signupPage')
   const tAuth = useTranslations('auth')
-  const tWorkspace = useTranslations('workspace')
   const locale = useLocale()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
-  const [isSlugValid, setIsSlugValid] = useState(false)
 
   const {
     register,
     handleSubmit,
     watch,
-    setValue,
     formState: { errors },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   })
 
   const passwordValue = watch('password', '')
-  const workspaceNameValue = watch('workspaceName', '')
 
   const signUpMutation = api.auth.signUp.useMutation({
     onSuccess: () => {
@@ -75,8 +74,6 @@ export default function SignUpPage() {
       if (error.data?.code === 'CONFLICT') {
         if (error.message.includes('Email already registered')) {
           toast.error(tAuth('errors.emailAlreadyRegistered'))
-        } else if (error.message.includes('workspace with this URL')) {
-          toast.error(tWorkspace('slug.unavailable'))
         } else {
           toast.error(error.message)
         }
@@ -87,11 +84,6 @@ export default function SignUpPage() {
   })
 
   const onSubmit = async (data: SignupFormData) => {
-    if (!isSlugValid) {
-      toast.error(tWorkspace('slug.unavailable'))
-      return
-    }
-
     setIsLoading(true)
     try {
       await signUpMutation.mutateAsync({
@@ -99,8 +91,6 @@ export default function SignUpPage() {
         password: data.password,
         fullName: data.name,
         locale,
-        workspaceName: data.workspaceName,
-        workspaceSlug: data.workspaceSlug,
       })
     } finally {
       setIsLoading(false)
@@ -155,33 +145,7 @@ export default function SignUpPage() {
             <PasswordStrengthIndicator password={passwordValue} className='mt-2' />
           </div>
 
-          <hr className='border-slate-200' />
-
-          <div className='space-y-4'>
-            <h3 className='text-lg font-semibold text-slate-800'>{tWorkspace('createFirst')}</h3>
-
-            <FormInput
-              id='workspace-name'
-              label={tWorkspace('form.name')}
-              placeholder={tWorkspace('form.namePlaceholder')}
-              {...(errors.workspaceName && { error: errors.workspaceName.message })}
-              {...register('workspaceName')}
-            />
-
-            <WorkspaceSlugInput
-              workspaceName={workspaceNameValue}
-              onChange={slug => setValue('workspaceSlug', slug)}
-              onValidityChange={setIsSlugValid}
-              error={errors.workspaceSlug?.message}
-              isPublic={true}
-            />
-          </div>
-
-          <PrimaryButton
-            type='submit'
-            isLoading={isLoading || signUpMutation.isPending}
-            disabled={!isSlugValid}
-          >
+          <PrimaryButton type='submit' isLoading={isLoading || signUpMutation.isPending}>
             {t('submitButton')}
           </PrimaryButton>
         </form>

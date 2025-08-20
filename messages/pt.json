@@ -130,7 +130,10 @@
       "backToLogin": "Voltar para o login",
       "invalidTokenTitle": "Link inválido ou expirado",
       "invalidTokenMessage": "Este link de redefinição de senha é inválido ou expirou. Por favor, solicite um novo.",
-      "requestNewLink": "Solicitar novo link"
+      "requestNewLink": "Solicitar novo link",
+      "checkingSession": "Verificando sua sessão...",
+      "invalidSession": "Sessão inválida. Por favor, solicite um novo link de redefinição de senha.",
+      "passwordResetSuccess": "Senha redefinida com sucesso! Por favor, faça login com sua nova senha."
     },
     "testimonial": {
       "author": {
@@ -154,6 +157,7 @@
       "redirectingToLogin": "Redirecionando para login...",
       "continueButton": "Continuar",
       "backToLogin": "Voltar para Login",
+      "requestNewLink": "Solicitar Novo Link",
       "invalidLink": "Link de verificação inválido"
     },
     "checkEmail": {
@@ -174,6 +178,7 @@
       "signOutError": "Falha ao sair",
       "resetPasswordEmail": "Verifique seu e-mail para o link de redefinição de senha",
       "passwordUpdated": "Senha atualizada com sucesso",
+      "passwordResetSuccess": "Senha redefinida com sucesso! Por favor, faça login com sua nova senha.",
       "checkNewEmail": "Verifique seu novo e-mail para confirmar a alteração",
       "profileUpdated": "Perfil atualizado com sucesso"
     },
@@ -210,6 +215,7 @@
       "emailLabel": "E-mail",
       "emailPlaceholder": "Digite seu e-mail",
       "submitButton": "Reenviar E-mail",
+      "emailSent": "E-mail de verificação reenviado! Verifique sua caixa de entrada.",
       "backToLogin": {
         "text": "Lembra da sua senha?",
         "link": "Entrar"

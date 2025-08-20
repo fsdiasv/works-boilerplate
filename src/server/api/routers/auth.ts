@@ -3,10 +3,16 @@ import { getTranslations } from 'next-intl/server'
 // import { hash, compare } from 'bcryptjs' // TODO: Remove if not needed
 import { z } from 'zod'
 
+import {
+  validatePasswordStrength,
+  validateEmailSecurity,
+  sanitizeAuthInput,
+} from '@/lib/auth-security'
+import { env } from '@/lib/env'
+import { createServiceClient } from '@/lib/supabase/server'
 import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
 import {
   authRateLimitedProcedure,
-  passwordResetRateLimitedProcedure,
   accountDeletionRateLimitedProcedure,
   rateLimitedProtectedProcedure,
 } from '@/server/api/trpc-rate-limited'
@@ -15,7 +21,6 @@ import {
 async function createSignUpSchema(locale: string) {
   const tAuth = await getTranslations({ locale, namespace: 'auth.validation' })
   const tValidation = await getTranslations({ locale, namespace: 'validation' })
-  const tWorkspace = await getTranslations({ locale, namespace: 'workspace.validation' })
 
   return z.object({
     email: z.string().email(tAuth('invalidEmail')),
@@ -23,27 +28,6 @@ async function createSignUpSchema(locale: string) {
     fullName: z.string().min(2, tAuth('nameMinLength')).optional(),
     locale: z.string().optional(),
     timezone: z.string().optional(),
-    workspaceName: z
-      .string()
-      .min(2, tWorkspace('nameMinLength'))
-      .max(50, tWorkspace('nameMaxLength'))
-      .trim(),
-    workspaceSlug: z
-      .string()
-      .min(3, tWorkspace('slugMinLength'))
-      .max(50, tWorkspace('slugMaxLength'))
-      .regex(/^[a-z0-9-]+$/, tWorkspace('slugInvalid'))
-      .trim(),
-  })
-}
-
-async function createUpdatePasswordSchema(locale: string) {
-  const tAuth = await getTranslations({ locale, namespace: 'auth.validation' })
-  const tValidation = await getTranslations({ locale, namespace: 'validation' })
-
-  return z.object({
-    currentPassword: z.string().min(1, tAuth('currentPasswordRequired')),
-    newPassword: z.string().min(8, tValidation('passwordMinLength')),
   })
 }
 
@@ -104,19 +88,40 @@ export const authRouter = createTRPCRouter({
         fullName: z.string().optional(),
         locale: z.string().optional(),
         timezone: z.string().optional(),
-        workspaceName: z.string(),
-        workspaceSlug: z.string(),
       })
     )
     .mutation(async ({ ctx, input }) => {
       // Validate with translations
       const schema = await createSignUpSchema(ctx.locale)
       const validatedInput = schema.parse(input)
-      const { email, password, fullName, locale, timezone, workspaceName, workspaceSlug } =
-        validatedInput
+      const { email: rawEmail, password, fullName: rawFullName, locale, timezone } = validatedInput
 
       // Get translations for error messages
       const tAuth = await getTranslations({ locale: ctx.locale, namespace: 'auth.validation' })
+
+      // Sanitize inputs
+      const email = sanitizeAuthInput(rawEmail)
+      const fullName =
+        rawFullName !== undefined && rawFullName !== '' ? sanitizeAuthInput(rawFullName) : undefined
+
+      // Additional email security validation
+      const emailSecurity = validateEmailSecurity(email)
+      if (!emailSecurity.isValid || !emailSecurity.isSecure) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: emailSecurity.issues[0] ?? 'Invalid email address',
+        })
+      }
+
+      // Enhanced password strength validation
+      const passwordStrength = validatePasswordStrength(password)
+      if (!passwordStrength.isStrong) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message:
+            passwordStrength.criticalIssues[0] ?? 'Password does not meet security requirements',
+        })
+      }
 
       // Check if user already exists in database
       const existingUser = await ctx.db.user.findUnique({
@@ -130,19 +135,8 @@ export const authRouter = createTRPCRouter({
         })
       }
 
-      // Check if workspace slug already exists
-      const existingWorkspace = await ctx.db.workspace.findUnique({
-        where: { slug: workspaceSlug },
-      })
-
-      if (existingWorkspace) {
-        throw new TRPCError({
-          code: 'CONFLICT',
-          message: tAuth('workspaceSlugExists'),
-        })
-      }
-
       // Sign up with Supabase
+      // console.log('🔄 Starting Supabase signup for:', email)
       const { data, error } = await ctx.supabase.auth.signUp({
         email,
         password,
@@ -154,6 +148,12 @@ export const authRouter = createTRPCRouter({
           },
         },
       })
+
+      // console.log('📧 Supabase signup result:', {
+      //   user: !!data.user,
+      //   session: !!data.session,
+      //   error: error?.message || 'none',
+      // })
 
       if (error) {
         // Check if error is due to existing user
@@ -176,13 +176,21 @@ export const authRouter = createTRPCRouter({
         })
       }
 
+      // Generate automatic workspace data
+      const user = data.user
+      const workspaceName =
+        fullName !== undefined && fullName !== ''
+          ? `${fullName}'s Workspace`
+          : `${email.split('@')[0]}'s Workspace`
+
+      const workspaceSlug = `workspace-${user.id.slice(0, 8)}`
+
       // Use a transaction to ensure atomicity
       const result = await ctx.db.$transaction(async tx => {
         // Create user in database
         const dbUser = await tx.user.create({
           data: {
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            id: data.user!.id,
+            id: user.id,
             email,
             fullName: fullName ?? null,
             locale: locale ?? 'en',
@@ -221,55 +229,11 @@ export const authRouter = createTRPCRouter({
       })
 
       return {
-        user: data.user,
+        user,
         session: data.session,
         workspace: result.workspace,
       }
     }),
-
-  // Update password
-  updatePassword: rateLimitedProtectedProcedure.mutation(async ({ ctx, input }) => {
-    // Validate with translations
-    const schema = await createUpdatePasswordSchema(ctx.locale)
-    const validatedInput = schema.parse(input)
-    const { currentPassword, newPassword } = validatedInput
-
-    // Check if user email exists and is valid
-    const userEmail = ctx.user.email
-    if (userEmail === undefined || userEmail === '') {
-      throw new TRPCError({
-        code: 'BAD_REQUEST',
-        message: 'User email is not available. Please sign in again.',
-      })
-    }
-
-    // Verify current password
-    const { error: userError } = await ctx.supabase.auth.signInWithPassword({
-      email: userEmail,
-      password: currentPassword,
-    })
-
-    if (userError !== null) {
-      throw new TRPCError({
-        code: 'UNAUTHORIZED',
-        message: 'Current password is incorrect',
-      })
-    }
-
-    // Update password
-    const { error } = await ctx.supabase.auth.updateUser({
-      password: newPassword,
-    })
-
-    if (error) {
-      throw new TRPCError({
-        code: 'INTERNAL_SERVER_ERROR',
-        message: error.message,
-      })
-    }
-
-    return { success: true }
-  }),
 
   /**
    * Updates the user's profile information including personal details and metadata.
@@ -397,35 +361,6 @@ export const authRouter = createTRPCRouter({
       return { success: true }
     }),
 
-  // Send password reset email
-  sendPasswordResetEmail: passwordResetRateLimitedProcedure
-    .input(
-      z.object({
-        email: z.string(),
-        redirectTo: z.string().optional(),
-      })
-    )
-    .mutation(async ({ ctx, input }) => {
-      // Validate email with translations
-      const t = await getTranslations({ locale: ctx.locale, namespace: 'auth.validation' })
-      const emailSchema = z.string().email(t('invalidEmail'))
-      const validatedEmail = emailSchema.parse(input.email)
-      const options =
-        input.redirectTo !== undefined && input.redirectTo !== ''
-          ? { redirectTo: input.redirectTo }
-          : {}
-      const { error } = await ctx.supabase.auth.resetPasswordForEmail(validatedEmail, options)
-
-      if (error) {
-        throw new TRPCError({
-          code: 'INTERNAL_SERVER_ERROR',
-          message: error.message,
-        })
-      }
-
-      return { success: true }
-    }),
-
   // Verify email
   verifyEmail: authRateLimitedProcedure
     .input(
@@ -483,7 +418,7 @@ export const authRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       const { email } = input
 
-      // Check if user exists in database
+      // Check if user exists in custom database
       const existingUser = await ctx.db.user.findUnique({
         where: { email },
       })
@@ -494,15 +429,37 @@ export const authRouter = createTRPCRouter({
         return { success: true }
       }
 
-      // Resend verification email
-      const { error } = await ctx.supabase.auth.resend({
-        type: 'signup',
-        email,
+      // Use service client for admin operations
+      const serviceClient = await createServiceClient()
+
+      // Resend verification email using REST API directly
+      const response = await fetch(`${env.NEXT_PUBLIC_SUPABASE_URL}/auth/v1/resend`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${env.SUPABASE_SERVICE_ROLE_KEY}`,
+          apikey: env.SUPABASE_SERVICE_ROLE_KEY,
+        },
+        body: JSON.stringify({
+          type: 'signup',
+          email,
+        }),
       })
 
-      if (error) {
-        // Log error but still return success to prevent enumeration
-        console.error('Failed to resend verification email:', error)
+      if (!response.ok) {
+        // Try alternative method using Supabase client
+        const { error: resendError } = await serviceClient.auth.resend({
+          type: 'signup',
+          email,
+        })
+
+        if (resendError) {
+          // Log error but still return success to prevent enumeration
+          if (env.NODE_ENV === 'development') {
+            // eslint-disable-next-line no-console
+            console.error('Failed to resend verification email:', resendError)
+          }
+        }
       }
 
       return { success: true }
