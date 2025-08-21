@@ -16,7 +16,6 @@ import { api } from '@/trpc/react'
 
 export default function ResendVerificationPage() {
   const t = useTranslations('auth.resendVerificationPage')
-  const tAuth = useTranslations('auth')
   const tError = useTranslations('auth.errors')
   const locale = useLocale()
 
@@ -57,7 +56,7 @@ export default function ResendVerificationPage() {
       setIsLoading(false)
     },
     onError: error => {
-      toast.error(error.message || tAuth('errors.genericError'))
+      toast.error(error.message || tError('generic'))
       setIsLoading(false)
     },
   })

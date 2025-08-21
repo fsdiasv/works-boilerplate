@@ -51,19 +51,21 @@ export const authRouter = createTRPCRouter({
     if (!user) return null
 
     // Get additional user data from database
+    const includeWorkspaceMemberships =
+      ctx.activeWorkspace?.id !== undefined
+        ? {
+            where: { workspaceId: ctx.activeWorkspace.id },
+            select: { role: true },
+            take: 1,
+          }
+        : undefined
+
     const dbUser = await ctx.db.user.findUnique({
       where: { id: user.id },
       include: {
         profile: true,
         activeWorkspace: true,
-        workspaceMemberships:
-          ctx.activeWorkspace?.id !== undefined
-            ? {
-                where: { workspaceId: ctx.activeWorkspace.id },
-                select: { role: true },
-                take: 1,
-              }
-            : false,
+        ...(includeWorkspaceMemberships && { workspaceMemberships: includeWorkspaceMemberships }),
       },
     })
 
