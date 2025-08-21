@@ -22,6 +22,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     enabled: !!user,
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     refetchOnWindowFocus: false,
+    retry: false, // Don't retry on failure for analytics pages
   })
 
   const value: WorkspaceContextValue = {
