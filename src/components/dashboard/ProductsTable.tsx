@@ -1,6 +1,7 @@
 'use client'
 
 import { ArrowUpDown, Download, Search } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import React, { useState, useMemo } from 'react'
 
 import { Badge } from '@/components/ui/badge'
@@ -57,19 +58,22 @@ export function ProductsTable({
   maxHeight = '500px',
   className,
 }: ProductsTableProps) {
+  const t = useTranslations('ProductsTable')
   const [searchTerm, setSearchTerm] = useState('')
   const [sortField, setSortField] = useState<SortField>('receita_brl')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
 
   // Filter and sort data
   const processedData = useMemo(() => {
-    let filtered = data
+    // Make a shallow copy to avoid mutating the original data
+    let filtered = [...data]
+    const lowerSearchTerm = searchTerm.toLowerCase()
 
     // Apply search filter
     if (searchTerm) {
-      filtered = data.filter(item =>
-        item.product_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.nome_produto?.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(item =>
+        item.product_code.toLowerCase().includes(lowerSearchTerm) ||
+        item.nome_produto?.toLowerCase().includes(lowerSearchTerm)
       )
     }
 
@@ -148,11 +152,18 @@ export function ProductsTable({
     )
   }
 
-  const getRefundRateColor = (rate: string) => {
-    const numRate = parseFloat(rate) || 0
-    if (numRate >= 10) return 'text-red-600 dark:text-red-400'
-    if (numRate >= 5) return 'text-yellow-600 dark:text-yellow-400'
+  const getRefundRateColor = (rate: number) => {
+    if (rate >= 10) return 'text-red-600 dark:text-red-400'
+    if (rate >= 5) return 'text-yellow-600 dark:text-yellow-400'
     return 'text-green-600 dark:text-green-400'
+  }
+
+  const formatRefundRate = (rate: string): { display: string; value: number } => {
+    const numRate = parseFloat(rate)
+    if (isNaN(numRate) || !isFinite(numRate)) {
+      return { display: '-', value: 0 }
+    }
+    return { display: `${numRate.toFixed(2)}%`, value: numRate }
   }
 
   const getStatusBadge = (status?: string) => {
@@ -160,11 +171,11 @@ export function ProductsTable({
     
     switch (status) {
       case 'active':
-        return <Badge variant='default' className='bg-green-100 text-green-800'>Ativo</Badge>
+        return <Badge variant='default' className='bg-green-100 text-green-800'>{t('status.active')}</Badge>
       case 'inactive':
-        return <Badge variant='secondary'>Inativo</Badge>
+        return <Badge variant='secondary'>{t('status.inactive')}</Badge>
       case 'discontinued':
-        return <Badge variant='destructive'>Descontinuado</Badge>
+        return <Badge variant='destructive'>{t('status.discontinued')}</Badge>
       default:
         return <Badge variant='outline'>{status}</Badge>
     }
@@ -211,7 +222,7 @@ export function ProductsTable({
     return (
       <div className={cn('rounded-md border border-red-200 bg-red-50 p-8 text-center dark:border-red-800 dark:bg-red-950', className)}>
         <div className='text-red-700 dark:text-red-300 font-medium mb-2'>
-          Erro ao carregar produtos
+          {t('error.loading')}
         </div>
         <div className='text-red-600 dark:text-red-400 text-sm'>
           {error}
@@ -228,7 +239,7 @@ export function ProductsTable({
           <div className='relative flex-1 max-w-sm'>
             <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
             <Input
-              placeholder='Buscar por código ou nome...'
+              placeholder={t('search.placeholder')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className='pl-9'
@@ -241,7 +252,7 @@ export function ProductsTable({
             disabled={processedData.length === 0}
           >
             <Download className='mr-2 h-4 w-4' />
-            Exportar CSV
+            {t('export.csv')}
           </Button>
         </div>
       )}
@@ -250,15 +261,15 @@ export function ProductsTable({
       <div className='text-sm text-muted-foreground'>
         {searchTerm ? (
           <>
-            Mostrando {processedData.length} de {data.length} produtos
+            {t('summary.showing', { count: processedData.length, total: data.length })}
             {processedData.length !== data.length && (
               <span className='ml-2 text-blue-600 dark:text-blue-400'>
-                (filtrado por "{searchTerm}")
+                {t('summary.filtered', { term: searchTerm })}
               </span>
             )}
           </>
         ) : (
-          `${data.length} produtos encontrados`
+          t('summary.total', { total: data.length })
         )}
       </div>
 
@@ -277,7 +288,7 @@ export function ProductsTable({
                   className='h-auto p-0 font-semibold'
                   onClick={() => handleSort('product_code')}
                 >
-                  Código
+                  {t('headers.code')}
                   {getSortIcon('product_code')}
                 </Button>
               </TableHead>
@@ -288,7 +299,7 @@ export function ProductsTable({
                   className='h-auto p-0 font-semibold'
                   onClick={() => handleSort('pedidos')}
                 >
-                  Pedidos
+                  {t('headers.orders')}
                   {getSortIcon('pedidos')}
                 </Button>
               </TableHead>
@@ -299,7 +310,7 @@ export function ProductsTable({
                   className='h-auto p-0 font-semibold'
                   onClick={() => handleSort('receita_brl')}
                 >
-                  Receita
+                  {t('headers.revenue')}
                   {getSortIcon('receita_brl')}
                 </Button>
               </TableHead>
@@ -310,7 +321,7 @@ export function ProductsTable({
                   className='h-auto p-0 font-semibold'
                   onClick={() => handleSort('ticket_medio_brl')}
                 >
-                  Ticket Médio
+                  {t('headers.averageTicket')}
                   {getSortIcon('ticket_medio_brl')}
                 </Button>
               </TableHead>
@@ -321,12 +332,12 @@ export function ProductsTable({
                   className='h-auto p-0 font-semibold'
                   onClick={() => handleSort('refund_rate')}
                 >
-                  Reembolsos
+                  {t('headers.refunds')}
                   {getSortIcon('refund_rate')}
                 </Button>
               </TableHead>
               {data.some(item => item.status) && (
-                <TableHead className='min-w-[100px]'>Status</TableHead>
+                <TableHead className='min-w-[100px]'>{t('headers.status')}</TableHead>
               )}
             </TableRow>
           </TableHeader>
@@ -337,7 +348,7 @@ export function ProductsTable({
                   colSpan={data.some(item => item.status) ? 6 : 5}
                   className='text-center py-8 text-muted-foreground'
                 >
-                  {searchTerm ? 'Nenhum produto encontrado' : 'Nenhum dado disponível'}
+                  {searchTerm ? t('empty.noProducts') : t('empty.noData')}
                 </TableCell>
               </TableRow>
             ) : (
@@ -368,9 +379,14 @@ export function ProductsTable({
                     {formatBRL(product.ticket_medio_brl, { locale })}
                   </TableCell>
                   <TableCell className='text-right'>
-                    <span className={getRefundRateColor(product.refund_rate)}>
-                      {parseFloat(product.refund_rate).toFixed(2)}%
-                    </span>
+                    {(() => {
+                      const { display, value } = formatRefundRate(product.refund_rate)
+                      return (
+                        <span className={getRefundRateColor(value)}>
+                          {display}
+                        </span>
+                      )
+                    })()}
                   </TableCell>
                   {data.some(item => item.status) && (
                     <TableCell>
@@ -389,27 +405,37 @@ export function ProductsTable({
         <div className='text-xs text-muted-foreground border-t pt-2'>
           <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
             <div>
-              <span className='font-medium'>Total de Pedidos:</span>{' '}
+              <span className='font-medium'>{t('footer.totalOrders')}</span>{' '}
               {processedData.reduce((sum, item) => sum + item.pedidos, 0).toLocaleString(locale)}
             </div>
             <div>
-              <span className='font-medium'>Receita Total:</span>{' '}
+              <span className='font-medium'>{t('footer.totalRevenue')}</span>{' '}
               {formatBRL(
                 processedData.reduce((sum, item) => sum + parseFloat(item.receita_brl), 0),
                 { locale }
               )}
             </div>
             <div>
-              <span className='font-medium'>Ticket Médio Geral:</span>{' '}
-              {formatBRL(
-                processedData.reduce((sum, item) => sum + parseFloat(item.receita_brl), 0) /
-                processedData.reduce((sum, item) => sum + item.pedidos, 0),
-                { locale }
-              )}
+              <span className='font-medium'>{t('footer.averageTicketGeneral')}</span>{' '}
+              {(() => {
+                const totalPedidos = processedData.reduce((sum, item) => sum + item.pedidos, 0)
+                const totalReceita = processedData.reduce((sum, item) => sum + parseFloat(item.receita_brl), 0)
+                if (totalPedidos === 0) {
+                  return 'N/A'
+                }
+                return formatBRL(totalReceita / totalPedidos, { locale })
+              })()}
             </div>
             <div>
-              <span className='font-medium'>Taxa Média de Reembolso:</span>{' '}
-              {(processedData.reduce((sum, item) => sum + parseFloat(item.refund_rate), 0) / processedData.length).toFixed(2)}%
+              <span className='font-medium'>{t('footer.averageRefundRate')}</span>{' '}
+              {(() => {
+                if (processedData.length === 0) return 'N/A'
+                const validRates = processedData
+                  .map(item => parseFloat(item.refund_rate))
+                  .filter(rate => !isNaN(rate) && isFinite(rate))
+                if (validRates.length === 0) return 'N/A'
+                return `${(validRates.reduce((sum, rate) => sum + rate, 0) / validRates.length).toFixed(2)}%`
+              })()}
             </div>
           </div>
         </div>

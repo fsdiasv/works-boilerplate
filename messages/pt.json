@@ -600,6 +600,157 @@
         "description": "Métricas e dashboards prontos para acompanhar o crescimento do seu negócio."
       }
     },
+    "Analytics": {
+      "title": "Analytics",
+      "subtitle": "Dashboard de vendas e assinaturas",
+      "filters": {
+        "title": "Filtros",
+        "subtitle": "Ajuste os filtros para personalizar a visualização dos dados",
+        "period": "Período",
+        "from": "Data Inicial",
+        "to": "Data Final",
+        "timezone": "Fuso Horário",
+        "product": "Produto",
+        "productPlaceholder": "Código do produto",
+        "gateway": "Gateway",
+        "country": "País",
+        "periods": {
+          "today": "Hoje",
+          "7d": "Últimos 7 dias",
+          "30d": "Últimos 30 dias",
+          "90d": "Últimos 90 dias",
+          "mtd": "Mês atual",
+          "custom": "Personalizado"
+        },
+        "gateways": {
+          "all": "Todos",
+          "stripe": "Stripe",
+          "paypal": "PayPal",
+          "mercadopago": "Mercado Pago",
+          "pagseguro": "PagSeguro"
+        },
+        "countries": {
+          "all": "Todos",
+          "BR": "Brasil",
+          "US": "Estados Unidos",
+          "AR": "Argentina",
+          "MX": "México",
+          "PT": "Portugal"
+        }
+      },
+      "metrics": {
+        "grossRevenue": "Receita Bruta",
+        "netRevenue": "Receita Líquida",
+        "orders": "Pedidos",
+        "aov": "Ticket Médio",
+        "taxes": "Impostos",
+        "taxesDescription": "Total de impostos no período",
+        "refundRate": "Taxa de Reembolso",
+        "refundRateDescription": "Percentual de reembolsos sobre vendas",
+        "chargebackRate": "Taxa de Chargeback",
+        "chargebackRateDescription": "Percentual de chargebacks sobre receita bruta",
+        "payments": "Pagamentos",
+        "paymentsDescription": "Total de pagamentos aprovados",
+        "subscriptions": "Assinaturas Ativas",
+        "mrr": "MRR Realizado",
+        "newSubscriptions": "Novas Assinaturas",
+        "newSubscriptionsDescription": "Assinaturas criadas no período"
+      },
+      "charts": {
+        "dailyRevenue": "Receita Diária",
+        "dailyRevenueDescription": "Evolução da receita por dia no período selecionado",
+        "dailyOrders": "Pedidos Diários",
+        "dailyOrdersDescription": "Número de pedidos por dia",
+        "revenueAndOrders": "Receita e Pedidos",
+        "revenueAndOrdersDescription": "Visão combinada de receita e volume de pedidos"
+      },
+      "tables": {
+        "topProducts": "Top Produtos",
+        "topProductsByRevenue": "Top Produtos por Receita",
+        "topProductsDescription": "Produtos com maior receita no período selecionado",
+        "disputes": "Disputas",
+        "disputesAndChargebacks": "Disputas e Chargebacks",
+        "disputesDescription": "Resumo de disputas e chargebacks no período",
+        "recentSales": "Vendas Recentes",
+        "recentPayments": "Vendas Recentes",
+        "recentPaymentsDescription": "Últimos pagamentos aprovados",
+        "noDataMessage": "Tabela de disputas detalhada estará disponível quando conectada à base de dados",
+        "noSalesDataMessage": "Tabela de vendas recentes estará disponível quando conectada à base de dados"
+      },
+      "disputes": {
+        "totalDisputes": "Total de Disputas",
+        "netLosses": "Perdas Líquidas",
+        "winRate": "Taxa de Vitória"
+      },
+      "products": {
+        "title": "Análise de Produtos",
+        "backToDashboard": "Voltar ao Dashboard",
+        "detailedAnalysis": "Análise detalhada do produto:",
+        "generalAnalysis": "Análise detalhada de performance por produto",
+        "filters": {
+          "title": "Filtros de Produtos",
+          "subtitle": "Ajuste os filtros para personalizar a análise de produtos",
+          "specificProduct": "Produto Específico",
+          "results": "Resultados",
+          "top10": "Top 10",
+          "top25": "Top 25",
+          "top50": "Top 50"
+        },
+        "singleProduct": {
+          "overview": "Análise Detalhada",
+          "description": "Performance detalhada do produto no período selecionado",
+          "dailyRevenue": "Receita Diária",
+          "dailyRevenueDescription": "Evolução da receita do produto por dia",
+          "dailyOrders": "Pedidos Diários",
+          "dailyOrdersDescription": "Volume de pedidos do produto por dia",
+          "comparison": "Comparação com Outros Produtos",
+          "comparisonDescription": "Como este produto se compara com os demais"
+        },
+        "multiProduct": {
+          "totalProducts": "Total de Produtos",
+          "totalProductsDescription": "Produtos com vendas no período",
+          "totalRevenue": "Receita Total",
+          "totalRevenueDescription": "Soma da receita de todos os produtos",
+          "totalOrders": "Pedidos Total",
+          "totalOrdersDescription": "Total de pedidos de todos os produtos",
+          "generalAov": "Ticket Médio Geral",
+          "generalAovDescription": "Ticket médio considerando todos os produtos",
+          "ranking": "Ranking de Produtos por Performance",
+          "rankingDescription": "Produtos ordenados por receita no período selecionado"
+        },
+        "tabs": {
+          "table": "Tabela de Produtos",
+          "insights": "Insights e Análises",
+          "export": "Exportar Dados"
+        },
+        "insights": {
+          "topThree": "Top 3 Produtos",
+          "topThreeDescription": "Melhores produtos por receita",
+          "performance": "Insights de Performance",
+          "performanceDescription": "Análise automática dos dados",
+          "bestAov": "Produto com melhor AOV:",
+          "mostOrders": "Produto com mais pedidos:",
+          "lowestRefund": "Produto com menor taxa de reembolso:",
+          "concentration": "Concentração:",
+          "concentrationText": "Os top 3 produtos representam {percentage}% da receita total"
+        },
+        "export": {
+          "title": "Exportar Dados de Produtos",
+          "description": "Download dos dados em diferentes formatos",
+          "csvButton": "Exportar como CSV",
+          "excelButton": "Exportar como Excel",
+          "comingSoon": "(Em breve)",
+          "csvDescription": "O arquivo CSV incluirá todos os produtos mostrados na tabela com as seguintes colunas:",
+          "columns": {
+            "productCode": "Código do Produto",
+            "orders": "Número de Pedidos",
+            "revenue": "Receita Total (BRL)",
+            "aov": "Ticket Médio (BRL)",
+            "refundRate": "Taxa de Reembolso (%)"
+          }
+        }
+      }
+    },
     "pricing": {
       "title": "Preços simples e transparentes",
       "subtitle": "Escolha o plano ideal para o seu negócio",
@@ -749,5 +900,65 @@
     },
     "signOut": "Sair",
     "signingOut": "Saindo..."
+  },
+  "ProductsTable": {
+    "search": {
+      "placeholder": "Buscar por código ou nome..."
+    },
+    "export": {
+      "csv": "Exportar CSV"
+    },
+    "summary": {
+      "showing": "Mostrando {count} de {total} produtos",
+      "filtered": "(filtrado por \"{term}\")",
+      "total": "{total} produtos encontrados"
+    },
+    "empty": {
+      "noProducts": "Nenhum produto encontrado",
+      "noData": "Nenhum dado disponível"
+    },
+    "error": {
+      "loading": "Erro ao carregar produtos"
+    },
+    "headers": {
+      "code": "Código",
+      "orders": "Pedidos",
+      "revenue": "Receita",
+      "averageTicket": "Ticket Médio",
+      "refunds": "Reembolsos",
+      "status": "Status"
+    },
+    "footer": {
+      "totalOrders": "Total de Pedidos:",
+      "totalRevenue": "Receita Total:",
+      "averageTicketGeneral": "Ticket Médio Geral:",
+      "averageRefundRate": "Taxa Média de Reembolso:"
+    },
+    "status": {
+      "active": "Ativo",
+      "inactive": "Inativo",
+      "discontinued": "Descontinuado"
+    }
+  },
+  "RevenueChart": {
+    "error": {
+      "loading": "Erro ao carregar dados"
+    },
+    "empty": {
+      "noData": "Nenhum dado disponível",
+      "suggestion": "Selecione um período diferente ou verifique os filtros"
+    },
+    "tooltip": {
+      "revenue": "Receita:",
+      "orders": "Pedidos:",
+      "averageTicket": "Ticket Médio:"
+    },
+    "legend": {
+      "revenue": "Receita (R$)",
+      "orders": "Pedidos"
+    },
+    "reference": {
+      "average": "Média: {value}"
+    }
   }
 }

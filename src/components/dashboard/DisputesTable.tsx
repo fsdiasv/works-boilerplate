@@ -78,7 +78,8 @@ export function DisputesTable({
 
   // Filter and sort data
   const processedData = useMemo(() => {
-    let filtered = data
+    // Start with a copy to avoid mutating props
+    let filtered = [...data]
 
     // Apply status filter
     if (statusFilter !== 'all') {
@@ -96,7 +97,7 @@ export function DisputesTable({
       )
     }
 
-    // Apply sorting
+    // Apply sorting (safe since we already have a copy)
     filtered.sort((a, b) => {
       let aValue: any = a[sortField as keyof DisputeData]
       let bValue: any = b[sortField as keyof DisputeData]

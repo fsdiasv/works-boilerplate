@@ -2,6 +2,7 @@
 
 import { format, parseISO } from 'date-fns'
 import { ptBR, enUS } from 'date-fns/locale'
+import { useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
 import React from 'react'
 import {
@@ -54,6 +55,7 @@ export function RevenueChart({
   timezone = 'America/Sao_Paulo',
   className,
 }: RevenueChartProps) {
+  const t = useTranslations('RevenueChart')
   const { theme } = useTheme()
   const isDark = theme === 'dark'
   const dateLocale = locale === 'pt-BR' ? ptBR : enUS
@@ -95,7 +97,7 @@ export function RevenueChart({
         <div className='flex h-full items-center justify-center'>
           <div className='text-center space-y-2'>
             <div className='text-red-500 text-sm font-medium'>
-              Erro ao carregar dados
+              {t('error.loading')}
             </div>
             <div className='text-muted-foreground text-xs'>
               {error}
@@ -112,10 +114,10 @@ export function RevenueChart({
         <div className='flex h-full items-center justify-center'>
           <div className='text-center space-y-2'>
             <div className='text-muted-foreground text-sm'>
-              Nenhum dado disponível
+              {t('empty.noData')}
             </div>
             <div className='text-muted-foreground text-xs'>
-              Selecione um período diferente ou verifique os filtros
+              {t('empty.suggestion')}
             </div>
           </div>
         </div>
@@ -154,6 +156,7 @@ export function RevenueChart({
           />
           
           <YAxis
+            yAxisId='left'
             axisLine={false}
             tickLine={false}
             tick={{
@@ -163,6 +166,21 @@ export function RevenueChart({
             tickMargin={8}
             tickFormatter={(value) => formatBRL(value, { locale, showSymbol: false })}
           />
+          
+          {showOrders && (
+            <YAxis
+              yAxisId='right'
+              orientation='right'
+              axisLine={false}
+              tickLine={false}
+              tick={{
+                fontSize: 12,
+                fill: isDark ? '#9ca3af' : '#6b7280',
+              }}
+              tickMargin={8}
+              tickFormatter={(value) => value.toLocaleString(locale)}
+            />
+          )}
           
           <Tooltip
             content={({ active, payload, label }) => {
@@ -180,7 +198,7 @@ export function RevenueChart({
                           style={{ backgroundColor: '#3b82f6' }}
                         />
                         <span className='text-gray-600 dark:text-gray-400'>
-                          Receita:
+                          {t('tooltip.revenue')}
                         </span>
                         <span className='font-medium text-gray-900 dark:text-gray-100'>
                           {data?.formattedRevenue}
@@ -194,7 +212,7 @@ export function RevenueChart({
                             style={{ backgroundColor: '#10b981' }}
                           />
                           <span className='text-gray-600 dark:text-gray-400'>
-                            Pedidos:
+                            {t('tooltip.orders')}
                           </span>
                           <span className='font-medium text-gray-900 dark:text-gray-100'>
                             {data.orders.toLocaleString(locale)}
@@ -209,7 +227,7 @@ export function RevenueChart({
                             style={{ backgroundColor: '#f59e0b' }}
                           />
                           <span className='text-gray-600 dark:text-gray-400'>
-                            Ticket Médio:
+                            {t('tooltip.averageTicket')}
                           </span>
                           <span className='font-medium text-gray-900 dark:text-gray-100'>
                             {formatBRL(data.aov, { locale })}
@@ -230,7 +248,7 @@ export function RevenueChart({
               stroke={isDark ? '#6b7280' : '#9ca3af'}
               strokeDasharray='5 5'
               label={{
-                value: `Média: ${formatBRL(avgRevenue, { locale, showSymbol: false })}`,
+                value: t('reference.average', { value: formatBRL(avgRevenue, { locale, showSymbol: false }) }),
                 position: 'topRight',
                 style: {
                   fontSize: '12px',
@@ -241,6 +259,7 @@ export function RevenueChart({
           )}
           
           <Line
+            yAxisId='left'
             type='monotone'
             dataKey='revenue'
             stroke='#3b82f6'
@@ -306,6 +325,7 @@ export function DualAxisRevenueChart({
   locale = 'pt-BR',
   className,
 }: DualAxisRevenueChartProps) {
+  const t = useTranslations('RevenueChart')
   const { theme } = useTheme()
   const isDark = theme === 'dark'
   const dateLocale = locale === 'pt-BR' ? ptBR : enUS
@@ -403,7 +423,7 @@ export function DualAxisRevenueChart({
                       <div className='flex items-center gap-2 text-sm'>
                         <div className='h-3 w-3 rounded-full bg-blue-500' />
                         <span className='text-gray-600 dark:text-gray-400'>
-                          Receita:
+                          {t('tooltip.revenue')}
                         </span>
                         <span className='font-medium text-gray-900 dark:text-gray-100'>
                           {data?.formattedRevenue}
@@ -412,7 +432,7 @@ export function DualAxisRevenueChart({
                       <div className='flex items-center gap-2 text-sm'>
                         <div className='h-3 w-3 rounded-full bg-green-500' />
                         <span className='text-gray-600 dark:text-gray-400'>
-                          Pedidos:
+                          {t('tooltip.orders')}
                         </span>
                         <span className='font-medium text-gray-900 dark:text-gray-100'>
                           {data?.orders?.toLocaleString(locale)}
@@ -442,7 +462,7 @@ export function DualAxisRevenueChart({
             dataKey='revenue'
             stroke='#3b82f6'
             strokeWidth={2}
-            name='Receita (R$)'
+            name={t('legend.revenue')}
             dot={{
               fill: '#3b82f6',
               strokeWidth: 2,
@@ -462,7 +482,7 @@ export function DualAxisRevenueChart({
             dataKey='orders'
             stroke='#10b981'
             strokeWidth={2}
-            name='Pedidos'
+            name={t('legend.orders')}
             dot={{
               fill: '#10b981',
               strokeWidth: 2,

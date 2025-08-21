@@ -624,6 +624,89 @@
         "description": "Ready-to-use metrics and dashboards to track your business growth."
       }
     },
+    "Analytics": {
+      "title": "Analytics",
+      "subtitle": "Sales and subscriptions dashboard",
+      "filters": {
+        "title": "Filters",
+        "subtitle": "Adjust filters to customize data visualization",
+        "period": "Period",
+        "from": "Start Date",
+        "to": "End Date",
+        "timezone": "Timezone",
+        "product": "Product",
+        "productPlaceholder": "Product code",
+        "gateway": "Gateway",
+        "country": "Country",
+        "periods": {
+          "today": "Today",
+          "7d": "Last 7 days",
+          "30d": "Last 30 days",
+          "90d": "Last 90 days",
+          "mtd": "Month to date",
+          "custom": "Custom"
+        },
+        "gateways": {
+          "all": "All",
+          "stripe": "Stripe",
+          "paypal": "PayPal",
+          "mercadopago": "Mercado Pago",
+          "pagseguro": "PagSeguro"
+        },
+        "countries": {
+          "all": "All",
+          "BR": "Brazil",
+          "US": "United States",
+          "AR": "Argentina",
+          "MX": "Mexico",
+          "PT": "Portugal"
+        }
+      },
+      "metrics": {
+        "grossRevenue": "Gross Revenue",
+        "netRevenue": "Net Revenue",
+        "orders": "Orders",
+        "aov": "Average Order Value",
+        "taxes": "Taxes",
+        "taxesDescription": "Total taxes in the period",
+        "refundRate": "Refund Rate",
+        "refundRateDescription": "Percentage of refunds over sales",
+        "chargebackRate": "Chargeback Rate",
+        "chargebackRateDescription": "Percentage of chargebacks over gross revenue",
+        "payments": "Payments",
+        "paymentsDescription": "Total approved payments",
+        "subscriptions": "Active Subscriptions",
+        "mrr": "Realized MRR",
+        "newSubscriptions": "New Subscriptions",
+        "newSubscriptionsDescription": "Subscriptions created in the period"
+      },
+      "charts": {
+        "dailyRevenue": "Daily Revenue",
+        "dailyRevenueDescription": "Revenue evolution per day in the selected period",
+        "dailyOrders": "Daily Orders",
+        "dailyOrdersDescription": "Number of orders per day",
+        "revenueAndOrders": "Revenue and Orders",
+        "revenueAndOrdersDescription": "Combined view of revenue and order volume"
+      },
+      "tables": {
+        "topProducts": "Top Products",
+        "topProductsByRevenue": "Top Products by Revenue",
+        "topProductsDescription": "Products with highest revenue in the selected period",
+        "disputes": "Disputes",
+        "disputesAndChargebacks": "Disputes and Chargebacks",
+        "disputesDescription": "Summary of disputes and chargebacks in the period",
+        "recentSales": "Recent Sales",
+        "recentPayments": "Recent Sales",
+        "recentPaymentsDescription": "Latest approved payments",
+        "noDataMessage": "Detailed disputes table will be available when connected to the database",
+        "noSalesDataMessage": "Recent sales table will be available when connected to the database"
+      },
+      "disputes": {
+        "totalDisputes": "Total Disputes",
+        "netLosses": "Net Losses",
+        "winRate": "Win Rate"
+      }
+    },
     "pricing": {
       "title": "Simple and transparent pricing",
       "subtitle": "Choose the ideal plan for your business",
@@ -773,5 +856,65 @@
     },
     "signOut": "Sign Out",
     "signingOut": "Signing Out..."
+  },
+  "ProductsTable": {
+    "search": {
+      "placeholder": "Search by code or name..."
+    },
+    "export": {
+      "csv": "Export CSV"
+    },
+    "summary": {
+      "showing": "Showing {count} of {total} products",
+      "filtered": "(filtered by \"{term}\")",
+      "total": "{total} products found"
+    },
+    "empty": {
+      "noProducts": "No products found",
+      "noData": "No data available"
+    },
+    "error": {
+      "loading": "Error loading products"
+    },
+    "headers": {
+      "code": "Code",
+      "orders": "Orders",
+      "revenue": "Revenue",
+      "averageTicket": "Average Ticket",
+      "refunds": "Refunds",
+      "status": "Status"
+    },
+    "footer": {
+      "totalOrders": "Total Orders:",
+      "totalRevenue": "Total Revenue:",
+      "averageTicketGeneral": "Overall Average Ticket:",
+      "averageRefundRate": "Average Refund Rate:"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive",
+      "discontinued": "Discontinued"
+    }
+  },
+  "RevenueChart": {
+    "error": {
+      "loading": "Error loading data"
+    },
+    "empty": {
+      "noData": "No data available",
+      "suggestion": "Select a different period or check the filters"
+    },
+    "tooltip": {
+      "revenue": "Revenue:",
+      "orders": "Orders:",
+      "averageTicket": "Average Ticket:"
+    },
+    "legend": {
+      "revenue": "Revenue ($)",
+      "orders": "Orders"
+    },
+    "reference": {
+      "average": "Average: {value}"
+    }
   }
 }

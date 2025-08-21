@@ -15,6 +15,16 @@ import { SalesMetricCard } from '@/components/dashboard/SalesMetricCard'
 import { getDateRange, formatBRL } from '@/lib/analytics-utils'
 import { api } from '@/trpc/react'
 
+// Type definitions for disputes data
+interface DisputesSummary {
+  total_disputas: number
+  cb_losses_brl: string
+  abertas: number
+  resolvidas: number
+  ganhas: number
+  perdidas: number
+}
+
 // Dynamically import chart components
 const RevenueChart = dynamic(
   () => import('@/components/dashboard/RevenueChart').then(mod => ({ default: mod.RevenueChart })),
@@ -40,9 +50,9 @@ interface DisputesFilters {
   from: string
   to: string
   timezone: string
-  gateway?: string
-  status?: string
-  outcome?: string
+  gateway?: string | undefined
+  status?: string | undefined
+  outcome?: string | undefined
 }
 
 function DisputesFilters({ 
@@ -169,7 +179,7 @@ function DisputesInsights({
   data, 
   loading 
 }: { 
-  data?: any
+  data?: DisputesSummary
   loading: boolean 
 }) {
   if (loading) {

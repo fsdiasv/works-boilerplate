@@ -256,6 +256,12 @@ export function exportToCSV(
  * @param filename - Name of the file
  */
 export function downloadCSV(csvContent: string, filename: string): void {
+  // Guard against SSR - only run in browser environment
+  if (typeof document === 'undefined' || typeof window === 'undefined') {
+    console.warn('downloadCSV: Cannot download file in server environment')
+    return
+  }
+
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
   

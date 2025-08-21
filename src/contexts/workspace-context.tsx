@@ -19,7 +19,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   // Only query when we have a user to avoid unnecessary calls
   const { data: session, isLoading } = api.auth.getSession.useQuery(undefined, {
-    enabled: !!user,
+    enabled: Boolean(user?.id),
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     refetchOnWindowFocus: false,
     retry: false, // Don't retry on failure for analytics pages
