@@ -27,10 +27,15 @@ export function AuthErrorHandler() {
         const emailMatch = errorDescription?.match(/([^\s]+@[^\s]+)/)
         const email = emailMatch?.[1]
 
-        // Redirect to resend verification page
+        // Redirect to resend verification page with proper URL params
+        const params = new URLSearchParams()
+        if (email !== undefined && email !== '') {
+          params.append('email', email)
+        }
+        params.append('reason', 'expired_link')
         const resendUrl = `/${locale}/auth/resend-verification${
-          email !== undefined && email !== '' ? `?email=${encodeURIComponent(email)}` : ''
-        }&reason=expired_link`
+          params.toString() ? `?${params.toString()}` : ''
+        }`
         router.push(resendUrl)
       } else if (error === 'access_denied') {
         // Generic access denied, redirect to login

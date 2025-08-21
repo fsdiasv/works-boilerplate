@@ -32,7 +32,28 @@ const workspaceSettingsSchema = z.object({
     .min(3)
     .max(50)
     .regex(/^[a-z0-9-]+$/),
-  logo: z.string().url().optional().nullable(),
+  // Accept either HTTP(S) URLs or data URLs (for temporary preview)
+  // TODO: Revert to z.string().url() once backend upload is implemented
+  logo: z
+    .string()
+    .refine(
+      val => {
+        if (!val) return true // Allow empty/null values
+        // Check if it's a valid HTTP(S) URL or a data URL
+        try {
+          if (val.startsWith('data:')) {
+            return /^data:image\/[a-zA-Z]+;base64,/.test(val)
+          }
+          new URL(val)
+          return val.startsWith('http://') || val.startsWith('https://')
+        } catch {
+          return false
+        }
+      },
+      { message: 'Must be a valid URL or image data URL' }
+    )
+    .optional()
+    .nullable(),
 })
 
 type WorkspaceSettingsForm = z.infer<typeof workspaceSettingsSchema>

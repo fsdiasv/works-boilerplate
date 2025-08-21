@@ -6,6 +6,7 @@ import type { ReactNode } from 'react'
 import { Toaster } from '@/components/ui/toaster'
 import { AuthProvider } from '@/contexts/auth-context'
 import { locales } from '@/i18n/config'
+import { env } from '@/lib/env'
 import { createClient } from '@/lib/supabase/server'
 import { ThemeProvider } from '@/lib/theme-provider'
 import { TRPCReactProvider } from '@/trpc/react'
@@ -51,7 +52,7 @@ export const viewport: Viewport = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params
   const messages = await getMessages({ locale })
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://localhost:3000'
+  const baseUrl = env.NEXT_PUBLIC_BASE_URL ?? 'https://localhost:3000'
 
   const t = (key: string): string => {
     const keys = key.split('.')
@@ -141,7 +142,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     verification: {
-      google: process.env.GOOGLE_SITE_VERIFICATION,
+      google: env.GOOGLE_SITE_VERIFICATION,
     },
   }
 }

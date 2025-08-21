@@ -90,17 +90,16 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
           const isInAuthCallback = currentPath.includes('/auth/callback')
           const isInResetPassword = currentPath.includes('/auth/reset-password')
 
-          // Check for recovery flow - either via cookie or URL parameters
+          // Check for recovery flow - via URL parameters or path
           const urlParams = new URLSearchParams(window.location.search)
           const isRecoveryType = urlParams.get('type') === 'recovery'
           const isRecoveryFlow =
-            document.cookie.includes('recovery_flow=true') ||
             isRecoveryType ||
             isInAuthCallback ||
-            isInResetPassword
+            isInResetPassword ||
+            currentPath.includes('/auth/reset-password')
 
           // console.log('🔍 Recovery flow checks:', {
-          //   cookie: document.cookie.includes('recovery_flow=true'),
           //   urlType: isRecoveryType,
           //   inCallback: isInAuthCallback,
           //   inResetPassword: isInResetPassword,
@@ -109,10 +108,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
 
           if (isRecoveryFlow) {
             // console.log('✅ Recovery/auth flow detected, skipping auto-redirect')
-            // Clean up the cookie if it exists
-            if (document.cookie.includes('recovery_flow=true')) {
-              document.cookie = 'recovery_flow=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;'
-            }
+            // Note: Recovery flow cookie is now httpOnly and will be cleaned up server-side
             break
           }
           // console.log('➡️ No special auth flow, proceeding with auto-redirect')
@@ -195,10 +191,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         }
       } catch (err) {
         const authError = err as SupabaseAuthError
-        // Don't show duplicate toast if already shown above
-        if (!authError.message.toLowerCase().includes('email not confirmed')) {
-          toast.error(authError.message)
-        }
+        // Error toast already shown above, just re-throw
         throw authError
       } finally {
         setLoading(false)

@@ -129,6 +129,15 @@ export const rateLimiters =
           analytics: true,
           prefix: 'ratelimit:heavy',
         }),
+        authCallback: new Ratelimit({
+          redis: new Redis({
+            url: env.UPSTASH_REDIS_REST_URL,
+            token: env.UPSTASH_REDIS_REST_TOKEN,
+          }),
+          limiter: Ratelimit.slidingWindow(10, '5 m'), // 10 callbacks per 5 minutes
+          analytics: true,
+          prefix: 'ratelimit:auth-callback',
+        }),
       }
     : {
         // Development rate limiters using in-memory storage
@@ -137,6 +146,7 @@ export const rateLimiters =
         passwordReset: new SimpleRateLimiter(3, parseDuration('1 h')),
         accountDeletion: new SimpleRateLimiter(1, parseDuration('24 h')),
         heavy: new SimpleRateLimiter(5, parseDuration('1 h')),
+        authCallback: new SimpleRateLimiter(10, parseDuration('5 m')),
       }
 
 /**
