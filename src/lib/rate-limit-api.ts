@@ -114,17 +114,17 @@ export function withRateLimit(
 
       // If rate limited, return error response with headers
       if (!rateLimitResult.success) {
+        const seconds = Math.max(0, Math.ceil((rateLimitResult.reset - Date.now()) / 1000))
         const response = new NextResponse(
           JSON.stringify({
             error: 'Rate limit exceeded',
-            message: `Too many requests. Try again in ${Math.ceil(
-              (rateLimitResult.reset - Date.now()) / 1000
-            )} seconds.`,
+            message: `Too many requests. Try again in ${seconds} seconds.`,
           }),
           {
             status: 429,
             headers: {
               'Content-Type': 'application/json',
+              'Retry-After': String(seconds),
               ...rateLimitResult.headers,
             },
           }

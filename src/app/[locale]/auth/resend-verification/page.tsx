@@ -14,17 +14,18 @@ import { FormInput } from '@/components/ui/form-input'
 import { PrimaryButton } from '@/components/ui/primary-button'
 import { api } from '@/trpc/react'
 
-const resendSchema = z.object({
-  email: z.string().email('Invalid email address').min(1, 'Email is required'),
-})
-
-type ResendFormData = z.infer<typeof resendSchema>
-
 export default function ResendVerificationPage() {
   const t = useTranslations('auth.resendVerificationPage')
   const tAuth = useTranslations('auth')
   const tError = useTranslations('auth.errors')
   const locale = useLocale()
+
+  // Create schema with translations
+  const resendSchema = z.object({
+    email: z.string().email(tError('invalidEmail')).min(1, tError('emailRequired')),
+  })
+
+  type ResendFormData = z.infer<typeof resendSchema>
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
 

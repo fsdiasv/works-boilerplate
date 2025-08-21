@@ -122,13 +122,11 @@ export default function WorkspaceDangerPage() {
           <CardHeader>
             <CardTitle className='flex items-center gap-2'>
               <AlertTriangle className='text-muted-foreground h-5 w-5' />
-              Access Restricted
+              {t('restrictedTitle')}
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className='text-muted-foreground text-sm'>
-              Only workspace owners can access destructive actions.
-            </p>
+            <p className='text-muted-foreground text-sm'>{t('restrictedDescription')}</p>
           </CardContent>
         </Card>
       )}

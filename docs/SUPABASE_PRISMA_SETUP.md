@@ -140,7 +140,7 @@ pnpm db:diff          # Show schema differences
 
 1. **"Database schema drift"**
    - Run `pnpm db:pull` to sync local schema
-   - Use `pnm db:diff` to see differences
+   - Use `pnpm db:diff` to see differences
 
 2. **"Migration failed"**
    - Check SQL syntax in the migration file

@@ -442,6 +442,8 @@
         "deleteConfirmDescription": "This action cannot be undone. This will permanently delete the {workspace} workspace and all associated data.",
         "deleteConfirmInput": "Type DELETE to confirm",
         "deleteConfirmationPlaceholder": "DELETE",
+        "restrictedTitle": "Access Restricted",
+        "restrictedDescription": "Only workspace owners can access destructive actions.",
         "archiveWorkspace": "Archive Workspace",
         "archiveDescription": "Archive this workspace. It can be restored later.",
         "archiveButton": "Archive Workspace",

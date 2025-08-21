@@ -1,4 +1,4 @@
-import { timingSafeEqual } from 'crypto'
+import { timingSafeEqual, createHash } from 'crypto'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -23,22 +23,12 @@ export async function POST(request: NextRequest) {
     const { userId, secret } = requestSchema.parse(body)
 
     // Verify the secret to ensure this is an authorized request
-    // Use constant-time comparison to prevent timing attacks
-    const secretBuffer = Buffer.from(secret, 'utf8')
-    const envSecretBuffer = Buffer.from(env.INTERNAL_API_SECRET, 'utf8')
+    // Use SHA-256 hashing to create fixed-size digests for timing-safe comparison
+    const providedSecretHash = createHash('sha256').update(secret).digest()
+    const envSecretHash = createHash('sha256').update(env.INTERNAL_API_SECRET).digest()
 
-    // Ensure buffers are the same length for timingSafeEqual
-    // If lengths differ, create dummy buffers to prevent length-based timing attacks
-    let isValidSecret = false
-    if (secretBuffer.length === envSecretBuffer.length) {
-      isValidSecret = timingSafeEqual(secretBuffer, envSecretBuffer)
-    } else {
-      // Perform a dummy comparison with same-length buffers to maintain timing consistency
-      const dummySecret = Buffer.alloc(envSecretBuffer.length, 'x')
-      const dummyEnv = Buffer.alloc(envSecretBuffer.length, 'y')
-      timingSafeEqual(dummySecret, dummyEnv) // Always returns false, maintains timing
-      isValidSecret = false
-    }
+    // Perform timing-safe comparison on the fixed-size hashes
+    const isValidSecret = timingSafeEqual(providedSecretHash, envSecretHash)
 
     if (!isValidSecret) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

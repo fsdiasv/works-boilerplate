@@ -12,17 +12,17 @@ export async function GET(request: NextRequest) {
   })
 
   if (!rateLimitResult.success) {
+    const remainingSeconds = Math.max(0, Math.ceil((rateLimitResult.reset - Date.now()) / 1000))
     const response = new NextResponse(
       JSON.stringify({
         error: 'Too many authentication attempts',
-        message: `Rate limit exceeded. Try again in ${Math.ceil(
-          (rateLimitResult.reset - Date.now()) / 1000
-        )} seconds.`,
+        message: `Rate limit exceeded. Try again in ${remainingSeconds} seconds.`,
       }),
       {
         status: 429,
         headers: {
           'Content-Type': 'application/json',
+          'Retry-After': remainingSeconds.toString(),
           ...rateLimitResult.headers,
         },
       }

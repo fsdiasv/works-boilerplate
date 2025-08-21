@@ -99,13 +99,13 @@ export const authRouter = createTRPCRouter({
       // Get translations for error messages
       const tAuth = await getTranslations({ locale: ctx.locale, namespace: 'auth.validation' })
 
-      // Sanitize inputs
-      const email = sanitizeAuthInput(rawEmail)
+      // Sanitize and normalize inputs
+      const normalizedEmail = sanitizeAuthInput(rawEmail).toLowerCase()
       const fullName =
         rawFullName !== undefined && rawFullName !== '' ? sanitizeAuthInput(rawFullName) : undefined
 
       // Additional email security validation
-      const emailSecurity = validateEmailSecurity(email)
+      const emailSecurity = validateEmailSecurity(normalizedEmail)
       if (!emailSecurity.isValid || !emailSecurity.isSecure) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
@@ -125,7 +125,7 @@ export const authRouter = createTRPCRouter({
 
       // Check if user already exists in database
       const existingUser = await ctx.db.user.findUnique({
-        where: { email },
+        where: { email: normalizedEmail },
       })
 
       if (existingUser) {
@@ -136,9 +136,9 @@ export const authRouter = createTRPCRouter({
       }
 
       // Sign up with Supabase
-      // console.log('🔄 Starting Supabase signup for:', email)
+      // console.log('🔄 Starting Supabase signup for:', normalizedEmail)
       const { data, error } = await ctx.supabase.auth.signUp({
-        email,
+        email: normalizedEmail,
         password,
         options: {
           data: {
@@ -181,7 +181,7 @@ export const authRouter = createTRPCRouter({
       const workspaceName =
         fullName !== undefined && fullName !== ''
           ? `${fullName}'s Workspace`
-          : `${email.split('@')[0]}'s Workspace`
+          : `${normalizedEmail.split('@')[0]}'s Workspace`
 
       const workspaceSlug = `workspace-${user.id.slice(0, 8)}`
 
@@ -192,7 +192,7 @@ export const authRouter = createTRPCRouter({
           const dbUser = await tx.user.create({
             data: {
               id: user.id,
-              email,
+              email: normalizedEmail,
               fullName: fullName ?? null,
               locale: locale ?? 'en',
               timezone: timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -423,7 +423,8 @@ export const authRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { email } = input
+      const { email: rawEmail } = input
+      const normalizedEmail = sanitizeAuthInput(rawEmail).toLowerCase()
 
       // Add artificial delay to normalize response times and prevent timing attacks
       const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
@@ -431,7 +432,7 @@ export const authRouter = createTRPCRouter({
 
       // Check if user exists in custom database
       const existingUser = await ctx.db.user.findUnique({
-        where: { email },
+        where: { email: normalizedEmail },
       })
 
       // Always return success to prevent email enumeration
@@ -459,7 +460,7 @@ export const authRouter = createTRPCRouter({
         },
         body: JSON.stringify({
           type: 'signup',
-          email,
+          email: normalizedEmail,
         }),
       })
 
@@ -467,7 +468,7 @@ export const authRouter = createTRPCRouter({
         // Try alternative method using Supabase client
         const { error: resendError } = await serviceClient.auth.resend({
           type: 'signup',
-          email,
+          email: normalizedEmail,
         })
 
         if (resendError) {
