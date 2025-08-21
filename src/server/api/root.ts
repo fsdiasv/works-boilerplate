@@ -1,3 +1,4 @@
+import { analyticsRouter } from '@/server/api/routers/analytics'
 import { authRouter } from '@/server/api/routers/auth'
 import { invitationRouter } from '@/server/api/routers/invitation'
 import { membersRouter } from '@/server/api/routers/members'
@@ -9,6 +10,7 @@ export const appRouter = createTRPCRouter({
   workspace: workspaceRouter,
   members: membersRouter,
   invitation: invitationRouter,
+  analytics: analyticsRouter,
 })
 
 export type AppRouter = typeof appRouter

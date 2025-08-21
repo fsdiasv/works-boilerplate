@@ -31,7 +31,49 @@ starter kit. Its core pillars are: mobile-first PWA, internationalization
 - **Environment Variables:** `@t3-oss/env-nextjs` for type-safe environment
   variables.
 
-## 3\. Essential Commands
+## 3\. 🚨 CRITICAL DATABASE SAFETY RULES 🚨
+
+**THESE RULES ARE NON-NEGOTIABLE AND MUST BE FOLLOWED AT ALL TIMES:**
+
+### ❌ FORBIDDEN DATABASE COMMANDS - NEVER USE:
+- `prisma db push --accept-data-loss` - **DESTROYS DATA PERMANENTLY**
+- `prisma db push` on databases with existing data - **HIGH RISK OF DATA LOSS**
+- `DROP TABLE` or `TRUNCATE` commands without explicit user approval
+- Any SQL command that modifies or deletes data without backup
+
+### ✅ SAFE DATABASE PRACTICES - ALWAYS USE:
+- `prisma migrate dev` - For development schema changes
+- `prisma migrate deploy` - For production deployments
+- `prisma migrate diff` - To preview changes before applying
+- `prisma db pull` - To sync schema from database (READ-ONLY)
+
+### 📋 MANDATORY PROCEDURES:
+1. **ALWAYS** create a backup before schema changes:
+   ```bash
+   pg_dump $DATABASE_URL > backup_$(date +%Y%m%d_%H%M%S).sql
+   ```
+
+2. **ALWAYS** use migrations for schema changes:
+   ```bash
+   pnpm prisma migrate dev --name describe_your_change
+   ```
+
+3. **NEVER** use `db push` on databases with production data
+
+4. **ALWAYS** verify migration safety with:
+   ```bash
+   pnpm prisma migrate diff --from-migrations --to-schema-datamodel
+   ```
+
+### 🛡️ DATA PROTECTION CHECKLIST:
+- [ ] Is this a development environment with disposable data?
+- [ ] Have I created a backup before making changes?
+- [ ] Am I using the correct migration command?
+- [ ] Have I reviewed the migration SQL before applying?
+
+**VIOLATION OF THESE RULES WILL RESULT IN IMMEDIATE CESSATION OF WORK UNTIL DATA RECOVERY IS COMPLETED.**
+
+## 4\. Essential Commands
 
 ### Development
 
@@ -70,7 +112,7 @@ starter kit. Its core pillars are: mobile-first PWA, internationalization
 - `pnpm test:coverage`: Generate a test coverage report.
 - `pnpm test:e2e`: Run end-to-end tests with Playwright.
 
-## 4\. Architecture and Directory Structure
+## 5\. Architecture and Directory Structure
 
 ```
 src/
@@ -88,7 +130,7 @@ src/
 └── lib/                  # Utilities and helpers
 ```
 
-## 5\. Fundamental Development Rules
+## 6\. Fundamental Development Rules
 
 ### General Principles
 
@@ -122,7 +164,7 @@ src/
 - **In-Code Documentation:** Explain the "why" of complex logic using **TSDoc**
   formatted comments.
 
-## 6\. Specific Patterns and Solutions (Consolidated Learnings)
+## 7\. Specific Patterns and Solutions (Consolidated Learnings)
 
 ### Tailwind CSS v4 & shadcn/ui
 
@@ -186,7 +228,65 @@ src/
   if (token) { ... }
   ```
 
-## 7\. Git Workflow and Versioning
+### Analytics System Architecture & Data Flow
+
+- **Database Structure:** The analytics system is based on `orders` and `order_items` tables, NOT the `payments` table. This is critical for correct data calculations.
+  ```sql
+  -- Correct data flow:
+  orders (1) → order_items (N) → product_language_versions → products
+  -- orders.status = 'COMPLETED' indicates successful purchases
+  -- order_items.price contains the monetary value
+  -- orders.gateway contains payment gateway info
+  ```
+
+- **Revenue Calculations:** Always use `order_items.price` as the source of truth for revenue calculations. Convert currencies to BRL using fixed rates:
+  ```typescript
+  const convertToBRL = (amount: number, currency: string): number => {
+    const rates = { 'USD': 5.50, 'EUR': 6.00, 'BRL': 1.00 }
+    return amount * (rates[currency] || rates['USD'] || 1.00)
+  }
+  ```
+
+- **Order Status Filtering:** Only include orders with `status = 'COMPLETED'` in analytics calculations. Other statuses (PENDING, CANCELLED, etc.) should be excluded.
+
+- **Analytics Query Patterns:**
+  ```typescript
+  // ✅ Correct: Start from orders, join order_items
+  const orders = await ctx.db.order.findMany({
+    where: { status: 'COMPLETED' },
+    include: { orderItems: { include: { productVersion: true } } }
+  })
+
+  // ❌ Incorrect: Starting from payments table
+  const payments = await ctx.db.payment.findMany({ ... })
+  ```
+
+- **Subscription Detection:** Identify subscriptions using `order_items.pricing_type = 'subscription'` and the existence of related `subscriptions` records.
+
+- **Product Filtering:** Use `product_language_versions.product_code` for product-based filters, not product IDs.
+
+- **Currency Handling:** Orders can have different currencies (USD, EUR, BRL). Always convert to BRL for consistent reporting using the conversion rates above.
+
+- **Time Series Queries:** Use `orders.created_at` for time-based grouping, not payment dates. Apply timezone conversion in SQL queries:
+  ```sql
+  DATE(orders.created_at AT TIME ZONE 'UTC' AT TIME ZONE ${tz}) as day
+  ```
+
+- **Key Metrics Definitions:**
+  - **Pedidos (Orders):** Count of distinct `orders.id` with status COMPLETED
+  - **Receita Bruta:** Sum of `order_items.price` converted to BRL
+  - **Ticket Médio:** Receita Bruta ÷ Pedidos
+  - **MRR:** Sum of subscription order items' prices in the period
+  - **Pagamentos:** Count of `order_items` (not actual payment records)
+
+- **Data Integrity:** Always validate that related records exist:
+  ```sql
+  WHERE orders.status = 'COMPLETED' 
+    AND order_items.price IS NOT NULL
+    AND product_language_versions.product_code IS NOT NULL
+  ```
+
+## 8\. Git Workflow and Versioning
 
 - **Creating Commits:** **DO NOT use `git commit` directly.** All commits MUST
   be created using the `pnpm commit` command. This will launch `Commitizen` to
@@ -249,7 +349,7 @@ This is a very long line that exceeds 100 characters and will fail validation be
 **Best Practice:** Always use `pnpm commit` for interactive commit creation to
 avoid format errors.
 
-## 8\. Definition of Done
+## 9\. Definition of Done
 
 A task is only considered complete when ALL of the following criteria are met:
 
@@ -266,7 +366,7 @@ A task is only considered complete when ALL of the following criteria are met:
 - [ ] Code review is approved.
 - [ ] No TypeScript errors or ESLint warnings (`pnpm validate` passes).
 
-## 9\. [CRITICAL WORKFLOW] Task Completion Process
+## 10\. [CRITICAL WORKFLOW] Task Completion Process
 
 Upon completing any task, you **MUST** follow these steps without exception:
 
@@ -278,7 +378,7 @@ Upon completing any task, you **MUST** follow these steps without exception:
     or a rule that all developers should follow, add it to
     `Section 6: Specific Patterns and Solutions`.
 
-## 10\. Configuration and Environment Variables
+## 11\. Configuration and Environment Variables
 
 - **Type-Safe Validation:** This project uses `@t3-oss/env-nextjs` to validate
   and provide type-safe access to environment variables.
