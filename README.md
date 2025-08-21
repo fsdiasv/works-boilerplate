@@ -39,6 +39,23 @@ cp .env.mcp.example .env.mcp
 
 See [MCP Setup Guide](docs/MCP_SETUP.md) for detailed instructions.
 
+## 🚨 CRITICAL DATABASE SECURITY
+
+**⚠️ READ THIS BEFORE ANY DATABASE OPERATIONS ⚠️**
+
+### 🛡️ Protect Your Data
+- **NEVER** use `pnpm db:push` on databases with existing data
+- **ALWAYS** create backups before schema changes: `pnpm db:backup`
+- **ALWAYS** use `pnpm db:migrate` for safe schema changes
+- **READ** the full safety guide: [`docs/CRITICAL-DATABASE-SAFETY.md`](docs/CRITICAL-DATABASE-SAFETY.md)
+
+### 🔴 One Wrong Command = Data Loss
+Database operations can **permanently destroy** all your data in seconds. Follow the safety protocols religiously.
+
+📖 **Required Reading**: [`docs/CRITICAL-DATABASE-SAFETY.md`](docs/CRITICAL-DATABASE-SAFETY.md)
+
+---
+
 ### Standard Setup
 
 1. **Prerequisites**
@@ -94,8 +111,12 @@ See [MCP Setup Guide](docs/MCP_SETUP.md) for detailed instructions.
    # Generate Prisma client
    pnpm db:generate
 
-   # Push schema to database
-   pnpm db:push
+   # SAFE: Create initial migration (recommended)
+   pnpm db:migrate
+
+   # OR if using empty database: Create backup first, then push
+   pnpm db:backup  # Create backup (will fail on empty DB, that's OK)
+   pnpm db:push    # Only safe on empty databases!
 
    # (Optional) Seed with sample data
    pnpm db:seed

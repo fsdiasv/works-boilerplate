@@ -14,7 +14,6 @@ const intlMiddleware = createMiddleware({
 
 // Define protected routes patterns
 const protectedRoutes = [
-  '/dashboard',
   '/profile',
   '/settings',
   '/admin',
@@ -22,14 +21,23 @@ const protectedRoutes = [
   '/faturamento',
 ]
 
+// Define public routes that don't require authentication
+const publicRoutes = [
+  '/analytics',
+]
+
 // Define auth routes (where authenticated users shouldn't be)
 const authRoutes = ['/login', '/signup', '/forgot-password']
 
 // Define routes that require an active workspace
-const workspaceRequiredRoutes = ['/dashboard', '/faturamento', '/workspace/settings']
+const workspaceRequiredRoutes = ['/faturamento', '/workspace/settings']
 
 function isProtectedRoute(pathname: string): boolean {
   return protectedRoutes.some(route => pathname.includes(route))
+}
+
+function isPublicRoute(pathname: string): boolean {
+  return publicRoutes.some(route => pathname.includes(route))
 }
 
 function isAuthRoute(pathname: string): boolean {
@@ -87,6 +95,14 @@ export default async function middleware(request: NextRequest) {
 
   // Get locale from pathname or default
   const locale = locales.find(l => pathname.startsWith(`/${l}`)) ?? defaultLocale
+
+  // Allow public routes without authentication
+  if (isPublicRoute(pathnameWithoutLocale)) {
+    // Skip auth checks for public routes like analytics
+    const isDev = env.NODE_ENV === 'development'
+    addCSPHeaders(authResponse.headers, isDev)
+    return authResponse
+  }
 
   // Check if the route is protected
   if (isProtectedRoute(pathnameWithoutLocale)) {
