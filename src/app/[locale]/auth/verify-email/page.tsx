@@ -125,8 +125,11 @@ export default function VerifyEmailPage({
             <>
               <XCircle className='text-destructive h-12 w-12' />
               <p className='text-destructive text-center text-sm'>{errorMessage}</p>
-              <Button onClick={() => router.push(`/${locale}/login`)} className='w-full'>
-                {t('backToLogin')}
+              <Button
+                onClick={() => router.push(`/${locale}/auth/resend-verification`)}
+                className='w-full'
+              >
+                {t('requestNewLink')}
               </Button>
             </>
           )}

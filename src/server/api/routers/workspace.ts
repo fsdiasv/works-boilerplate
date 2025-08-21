@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server'
 import { getTranslations } from 'next-intl/server'
 import { z } from 'zod'
 
+import { validateWorkspaceSlugSecurity, sanitizeAuthInput } from '@/lib/auth-security'
 import {
   createTRPCRouter,
   publicProcedure,
@@ -149,9 +150,22 @@ export const workspaceRouter = createTRPCRouter({
       const schema = await createWorkspaceSchema(ctx.locale)
       const validatedInput = schema.parse(input)
 
+      // Sanitize inputs
+      const sanitizedName = sanitizeAuthInput(validatedInput.name)
+      const sanitizedSlug = validatedInput.slug.toLowerCase().trim()
+
+      // Additional slug security validation
+      const slugSecurity = validateWorkspaceSlugSecurity(sanitizedSlug)
+      if (!slugSecurity.isValid) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: slugSecurity.issues[0] ?? 'Invalid workspace slug',
+        })
+      }
+
       // Check if slug already exists
       const existingWorkspace = await ctx.db.workspace.findUnique({
-        where: { slug: validatedInput.slug },
+        where: { slug: sanitizedSlug },
       })
 
       if (existingWorkspace) {
@@ -164,8 +178,8 @@ export const workspaceRouter = createTRPCRouter({
       // Create workspace and add user as owner
       const workspace = await ctx.db.workspace.create({
         data: {
-          name: validatedInput.name,
-          slug: validatedInput.slug,
+          name: sanitizedName,
+          slug: sanitizedSlug,
           members: {
             create: {
               userId: ctx.user!.id,
@@ -207,6 +221,24 @@ export const workspaceRouter = createTRPCRouter({
       const validatedInput = schema.parse(input)
       const { workspaceId, ...data } = validatedInput
 
+      // Sanitize inputs
+      const sanitizedData = { ...data }
+      if (sanitizedData.name !== undefined && sanitizedData.name !== '') {
+        sanitizedData.name = sanitizeAuthInput(sanitizedData.name)
+      }
+      if (sanitizedData.slug !== undefined && sanitizedData.slug !== '') {
+        sanitizedData.slug = sanitizedData.slug.toLowerCase().trim()
+
+        // Additional slug security validation
+        const slugSecurity = validateWorkspaceSlugSecurity(sanitizedData.slug)
+        if (!slugSecurity.isValid) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: slugSecurity.issues[0] ?? 'Invalid workspace slug',
+          })
+        }
+      }
+
       // Verify workspace access
       const membership = await ctx.db.workspaceMember.findUnique({
         where: {
@@ -245,9 +277,13 @@ export const workspaceRouter = createTRPCRouter({
       const updatedWorkspace = await ctx.db.workspace.update({
         where: { id: workspaceId },
         data: {
-          ...(data.name !== undefined && data.name !== '' ? { name: data.name } : {}),
-          ...(data.slug !== undefined && data.slug !== '' ? { slug: data.slug } : {}),
-          ...(data.logo !== undefined ? { logo: data.logo } : {}),
+          ...(sanitizedData.name !== undefined && sanitizedData.name !== ''
+            ? { name: sanitizedData.name }
+            : {}),
+          ...(sanitizedData.slug !== undefined && sanitizedData.slug !== ''
+            ? { slug: sanitizedData.slug }
+            : {}),
+          ...(sanitizedData.logo !== undefined ? { logo: sanitizedData.logo } : {}),
           ...(data.settings && { settings: data.settings }),
         },
       })

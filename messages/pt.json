@@ -47,7 +47,6 @@
       "close": "Fechar",
       "retry": "Tentar novamente"
     },
-    "save": "Salvar",
     "status": {
       "online": "Online",
       "offline": "Offline",
@@ -91,8 +90,7 @@
       "legalText": "Ao criar uma conta você concorda com nossos",
       "termsOfService": "Termos de Serviço",
       "and": "e nossa",
-      "privacyPolicy": "Política de Privacidade",
-      "verificationEmailSent": "E-mail de verificação enviado! Verifique sua caixa de entrada para confirmar sua conta."
+      "privacyPolicy": "Política de Privacidade"
     },
     "loginPage": {
       "title": "Bem-vindo de volta!",
@@ -130,7 +128,10 @@
       "backToLogin": "Voltar para o login",
       "invalidTokenTitle": "Link inválido ou expirado",
       "invalidTokenMessage": "Este link de redefinição de senha é inválido ou expirou. Por favor, solicite um novo.",
-      "requestNewLink": "Solicitar novo link"
+      "requestNewLink": "Solicitar novo link",
+      "checkingSession": "Verificando sua sessão...",
+      "invalidSession": "Sessão inválida. Por favor, solicite um novo link de redefinição de senha.",
+      "passwordResetSuccess": "Senha redefinida com sucesso! Por favor, faça login com sua nova senha."
     },
     "testimonial": {
       "author": {
@@ -154,6 +155,7 @@
       "redirectingToLogin": "Redirecionando para login...",
       "continueButton": "Continuar",
       "backToLogin": "Voltar para Login",
+      "requestNewLink": "Solicitar Novo Link",
       "invalidLink": "Link de verificação inválido"
     },
     "checkEmail": {
@@ -174,6 +176,7 @@
       "signOutError": "Falha ao sair",
       "resetPasswordEmail": "Verifique seu e-mail para o link de redefinição de senha",
       "passwordUpdated": "Senha atualizada com sucesso",
+      "passwordResetSuccess": "Senha redefinida com sucesso! Por favor, faça login com sua nova senha.",
       "checkNewEmail": "Verifique seu novo e-mail para confirmar a alteração",
       "profileUpdated": "Perfil atualizado com sucesso"
     },
@@ -183,15 +186,15 @@
       "currentPasswordRequired": "A senha atual é obrigatória",
       "urlInvalid": "URL inválida",
       "bioMaxLength": "A biografia não deve exceder 500 caracteres",
-      "emailAlreadyExists": "Este e-mail já está cadastrado",
-      "workspaceSlugExists": "Esta URL de workspace já existe",
-      "emailAlreadyRegisteredVerify": "E-mail já cadastrado. Verifique sua caixa de entrada ou tente fazer login.",
+      "emailAlreadyExists": "Usuário com este e-mail já existe",
+      "workspaceSlugExists": "Um workspace com esta URL já existe",
+      "emailAlreadyRegisteredVerify": "E-mail já cadastrado. Verifique seu e-mail para verificação ou tente fazer login.",
       "failedToCreateUser": "Falha ao criar usuário"
     },
     "errors": {
       "generic": "Falha na autenticação. Por favor, tente novamente.",
       "emailAlreadyRegistered": "Este e-mail já está cadastrado. Se você esqueceu sua senha, clique em 'Esqueceu a senha?' na tela de login.",
-      "emailNotVerified": "Seu e-mail ainda não foi verificado. Verifique sua caixa de entrada e spam.",
+      "emailNotVerified": "Seu e-mail ainda não foi verificado. Verifique sua caixa de entrada e pasta de spam.",
       "expiredLink": "O link de verificação expirou. Por favor, solicite um novo link.",
       "oauthProviderError": "O provedor de autenticação encontrou um erro. Por favor, tente novamente.",
       "oauthMissingCode": "Código de autorização ausente. Por favor, tente fazer login novamente.",
@@ -210,6 +213,7 @@
       "emailLabel": "E-mail",
       "emailPlaceholder": "Digite seu e-mail",
       "submitButton": "Reenviar E-mail",
+      "emailSent": "E-mail de verificação reenviado! Verifique sua caixa de entrada.",
       "backToLogin": {
         "text": "Lembra da sua senha?",
         "link": "Entrar"
@@ -223,6 +227,18 @@
     "recentActivity": "Atividade recente",
     "statistics": "Estatísticas",
     "noData": "Sem dados disponíveis",
+    "openMenu": "Abrir menu",
+    "edit": "Editar",
+    "viewDetails": "Ver detalhes",
+    "duplicate": "Duplicar",
+    "delete": "Excluir",
+    "number": "#",
+    "header": "Cabeçalho",
+    "sectionType": "Tipo de Seção",
+    "status": "Status",
+    "target": "Meta",
+    "limit": "Limite",
+    "reviewer": "Revisor",
     "meta": {
       "title": "Painel - Acme Inc.",
       "description": "Visualize suas métricas de negócios, documentos e análises"
@@ -298,7 +314,6 @@
       "admin": "Administrador",
       "member": "Membro"
     },
-    "createSuccess": "Workspace criado com sucesso!",
     "settings": {
       "title": "Configurações de {workspace}",
       "description": "Gerencie as configurações e preferências do seu workspace",
@@ -358,7 +373,23 @@
         "updateSuccess": "Membro atualizado com sucesso",
         "removeSuccess": "Membro removido com sucesso",
         "transferSuccess": "Propriedade transferida com sucesso",
-        "leaveSuccess": "Você saiu do workspace"
+        "leaveSuccess": "Você saiu do workspace",
+        "noMembersFound": "Nenhum membro encontrado",
+        "noMembersYet": "Ainda não há membros",
+        "cancel": "Cancelar",
+        "changing": "Alterando...",
+        "change": "Alterar Função",
+        "removing": "Removendo...",
+        "remove": "Remover",
+        "leave": "Sair",
+        "changeRoleDescription": "Alterar função para {name}",
+        "selectNewRole": "Selecionar nova função",
+        "updating": "Atualizando...",
+        "updateRole": "Atualizar Função",
+        "selectMemberPrompt": "Selecione um membro para transferir a propriedade",
+        "selectNewOwner": "Selecionar novo proprietário",
+        "selectMemberPlaceholder": "Selecionar um membro",
+        "transferring": "Transferindo..."
       },
       "invitations": {
         "title": "Convites",
@@ -384,7 +415,22 @@
         "sendSuccess": "Convite enviado com sucesso",
         "resendSuccess": "Convite reenviado com sucesso",
         "cancelSuccess": "Convite cancelado",
-        "linkCopied": "Link do convite copiado para a área de transferência"
+        "linkCopied": "Link do convite copiado para a área de transferência",
+        "copyLinkError": "Falha ao copiar link",
+        "status": "Status",
+        "actions": "Ações",
+        "openMenu": "Abrir menu",
+        "bulkSendSuccess": "{count, plural, =1 {1 convite enviado com sucesso} other {# convites enviados com sucesso}}",
+        "bulkSendError": "{count, plural, =1 {1 convite falhou} other {# convites falharam}}",
+        "invalidFileType": "Por favor, envie um arquivo CSV",
+        "fileReadError": "Falha ao ler arquivo",
+        "enterValidEmail": "Por favor, digite pelo menos um e-mail válido",
+        "uploadCSV": "Enviar CSV",
+        "orPasteEmails": "Ou cole e-mails",
+        "emailFormatHelp": "Um e-mail por linha ou separado por vírgulas",
+        "defaultRole": "Função padrão",
+        "sending": "Enviando...",
+        "sendInvitations": "Enviar Convites"
       },
       "danger": {
         "title": "Zona de Perigo",
@@ -395,6 +441,9 @@
         "deleteConfirmTitle": "Excluir Workspace",
         "deleteConfirmDescription": "Esta ação não pode ser desfeita. Isso excluirá permanentemente o workspace {workspace} e todos os dados associados.",
         "deleteConfirmInput": "Digite DELETE para confirmar",
+        "deleteConfirmationPlaceholder": "DELETE",
+        "restrictedTitle": "Acesso Restrito",
+        "restrictedDescription": "Apenas proprietários do workspace podem acessar ações destrutivas.",
         "archiveWorkspace": "Arquivar Workspace",
         "archiveDescription": "Arquive este workspace. Ele pode ser restaurado mais tarde.",
         "archiveButton": "Arquivar Workspace",
@@ -403,7 +452,34 @@
         "exportButton": "Exportar Dados",
         "deleteSuccess": "Workspace excluído com sucesso",
         "archiveSuccess": "Workspace arquivado com sucesso",
-        "exportSuccess": "Exportação iniciada. Você receberá um e-mail quando estiver pronta."
+        "exportSuccess": "Exportação iniciada. Você receberá um e-mail quando estiver pronta.",
+        "cancel": "Cancelar",
+        "deleting": "Excluindo...",
+        "delete": "Excluir",
+        "exporting": "Exportando...",
+        "archiving": "Arquivando..."
+      },
+      "billing": {
+        "title": "Faturamento",
+        "description": "Gerencie a assinatura e faturamento do seu workspace",
+        "currentPlan": {
+          "title": "Plano Atual",
+          "description": "Você está atualmente no plano Gratuito",
+          "freePlan": "Plano Gratuito",
+          "freePlanDescription": "Até 3 membros",
+          "upgradePlan": "Fazer Upgrade do Plano"
+        },
+        "paymentMethod": {
+          "title": "Método de Pagamento",
+          "description": "Gerencie seus métodos de pagamento",
+          "noPaymentMethod": "Nenhum método de pagamento cadastrado",
+          "addPaymentMethod": "Adicionar Método de Pagamento"
+        },
+        "billingHistory": {
+          "title": "Histórico de Faturamento",
+          "description": "Veja suas faturas anteriores",
+          "noBillingHistory": "Nenhum histórico de faturamento disponível"
+        }
       }
     },
     "form": {
@@ -481,38 +557,6 @@
       "cannotRemoveOwner": "Não é possível remover o proprietário da área de trabalho",
       "cannotLeaveAsOwner": "Transfira a propriedade antes de sair",
       "noWorkspaces": "Nenhuma área de trabalho encontrada"
-    },
-    "settings": {
-      "members": {
-        "cancel": "Cancelar",
-        "remove": "Remover",
-        "leave": "Sair",
-        "removing": "Removendo...",
-        "noMembersFound": "Nenhum membro encontrado",
-        "noMembersYet": "Ainda não há membros"
-      },
-      "billing": {
-        "title": "Faturamento",
-        "description": "Gerencie a assinatura e faturamento do seu workspace",
-        "currentPlan": {
-          "title": "Plano Atual",
-          "description": "Você está atualmente no plano Gratuito",
-          "freePlan": "Plano Gratuito",
-          "freePlanDescription": "Até 3 membros",
-          "upgradePlan": "Fazer Upgrade"
-        },
-        "paymentMethod": {
-          "title": "Método de Pagamento",
-          "description": "Gerencie seus métodos de pagamento",
-          "noPaymentMethod": "Nenhum método de pagamento cadastrado",
-          "addPaymentMethod": "Adicionar Método de Pagamento"
-        },
-        "billingHistory": {
-          "title": "Histórico de Faturamento",
-          "description": "Veja suas faturas anteriores",
-          "noBillingHistory": "Nenhum histórico de faturamento disponível"
-        }
-      }
     }
   },
   "validation": {

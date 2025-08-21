@@ -39,39 +39,45 @@ export const WorkspaceSlugInput = forwardRef<HTMLInputElement, WorkspaceSlugInpu
     const [isGenerating, setIsGenerating] = useState(false)
     const debouncedSlug = useDebounce(slug, 500)
 
-    // Generate slug from workspace name
-    const generateSlugMutation = isPublic
-      ? api.workspace.generateSlugPublic.useQuery(
-          { name: workspaceName },
-          {
-            enabled: false,
-            retry: false,
-          }
-        )
-      : api.workspace.generateSlug.useQuery(
-          { name: workspaceName },
-          {
-            enabled: false,
-            retry: false,
-          }
-        )
+    // Generate slug from workspace name - call both hooks unconditionally
+    const generateSlugPublicQuery = api.workspace.generateSlugPublic.useQuery(
+      { name: workspaceName },
+      {
+        enabled: false,
+        retry: false,
+      }
+    )
 
-    // Check slug availability
-    const checkSlugMutation = isPublic
-      ? api.workspace.checkSlugPublic.useQuery(
-          { slug: debouncedSlug },
-          {
-            enabled: debouncedSlug.length >= 3 && debouncedSlug.match(/^[a-z0-9-]+$/) !== null,
-            retry: false,
-          }
-        )
-      : api.workspace.checkSlug.useQuery(
-          { slug: debouncedSlug },
-          {
-            enabled: debouncedSlug.length >= 3 && debouncedSlug.match(/^[a-z0-9-]+$/) !== null,
-            retry: false,
-          }
-        )
+    const generateSlugPrivateQuery = api.workspace.generateSlug.useQuery(
+      { name: workspaceName },
+      {
+        enabled: false,
+        retry: false,
+      }
+    )
+
+    // Select the appropriate result based on isPublic
+    const generateSlugMutation = isPublic ? generateSlugPublicQuery : generateSlugPrivateQuery
+
+    // Check slug availability - call both hooks unconditionally
+    const checkSlugPublicQuery = api.workspace.checkSlugPublic.useQuery(
+      { slug: debouncedSlug },
+      {
+        enabled: debouncedSlug.length >= 3 && debouncedSlug.match(/^[a-z0-9-]+$/) !== null,
+        retry: false,
+      }
+    )
+
+    const checkSlugPrivateQuery = api.workspace.checkSlug.useQuery(
+      { slug: debouncedSlug },
+      {
+        enabled: debouncedSlug.length >= 3 && debouncedSlug.match(/^[a-z0-9-]+$/) !== null,
+        retry: false,
+      }
+    )
+
+    // Select the appropriate result based on isPublic
+    const checkSlugMutation = isPublic ? checkSlugPublicQuery : checkSlugPrivateQuery
 
     // Generate slug when workspace name changes
     useEffect(() => {

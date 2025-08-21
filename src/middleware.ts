@@ -41,15 +41,35 @@ function requiresWorkspace(pathname: string): boolean {
 }
 
 export default async function middleware(request: NextRequest) {
-  // Skip i18n for auth callback
-  const initialPathname = request.nextUrl.pathname
-  if (initialPathname === '/auth/callback') {
-    // Let the auth callback route handler process without locale prefix
+  const pathname = request.nextUrl.pathname
+
+  // Handle auth routes without locale prefix
+  if (pathname.startsWith('/auth/') && !pathname.startsWith('/auth/callback')) {
+    // Get locale from cookie or accept-language header
+    const locale =
+      request.cookies.get('locale')?.value ??
+      request.headers.get('accept-language')?.split(',')[0]?.split('-')[0] ??
+      defaultLocale
+
+    // Redirect to localized version
+    const localizedUrl = new URL(`/${locale}${pathname}`, request.url)
+    localizedUrl.search = request.nextUrl.search
+    return NextResponse.redirect(localizedUrl)
+  }
+
+  // Skip i18n middleware for auth callback routes (they don't need locale prefixes)
+  if (pathname.startsWith('/auth/callback')) {
+    // Handle auth directly without locale prefix
     const { response: authResponse } = await updateSession(request)
+
+    // Add CSP headers
+    const isDev = env.NODE_ENV === 'development'
+    addCSPHeaders(authResponse.headers, isDev)
+
     return authResponse
   }
 
-  // First, handle i18n
+  // First, handle i18n for all other routes
   const intlResponse = intlMiddleware(request)
 
   // If intl middleware returns a response (redirect or rewrite), return it
@@ -61,7 +81,6 @@ export default async function middleware(request: NextRequest) {
   const { supabase, response: authResponse, user } = await updateSession(request)
 
   // Get the pathname without locale prefix
-  const pathname = request.nextUrl.pathname
   const pathnameWithoutLocale =
     locales.reduce((path, locale) => path.replace(`/${locale}`, ''), pathname).replace(/^\//, '') ||
     '/'
@@ -74,7 +93,9 @@ export default async function middleware(request: NextRequest) {
     if (!user) {
       // Redirect to login with return URL
       const redirectUrl = new URL(`/${locale}/auth/login`, request.url)
-      redirectUrl.searchParams.set('redirectTo', pathname)
+      // Preserve original URL including query parameters
+      const originalUrl = `${pathname}${request.nextUrl.search}`
+      redirectUrl.searchParams.set('redirectTo', originalUrl)
       return NextResponse.redirect(redirectUrl)
     }
 

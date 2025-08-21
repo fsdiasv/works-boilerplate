@@ -6,28 +6,9 @@ import { useLocale, useTranslations } from 'next-intl'
 import { createContext, useContext, useEffect, useState, useCallback, useMemo, useRef } from 'react'
 import { toast } from 'sonner'
 
+import { validateSessionSecurity } from '@/lib/session-security'
 import { createClient } from '@/lib/supabase/client'
 import { performLogoutCleanup } from '@/lib/utils/auth-cleanup'
-
-/**
- * Generates a cryptographically secure random state parameter for OAuth flows.
- * This is used for CSRF protection during the OAuth authorization process.
- *
- * @returns A random 32-character hexadecimal string
- */
-function generateRandomState(): string {
-  const array = new Uint8Array(16)
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, @typescript-eslint/strict-boolean-expressions
-  if (typeof window !== 'undefined' && window.crypto) {
-    window.crypto.getRandomValues(array)
-  } else {
-    // Fallback for environments without crypto API
-    for (let i = 0; i < array.length; i++) {
-      array[i] = Math.floor(Math.random() * 256)
-    }
-  }
-  return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('')
-}
 
 interface AuthContextValue {
   user: User | null
@@ -35,8 +16,7 @@ interface AuthContextValue {
   loading: boolean
   error: SupabaseAuthError | null
   signIn: (email: string, password: string) => Promise<void>
-  signUp: (email: string, password: string, metadata?: Record<string, unknown>) => Promise<void>
-  signOut: () => Promise<void>
+  signOut: (redirectTo?: string) => Promise<void>
   signInWithProvider: (provider: 'google' | 'github' | 'apple') => Promise<void>
   resetPassword: (email: string) => Promise<void>
   updatePassword: (newPassword: string) => Promise<void>
@@ -63,6 +43,27 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
   const t = useTranslations('auth.toast')
   const supabase = useMemo(() => createClient(), [])
   const isLoggingOut = useRef(false)
+  const lastActivity = useRef<Date>(new Date())
+
+  // Update last activity on any user interaction
+  useEffect(() => {
+    const updateActivity = () => {
+      lastActivity.current = new Date()
+    }
+
+    // Listen for user interactions
+    window.addEventListener('mousedown', updateActivity)
+    window.addEventListener('keydown', updateActivity)
+    window.addEventListener('scroll', updateActivity)
+    window.addEventListener('touchstart', updateActivity)
+
+    return () => {
+      window.removeEventListener('mousedown', updateActivity)
+      window.removeEventListener('keydown', updateActivity)
+      window.removeEventListener('scroll', updateActivity)
+      window.removeEventListener('touchstart', updateActivity)
+    }
+  }, [])
 
   useEffect(() => {
     const {
@@ -81,11 +82,54 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
       // Handle auth events
       switch (event) {
         case 'SIGNED_IN':
-          router.push(`/${locale}/dashboard`)
+          // console.log('🔔 SIGNED_IN event fired')
+          // console.log('📍 Current pathname:', window.location.pathname)
+
+          // Skip auto-redirect if we're in specific auth flows
+          const currentPath = window.location.pathname
+          const isInAuthCallback = currentPath.includes('/auth/callback')
+          const isInResetPassword = currentPath.includes('/auth/reset-password')
+
+          // Check for recovery flow - via URL parameters or path
+          const urlParams = new URLSearchParams(window.location.search)
+          const isRecoveryType = urlParams.get('type') === 'recovery'
+          const isRecoveryFlow =
+            isRecoveryType ||
+            isInAuthCallback ||
+            isInResetPassword ||
+            currentPath.includes('/auth/reset-password')
+
+          // console.log('🔍 Recovery flow checks:', {
+          //   urlType: isRecoveryType,
+          //   inCallback: isInAuthCallback,
+          //   inResetPassword: isInResetPassword,
+          //   isRecoveryFlow,
+          // })
+
+          if (isRecoveryFlow) {
+            // console.log('✅ Recovery/auth flow detected, skipping auto-redirect')
+            // Note: Recovery flow cookie is now httpOnly and will be cleaned up server-side
+            break
+          }
+          // console.log('➡️ No special auth flow, proceeding with auto-redirect')
+
+          // Check for redirectTo in URL params or use dashboard as default
+          const redirectToParam = urlParams.get('redirectTo')
+          const redirectTo =
+            redirectToParam !== null && redirectToParam !== ''
+              ? redirectToParam
+              : `/${locale}/dashboard`
+
+          // Ensure the redirect URL is safe and starts with the locale
+          const safeRedirectTo = redirectTo.startsWith(`/${locale}`)
+            ? redirectTo
+            : `/${locale}${redirectTo.startsWith('/') ? redirectTo : '/dashboard'}`
+
+          router.push(safeRedirectTo)
           break
         case 'SIGNED_OUT':
-          // Only redirect if not manually logging out
-          if (!isLoggingOut.current) {
+          // Only redirect if not manually logging out and not on auth pages
+          if (!isLoggingOut.current && !window.location.pathname.includes('/auth/')) {
             router.push(`/${locale}`)
           }
           break
@@ -147,10 +191,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         }
       } catch (err) {
         const authError = err as SupabaseAuthError
-        // Don't show duplicate toast if already shown above
-        if (!authError.message.toLowerCase().includes('email not confirmed')) {
-          toast.error(authError.message)
-        }
+        // Error toast already shown above, just re-throw
         throw authError
       } finally {
         setLoading(false)
@@ -159,129 +200,107 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
     [supabase, t]
   )
 
-  const signUp = useCallback(
-    async (email: string, password: string, metadata?: Record<string, unknown>) => {
+  const signOut = useCallback(
+    async (redirectTo?: string) => {
       try {
         setError(null)
         setLoading(true)
+        isLoggingOut.current = true
 
-        const { error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            data: {
-              ...metadata,
-              locale,
-            },
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-          },
-        })
+        // Perform cleanup before signing out
+        await performLogoutCleanup()
 
-        if (signUpError) {
-          setError(signUpError)
-          throw signUpError
+        // Sign out from Supabase
+        const { error: signOutError } = await supabase.auth.signOut()
+
+        if (signOutError) {
+          setError(signOutError)
+          throw signOutError
         }
 
-        toast.success(t('checkEmail'))
+        // Clear local state
+        setUser(null)
+        setSession(null)
+
+        // Show success message
+        toast.success(t('signedOut'))
+
+        // Navigate to specified page or home
+        const destination =
+          redirectTo !== undefined && redirectTo !== '' ? redirectTo : `/${locale}`
+        const safeDestination = destination.startsWith(`/${locale}`)
+          ? destination
+          : `/${locale}${destination.startsWith('/') ? destination : `/${destination}`}`
+
+        router.push(safeDestination)
       } catch (err) {
         const authError = err as SupabaseAuthError
-        toast.error(authError.message)
+        toast.error(authError.message || t('signOutError'))
         throw authError
       } finally {
         setLoading(false)
+        // Reset the flag after a delay to ensure navigation completes
+        setTimeout(() => {
+          isLoggingOut.current = false
+        }, 1000)
       }
     },
-    [supabase, locale, t]
+    [supabase, router, locale, t]
   )
 
-  const signOut = useCallback(async () => {
+  const signInWithProvider = useCallback(async (provider: 'google' | 'github' | 'apple') => {
     try {
       setError(null)
       setLoading(true)
-      isLoggingOut.current = true
 
-      // Perform cleanup before signing out
-      await performLogoutCleanup()
+      // Use secure OAuth endpoint that handles state management server-side
+      const response = await fetch('/api/auth/oauth', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ provider }),
+      })
 
-      // Sign out from Supabase
-      const { error: signOutError } = await supabase.auth.signOut()
-
-      if (signOutError) {
-        setError(signOutError)
-        throw signOutError
+      if (!response.ok) {
+        const errorData: unknown = await response.json()
+        const errorMessage =
+          (errorData !== null &&
+          errorData !== undefined &&
+          typeof errorData === 'object' &&
+          'error' in errorData
+            ? (errorData.error as string)
+            : null) ?? 'OAuth initiation failed'
+        throw new Error(errorMessage)
       }
 
-      // Clear local state
-      setUser(null)
-      setSession(null)
+      const responseData: unknown = await response.json()
+      const url =
+        responseData !== null &&
+        responseData !== undefined &&
+        typeof responseData === 'object' &&
+        'url' in responseData
+          ? (responseData.url as string)
+          : null
 
-      // Show success message
-      toast.success(t('signedOut'))
+      if (url === null || url === '') {
+        throw new Error('No OAuth URL received')
+      }
 
-      // Navigate to home page
-      router.push(`/${locale}`)
+      // Redirect to the OAuth provider
+      window.location.href = url
     } catch (err) {
-      const authError = err as SupabaseAuthError
-      toast.error(authError.message || t('signOutError'))
+      const error = err as Error
+      // Create a proper SupabaseAuthError-like object
+      const authError = new Error(error.message) as SupabaseAuthError
+      authError.name = 'AuthError'
+      setError(authError)
+      toast.error(error.message)
       throw authError
     } finally {
       setLoading(false)
-      // Reset the flag after a delay to ensure navigation completes
-      setTimeout(() => {
-        isLoggingOut.current = false
-      }, 1000)
     }
-  }, [supabase, router, locale, t])
-
-  const signInWithProvider = useCallback(
-    async (provider: 'google' | 'github' | 'apple') => {
-      try {
-        setError(null)
-        setLoading(true)
-
-        // Generate a random state parameter for CSRF protection
-        const state = generateRandomState()
-
-        // Store state in a secure cookie (this would typically be done server-side)
-        // For now, we'll pass it through and let the server handle it
-        const { data, error: oauthError } = await supabase.auth.signInWithOAuth({
-          provider,
-          options: {
-            redirectTo: `${window.location.origin}/auth/callback`,
-            queryParams: {
-              access_type: 'offline',
-              prompt: 'consent',
-              state, // Include state parameter for CSRF protection
-            },
-          },
-        })
-
-        if (oauthError) {
-          setError(oauthError)
-          throw oauthError
-        }
-
-        // Store state in cookie for validation on callback
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (data?.url) {
-          // Extract state from the URL to store it
-          const authUrl = new URL(data.url)
-          const urlState = authUrl.searchParams.get('state')
-          if (urlState !== null && urlState !== '') {
-            // Set cookie with same parameters as middleware expects
-            document.cookie = `oauth_state=${urlState}; path=/; secure; samesite=lax; max-age=600` // 10 minute expiry
-          }
-        }
-      } catch (err) {
-        const authError = err as SupabaseAuthError
-        toast.error(authError.message)
-        throw authError
-      } finally {
-        setLoading(false)
-      }
-    },
-    [supabase]
-  )
+  }, [])
 
   const resetPassword = useCallback(
     async (email: string) => {
@@ -290,7 +309,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         setLoading(true)
 
         const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
-          redirectTo: `${window.location.origin}/${locale}/auth/reset-password`,
+          redirectTo: `${window.location.origin}/auth/callback`,
         })
 
         if (resetError) {
@@ -307,7 +326,7 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
         setLoading(false)
       }
     },
-    [supabase, locale, t]
+    [supabase, t]
   )
 
   const updatePassword = useCallback(
@@ -325,7 +344,9 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
           throw updateError
         }
 
-        toast.success(t('passwordUpdated'))
+        // Check if we're in a password reset flow
+        const isPasswordReset = window.location.pathname.includes('/auth/reset-password')
+        toast.success(isPasswordReset ? t('passwordResetSuccess') : t('passwordUpdated'))
       } catch (err) {
         const authError = err as SupabaseAuthError
         toast.error(authError.message)
@@ -415,6 +436,63 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
     }
   }, [supabase])
 
+  // Session security validation with automatic actions
+  useEffect(() => {
+    if (!session) return
+
+    const checkSessionSecurity = async () => {
+      const securityCheck = validateSessionSecurity(
+        session,
+        lastActivity.current,
+        navigator.userAgent
+        // IP address would come from server-side
+      )
+
+      if (!securityCheck.isSecure) {
+        const criticalEvents = securityCheck.events.filter(
+          e => e.severity === 'critical' || e.severity === 'high'
+        )
+
+        if (criticalEvents.length > 0) {
+          console.warn('Session security issues detected:', securityCheck.events)
+
+          // Take automatic action for critical security events
+          for (const event of criticalEvents) {
+            if (event.type === 'session_expired') {
+              // Check time to expiry
+              const expiresAt = new Date((session.expires_at ?? 0) * 1000)
+              const timeToExpiry = expiresAt.getTime() - new Date().getTime()
+
+              if (timeToExpiry < 5 * 60 * 1000) {
+                // Less than 5 minutes - attempt automatic refresh
+                try {
+                  await refreshSession()
+                  toast.success(t('sessionRefreshed'))
+                } catch {
+                  // Refresh failed, warn user
+                  toast.warning(t('sessionExpiringSoon'))
+                }
+              } else {
+                // Just warn for now
+                toast.warning(t('sessionWillExpire'))
+              }
+            } else if (event.type === 'suspicious_activity' && event.severity === 'critical') {
+              // For critical suspicious activity, force re-authentication
+              toast.error(t('suspiciousActivityDetected'))
+              await signOut()
+            }
+          }
+        }
+      }
+    }
+
+    // Check immediately and then every 5 minutes
+    void checkSessionSecurity()
+    const interval = setInterval(() => void checkSessionSecurity(), 5 * 60 * 1000) // 5 minutes
+
+    return () => clearInterval(interval)
+  }, [session, refreshSession, signOut, t])
+
   const value = useMemo(
     () => ({
       user,
@@ -422,7 +500,6 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
       loading,
       error,
       signIn,
-      signUp,
       signOut,
       signInWithProvider,
       resetPassword,
@@ -437,7 +514,6 @@ export function AuthProvider({ children, initialSession }: AuthProviderProps) {
       loading,
       error,
       signIn,
-      signUp,
       signOut,
       signInWithProvider,
       resetPassword,

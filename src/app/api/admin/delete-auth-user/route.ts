@@ -1,4 +1,4 @@
-import { timingSafeEqual } from 'crypto'
+import { timingSafeEqual, createHash } from 'crypto'
 
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
@@ -23,14 +23,12 @@ export async function POST(request: NextRequest) {
     const { userId, secret } = requestSchema.parse(body)
 
     // Verify the secret to ensure this is an authorized request
-    // Use constant-time comparison to prevent timing attacks
-    const secretBuffer = Buffer.from(secret)
-    const envSecretBuffer = Buffer.from(env.INTERNAL_API_SECRET)
+    // Use SHA-256 hashing to create fixed-size digests for timing-safe comparison
+    const providedSecretHash = createHash('sha256').update(secret).digest()
+    const envSecretHash = createHash('sha256').update(env.INTERNAL_API_SECRET).digest()
 
-    // Ensure buffers are the same length for timingSafeEqual
-    const isValidSecret =
-      secretBuffer.length === envSecretBuffer.length &&
-      timingSafeEqual(secretBuffer, envSecretBuffer)
+    // Perform timing-safe comparison on the fixed-size hashes
+    const isValidSecret = timingSafeEqual(providedSecretHash, envSecretHash)
 
     if (!isValidSecret) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
@@ -43,19 +41,27 @@ export async function POST(request: NextRequest) {
     const { error } = await supabase.auth.admin.deleteUser(userId)
 
     if (error) {
-      // eslint-disable-next-line no-console
-      console.error('Failed to delete user from Supabase Auth:', error)
+      // Only log in development to avoid exposing sensitive information in production
+      if (process.env.NODE_ENV === 'development') {
+        // eslint-disable-next-line no-console
+        console.error('Failed to delete user from Supabase Auth:', error)
+      }
       return NextResponse.json({ error: 'Failed to delete user' }, { status: 500 })
     }
 
-    // Log the successful deletion for audit purposes
-    // eslint-disable-next-line no-console
-    console.log(`User ${userId} successfully deleted from Supabase Auth`)
+    // Log the successful deletion for audit purposes (development only)
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.log(`User ${userId} successfully deleted from Supabase Auth`)
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {
-    // eslint-disable-next-line no-console
-    console.error('Error in delete-auth-user endpoint:', error)
+    // Only log in development to avoid exposing sensitive information in production
+    if (process.env.NODE_ENV === 'development') {
+      // eslint-disable-next-line no-console
+      console.error('Error in delete-auth-user endpoint:', error)
+    }
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }

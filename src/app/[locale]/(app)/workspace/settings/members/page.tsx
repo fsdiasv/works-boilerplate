@@ -302,6 +302,12 @@ export default function WorkspaceMembersPage() {
         onOpenChange={open => !open && closeDialog()}
         member={selectedMember}
         workspaceId={activeWorkspace.id}
+        isLeavingWorkspace={
+          selectedMember !== null &&
+          session !== null &&
+          selectedMember.user.id === session.user.id &&
+          selectedMember.role !== 'owner'
+        }
       />
 
       <TransferOwnershipDialog

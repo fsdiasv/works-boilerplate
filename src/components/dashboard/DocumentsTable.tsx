@@ -1,6 +1,7 @@
 'use client'
 
 import { MoreVertical, Circle, CheckCircle2 } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -102,6 +103,8 @@ const documents = [
 ]
 
 export function DocumentsTable() {
+  const t = useTranslations('dashboard')
+
   return (
     <div className='space-y-4'>
       {/* Mobile Cards View */}
@@ -185,13 +188,13 @@ export function DocumentsTable() {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className='w-[50px]'>#</TableHead>
-              <TableHead>Header</TableHead>
-              <TableHead>Section Type</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Target</TableHead>
-              <TableHead>Limit</TableHead>
-              <TableHead>Reviewer</TableHead>
+              <TableHead className='w-[50px]'>{t('number')}</TableHead>
+              <TableHead>{t('header')}</TableHead>
+              <TableHead>{t('sectionType')}</TableHead>
+              <TableHead>{t('status')}</TableHead>
+              <TableHead>{t('target')}</TableHead>
+              <TableHead>{t('limit')}</TableHead>
+              <TableHead>{t('reviewer')}</TableHead>
               <TableHead className='w-[50px]'></TableHead>
             </TableRow>
           </TableHeader>
@@ -238,14 +241,14 @@ export function DocumentsTable() {
                     <DropdownMenuTrigger asChild>
                       <Button variant='ghost' size='sm' className='h-8 w-8 p-0'>
                         <MoreVertical className='h-4 w-4' />
-                        <span className='sr-only'>Open menu</span>
+                        <span className='sr-only'>{t('openMenu')}</span>
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align='end'>
-                      <DropdownMenuItem>Edit</DropdownMenuItem>
-                      <DropdownMenuItem>View details</DropdownMenuItem>
-                      <DropdownMenuItem>Duplicate</DropdownMenuItem>
-                      <DropdownMenuItem className='text-red-600'>Delete</DropdownMenuItem>
+                      <DropdownMenuItem>{t('edit')}</DropdownMenuItem>
+                      <DropdownMenuItem>{t('viewDetails')}</DropdownMenuItem>
+                      <DropdownMenuItem>{t('duplicate')}</DropdownMenuItem>
+                      <DropdownMenuItem className='text-red-600'>{t('delete')}</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </TableCell>
