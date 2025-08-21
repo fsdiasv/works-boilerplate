@@ -1,9 +1,35 @@
 import { NextResponse, type NextRequest } from 'next/server'
 
 import { validateOAuthStateFromRequest, createClearStateHeaders } from '@/lib/oauth-state'
+import { checkRateLimit } from '@/lib/rate-limit-api'
 import { createClient } from '@/lib/supabase/server'
 
 export async function GET(request: NextRequest) {
+  // Apply rate limiting to prevent callback abuse
+  const rateLimitResult = await checkRateLimit(request, {
+    limiter: 'authCallback',
+    identifierType: 'ip',
+  })
+
+  if (!rateLimitResult.success) {
+    const response = new NextResponse(
+      JSON.stringify({
+        error: 'Too many authentication attempts',
+        message: `Rate limit exceeded. Try again in ${Math.ceil(
+          (rateLimitResult.reset - Date.now()) / 1000
+        )} seconds.`,
+      }),
+      {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          ...rateLimitResult.headers,
+        },
+      }
+    )
+    return response
+  }
+
   let { searchParams } = new URL(request.url)
 
   // Debug logging to understand what parameters are being received
@@ -88,7 +114,9 @@ export async function GET(request: NextRequest) {
         })
 
         if (verifyError) {
-          console.error('❌ Email verification failed:', verifyError)
+          if (process.env.NODE_ENV === 'development') {
+            console.error('❌ Email verification failed:', verifyError)
+          }
 
           if (verifyError.message.includes('expired')) {
             const resendUrl = new URL(`/${locale}/auth/resend-verification`, request.url)
@@ -112,7 +140,9 @@ export async function GET(request: NextRequest) {
         })
 
         if (verifyError) {
-          console.error('❌ Email verification failed:', verifyError)
+          if (process.env.NODE_ENV === 'development') {
+            console.error('❌ Email verification failed:', verifyError)
+          }
 
           if (verifyError.message.includes('expired')) {
             const resendUrl = new URL(`/${locale}/auth/resend-verification`, request.url)
@@ -139,7 +169,7 @@ export async function GET(request: NextRequest) {
         )
         response.cookies.set('recovery_flow', 'true', {
           maxAge: 300, // 5 minutes to handle slow connections and page load times
-          httpOnly: false, // Allow JavaScript to read it
+          httpOnly: true, // Security: prevent XSS access to auth cookies
           sameSite: 'strict',
           path: '/',
           secure: process.env.NODE_ENV === 'production',
@@ -211,8 +241,10 @@ export async function GET(request: NextRequest) {
 
         // console.log('✅ Email verification successful')
         return NextResponse.redirect(new URL(`/${locale}/auth/login?verified=true`, request.url))
-      } catch {
-        // console.error('❌ Unexpected error during email verification:', err)
+      } catch (err) {
+        if (process.env.NODE_ENV === 'development') {
+          console.error('❌ Unexpected error during email verification:', err)
+        }
         return NextResponse.redirect(
           new URL(
             `/${locale}/auth/login?error=${encodeURIComponent('An unexpected error occurred')}`,
@@ -280,7 +312,10 @@ export async function GET(request: NextRequest) {
       })
 
       return response
-    } catch {
+    } catch (err) {
+      if (process.env.NODE_ENV === 'development') {
+        console.error('❌ OAuth code exchange error:', err)
+      }
       const response = NextResponse.redirect(
         new URL(`/${locale}/auth/login?error=unexpected_error`, request.url)
       )

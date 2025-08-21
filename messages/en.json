@@ -227,6 +227,18 @@
     "recentActivity": "Recent activity",
     "statistics": "Statistics",
     "noData": "No data available",
+    "openMenu": "Open menu",
+    "edit": "Edit",
+    "viewDetails": "View details",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "number": "#",
+    "header": "Header",
+    "sectionType": "Section Type",
+    "status": "Status",
+    "target": "Target",
+    "limit": "Limit",
+    "reviewer": "Reviewer",
     "meta": {
       "title": "Dashboard - Acme Inc.",
       "description": "View your business metrics, documents, and analytics"

@@ -50,7 +50,9 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       // Generic error message to avoid exposing internal details
-      console.error('OAuth initiation error:', error)
+      if (process.env.NODE_ENV === 'development') {
+        console.error('OAuth initiation error:', error)
+      }
       return NextResponse.json({ error: 'Authentication failed' }, { status: 400 })
     }
 
@@ -60,7 +62,9 @@ export async function POST(request: NextRequest) {
       state, // Return state for client verification (optional)
     })
   } catch (err) {
-    console.error('OAuth route error:', err)
+    if (process.env.NODE_ENV === 'development') {
+      console.error('OAuth route error:', err)
+    }
     return NextResponse.json({ error: 'Authentication failed' }, { status: 500 })
   }
 }

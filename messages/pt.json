@@ -229,6 +229,18 @@
     "recentActivity": "Atividade recente",
     "statistics": "Estatísticas",
     "noData": "Sem dados disponíveis",
+    "openMenu": "Abrir menu",
+    "edit": "Editar",
+    "viewDetails": "Ver detalhes",
+    "duplicate": "Duplicar",
+    "delete": "Excluir",
+    "number": "#",
+    "header": "Cabeçalho",
+    "sectionType": "Tipo de Seção",
+    "status": "Status",
+    "target": "Meta",
+    "limit": "Limite",
+    "reviewer": "Revisor",
     "meta": {
       "title": "Painel - Acme Inc.",
       "description": "Visualize suas métricas de negócios, documentos e análises"
