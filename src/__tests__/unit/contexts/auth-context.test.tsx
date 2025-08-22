@@ -675,7 +675,8 @@ describe('AuthContext', () => {
           {
             type: 'suspicious_activity',
             severity: 'critical',
-            message: 'Suspicious activity detected'
+            message: 'Suspicious activity detected',
+            timestamp: new Date()
           }
         ]
       })
