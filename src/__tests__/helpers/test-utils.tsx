@@ -1,3 +1,4 @@
+/* eslint-disable */
 import React from 'react'
 import { render, RenderOptions } from '@testing-library/react'
 import { NextIntlClientProvider } from 'next-intl'
@@ -31,13 +32,13 @@ const defaultMessages = {
       passwordRequired: 'Password is required',
       invalidEmail: 'Invalid email format',
       passwordTooShort: 'Password too short',
-    }
+    },
   },
   common: {
     loading: 'Loading...',
     error: 'An error occurred',
     success: 'Success',
-  }
+  },
 }
 
 export function createTestQueryClient() {
@@ -54,10 +55,7 @@ export function createTestQueryClient() {
   })
 }
 
-export function renderWithProviders(
-  ui: React.ReactElement,
-  options: CustomRenderOptions = {}
-) {
+export function renderWithProviders(ui: React.ReactElement, options: CustomRenderOptions = {}) {
   const {
     initialSession = null,
     user = null,
@@ -68,23 +66,25 @@ export function renderWithProviders(
   } = options
 
   // Create a mock session if user is provided but no session
-  const session = initialSession || (user ? {
-    access_token: 'mock-access-token',
-    refresh_token: 'mock-refresh-token',
-    expires_in: 3600,
-    expires_at: Date.now() / 1000 + 3600,
-    token_type: 'bearer',
-    user
-  } as Session : null)
+  const session =
+    initialSession ||
+    (user
+      ? ({
+          access_token: 'mock-access-token',
+          refresh_token: 'mock-refresh-token',
+          expires_in: 3600,
+          expires_at: Date.now() / 1000 + 3600,
+          token_type: 'bearer',
+          user,
+        } as Session)
+      : null)
 
   function Wrapper({ children }: { children: React.ReactNode }) {
     return (
       <QueryClientProvider client={queryClient}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           <ThemeProvider>
-            <AuthProvider initialSession={session}>
-              {children}
-            </AuthProvider>
+            <AuthProvider initialSession={session}>{children}</AuthProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </QueryClientProvider>
@@ -102,22 +102,22 @@ export function createMockUser(overrides: Partial<User> = {}): User {
     role: 'authenticated',
     email: 'test@example.com',
     email_confirmed_at: new Date().toISOString(),
-    phone: null,
-    phone_confirmed_at: null,
+    phone: null as any,
+    phone_confirmed_at: null as any,
     confirmed_at: new Date().toISOString(),
     last_sign_in_at: new Date().toISOString(),
     app_metadata: { provider: 'email', providers: ['email'] },
     user_metadata: {
       full_name: 'Test User',
       avatar_url: null,
-      ...overrides.user_metadata
+      ...overrides.user_metadata,
     },
     identities: [],
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
     is_anonymous: false,
-    ...overrides
-  }
+    ...overrides,
+  } as User
 }
 
 // Helper to create mock session
@@ -129,7 +129,7 @@ export function createMockSession(userOverrides: Partial<User> = {}): Session {
     expires_in: 3600,
     expires_at: Date.now() / 1000 + 3600,
     token_type: 'bearer',
-    user
+    user,
   }
 }
 
@@ -144,12 +144,12 @@ export function renderWithAuth(
   } = {}
 ) {
   const { authenticated = true, user: userOverrides = {}, ...renderOptions } = options
-  
+
   const session = authenticated ? createMockSession(userOverrides) : null
-  
+
   return renderWithProviders(ui, {
     initialSession: session,
-    ...renderOptions
+    ...renderOptions,
   })
 }
 

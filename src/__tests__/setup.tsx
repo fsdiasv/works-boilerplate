@@ -1,6 +1,7 @@
+/* eslint-disable */
 import '@testing-library/jest-dom'
 import React from 'react'
-import { afterAll, afterEach, beforeAll } from 'vitest'
+import { afterAll, afterEach, beforeAll, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 import { server } from './helpers/msw-server'
 
@@ -45,15 +46,15 @@ const mockSupabaseClient = {
     updateUser: vi.fn(),
     refreshSession: vi.fn(),
     onAuthStateChange: vi.fn(() => ({
-      data: { subscription: { unsubscribe: vi.fn() } }
+      data: { subscription: { unsubscribe: vi.fn() } },
     })),
     getSession: vi.fn().mockResolvedValue({
       data: { session: null },
-      error: null
+      error: null,
     }),
     getUser: vi.fn().mockResolvedValue({
       data: { user: null },
-      error: null
+      error: null,
     }),
   },
   from: vi.fn(() => ({
@@ -67,7 +68,7 @@ const mockSupabaseClient = {
 }
 
 vi.mock('@/lib/supabase/client', () => ({
-  createClient: () => mockSupabaseClient
+  createClient: () => mockSupabaseClient,
 }))
 
 // Export for tests to access
@@ -85,7 +86,7 @@ vi.mock('sonner', () => ({
     error: vi.fn(),
     info: vi.fn(),
     warning: vi.fn(),
-  }
+  },
 }))
 
 // Mock environment variables
@@ -95,7 +96,7 @@ vi.mock('@/lib/env', () => ({
     NEXT_PUBLIC_SUPABASE_URL: 'http://localhost:54321',
     NEXT_PUBLIC_SUPABASE_ANON_KEY: 'test-anon-key',
     SUPABASE_SERVICE_ROLE_KEY: 'test-service-key',
-  }
+  },
 }))
 
 // Setup MSW
