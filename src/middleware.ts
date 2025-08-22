@@ -72,8 +72,11 @@ export default async function middleware(request: NextRequest) {
   // First, handle i18n for all other routes
   const intlResponse = intlMiddleware(request)
 
-  // If intl middleware returns a response (redirect or rewrite), return it
-  if (intlResponse instanceof NextResponse) {
+  // Only bail out if next-intl performed a rewrite or redirect
+  const i18nHandled =
+    intlResponse.headers.has('x-middleware-rewrite') ||
+    intlResponse.headers.has('x-middleware-redirect')
+  if (i18nHandled) {
     return intlResponse
   }
 
@@ -138,6 +141,11 @@ export default async function middleware(request: NextRequest) {
   // Add CSP headers
   const isDev = env.NODE_ENV === 'development'
   addCSPHeaders(authResponse.headers, isDev)
+
+  // Merge any cookies set by i18n (e.g., NEXT_LOCALE) into the final response
+  for (const { name, value, ...options } of intlResponse.cookies.getAll()) {
+    authResponse.cookies.set(name, value, options)
+  }
 
   // Return the response with any auth cookie updates and CSP headers
   return authResponse

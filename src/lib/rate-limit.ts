@@ -172,9 +172,16 @@ export function getRateLimitHeaders(result: {
   remaining: number
   reset: number
 }): Record<string, string> {
+  // result.reset is either an absolute timestamp (Upstash) or relative ms (SimpleRateLimiter)
+  // For SimpleRateLimiter, it's an absolute timestamp, but let's handle both cases safely
+  const resetTime =
+    result.reset > Date.now() + 1000 * 60 * 60 * 24 * 365
+      ? result.reset // Already an absolute timestamp
+      : Date.now() + result.reset // Relative ms, convert to absolute
+
   return {
     'X-RateLimit-Limit': result.limit.toString(),
     'X-RateLimit-Remaining': result.remaining.toString(),
-    'X-RateLimit-Reset': new Date(result.reset).toISOString(),
+    'X-RateLimit-Reset': Math.floor(resetTime / 1000).toString(), // Unix timestamp in seconds
   }
 }
