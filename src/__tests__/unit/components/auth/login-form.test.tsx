@@ -255,8 +255,8 @@ describe('LoginPage', () => {
     mockSearchParams.set('email', 'test@example.com')
     render(<LoginPage />)
 
-    const emailInput = screen.getByTestId('email') as HTMLInputElement
-    expect(emailInput.value).toBe('test@example.com')
+    const emailInput = screen.getByTestId('email')
+    expect(emailInput).toHaveAttribute('value', 'test@example.com')
   })
 
   it('should handle email verification success message', () => {
@@ -291,11 +291,11 @@ describe('LoginPage', () => {
     const user = userEvent.setup()
     render(<LoginPage />)
 
-    const rememberMeCheckbox = screen.getByTestId('remember-me') as HTMLInputElement
-    expect(rememberMeCheckbox.checked).toBe(false)
+    const rememberMeCheckbox = screen.getByTestId('remember-me')
+    expect(rememberMeCheckbox).not.toBeChecked()
 
     await user.click(rememberMeCheckbox)
-    expect(rememberMeCheckbox.checked).toBe(true)
+    expect(rememberMeCheckbox).toBeChecked()
   })
 
   it('should show loading state during form submission', async () => {
