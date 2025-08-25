@@ -570,6 +570,8 @@
     "passwordUppercase": "La contraseña debe contener al menos una letra mayúscula",
     "passwordLowercase": "La contraseña debe contener al menos una letra minúscula",
     "passwordNumber": "La contraseña debe contener al menos un número",
+    "passwordSpecialChar": "La contraseña debe contener al menos un carácter especial",
+    "passwordCommonWords": "Evita palabras comunes como \"contraseña\", \"admin\", \"usuario\", etc.",
     "validInput": "Entrada válida",
     "invalidInput": "Entrada inválida"
   },

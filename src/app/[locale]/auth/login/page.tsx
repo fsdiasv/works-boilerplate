@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -18,18 +18,23 @@ import { SocialLoginButton } from '@/components/ui/social-login-button'
 import { useAuth } from '@/hooks/use-auth'
 import { api } from '@/trpc/react'
 
-const loginSchema = z.object({
-  email: z.string().email('Invalid email address').min(1, 'Email is required'),
-  password: z.string().min(1, 'Password is required'),
-})
-
-type LoginFormData = z.infer<typeof loginSchema>
-
 export default function LoginPage() {
   const t = useTranslations('auth.loginPage')
   const tError = useTranslations('auth.errors')
   const tAuth = useTranslations('auth')
+  const tValidation = useTranslations('validation')
   const locale = useLocale()
+
+  const loginSchema = useMemo(
+    () =>
+      z.object({
+        email: z.string().email(tValidation('email')).min(1, tValidation('required')),
+        password: z.string().min(1, tValidation('required')),
+      }),
+    [tValidation]
+  )
+
+  type LoginFormData = z.infer<typeof loginSchema>
   const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const [rememberMe, setRememberMe] = useState(false)

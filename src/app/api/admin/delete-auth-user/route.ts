@@ -13,7 +13,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 
 const requestSchema = z.object({
   userId: z.string().uuid(),
-  secret: z.string(),
+  secret: z.string().trim().min(8).max(256),
 })
 
 export async function POST(request: NextRequest) {
