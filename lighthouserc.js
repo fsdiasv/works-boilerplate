@@ -15,9 +15,9 @@ module.exports = {
       assertions: {
         'categories:performance': ['warn', { minScore: 0.85 }],
         'categories:accessibility': ['error', { minScore: 0.95 }],
-        'categories:best-practices': ['error', { minScore: 0.90 }],
-        'categories:seo': ['error', { minScore: 0.90 }],
-        'categories:pwa': ['warn', { minScore: 0.80 }],
+        'categories:best-practices': ['error', { minScore: 0.9 }],
+        'categories:seo': ['error', { minScore: 0.9 }],
+        'categories:pwa': ['warn', { minScore: 0.8 }],
         // Core Web Vitals
         'first-contentful-paint': ['warn', { maxNumericValue: 2000 }],
         'largest-contentful-paint': ['warn', { maxNumericValue: 4000 }],
@@ -28,7 +28,7 @@ module.exports = {
         'apple-touch-icon': 'error',
         'themed-omnibox': 'off', // Optional for PWA
         // Mobile-first
-        'viewport': 'error',
+        viewport: 'error',
         'tap-targets': 'error',
         // Security
         'is-on-https': 'off', // Skip for localhost

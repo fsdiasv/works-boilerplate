@@ -123,7 +123,8 @@ describe('AuthContext', () => {
       throw new Error('mockSupabaseClient not found in global scope')
     }
 
-    mockSupabaseAuth = global.mockSupabaseClient.auth
+    const mockClient = global.mockSupabaseClient as any
+    mockSupabaseAuth = mockClient?.auth ?? {}
     mockToast = toast as any
 
     // Reset mock implementations

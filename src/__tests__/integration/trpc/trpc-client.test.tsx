@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
+
 import { api, TRPCReactProvider } from '@/trpc/react'
 
 // Mock Next.js
@@ -30,9 +30,9 @@ function TestComponent() {
   return (
     <div>
       {isLoading ? (
-        <div data-testid="loading">Loading...</div>
+        <div data-testid='loading'>Loading...</div>
       ) : (
-        <div data-testid="ready">Ready</div>
+        <div data-testid='ready'>Ready</div>
       )}
     </div>
   )
@@ -41,7 +41,7 @@ function TestComponent() {
 describe('tRPC Client Integration', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    
+
     // Mock fetch to prevent actual API calls
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,

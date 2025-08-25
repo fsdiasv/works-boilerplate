@@ -1,6 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import ForgotPasswordPage from '@/app/[locale]/auth/forgot-password/page'
 
@@ -21,7 +21,7 @@ vi.mock('@/hooks/use-auth', () => ({
     updateEmail: vi.fn(),
     updateProfile: vi.fn(),
     refreshSession: vi.fn(),
-  })
+  }),
 }))
 
 // Mock next/navigation
@@ -42,26 +42,27 @@ vi.mock('next-intl', () => ({
   useTranslations: (namespace: string) => (key: string) => {
     const translations: Record<string, Record<string, string>> = {
       'auth.forgotPasswordPage': {
-        'title': 'Forgot your password?',
-        'description': "Don't worry! Enter your email address and we'll send you a link to reset your password.",
-        'emailLabel': 'Email address',
-        'emailPlaceholder': 'Enter your email address',
-        'submitButton': 'Send reset link',
-        'backToLogin': 'Remember your password?',
-        'backToLoginLink': 'Sign in here'
-      }
+        title: 'Forgot your password?',
+        description:
+          "Don't worry! Enter your email address and we'll send you a link to reset your password.",
+        emailLabel: 'Email address',
+        emailPlaceholder: 'Enter your email address',
+        submitButton: 'Send reset link',
+        backToLogin: 'Remember your password?',
+        backToLoginLink: 'Sign in here',
+      },
     }
     return translations[namespace]?.[key] || key
   },
   useLocale: () => 'en',
-  NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => children
+  NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => children,
 }))
 
 // Mock auth components
 vi.mock('@/components/auth/auth-layout', () => ({
   AuthLayout: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="auth-layout">{children}</div>
-  )
+    <div data-testid='auth-layout'>{children}</div>
+  ),
 }))
 
 vi.mock('@/components/ui/form-input', () => ({
@@ -72,15 +73,15 @@ vi.mock('@/components/ui/form-input', () => ({
       placeholder={props.placeholder}
       {...props}
     />
-  )
+  ),
 }))
 
 vi.mock('@/components/ui/primary-button', () => ({
   PrimaryButton: ({ children, isLoading, ...props }: any) => (
-    <button {...props} disabled={isLoading} data-testid="submit-button">
+    <button {...props} disabled={isLoading} data-testid='submit-button'>
       {isLoading ? 'Loading...' : children}
     </button>
-  )
+  ),
 }))
 
 describe('ForgotPasswordPage', () => {
@@ -109,7 +110,11 @@ describe('ForgotPasswordPage', () => {
     render(<ForgotPasswordPage />)
 
     expect(screen.getByText('Forgot your password?')).toBeInTheDocument()
-    expect(screen.getByText("Don't worry! Enter your email address and we'll send you a link to reset your password.")).toBeInTheDocument()
+    expect(
+      screen.getByText(
+        "Don't worry! Enter your email address and we'll send you a link to reset your password."
+      )
+    ).toBeInTheDocument()
     expect(screen.getByTestId('email')).toBeInTheDocument()
     expect(screen.getByTestId('submit-button')).toBeInTheDocument()
     expect(screen.getByText('Remember your password?')).toBeInTheDocument()
@@ -152,7 +157,7 @@ describe('ForgotPasswordPage', () => {
   it('should submit form with valid email', async () => {
     const user = userEvent.setup()
     mockResetPassword.mockResolvedValue(undefined)
-    
+
     render(<ForgotPasswordPage />)
 
     // Fill form with valid email
@@ -166,14 +171,14 @@ describe('ForgotPasswordPage', () => {
 
   it('should show loading state during form submission', async () => {
     const user = userEvent.setup()
-    
+
     // Create a promise that we can control
     let resolvePromise: () => void
     const resetPasswordPromise = new Promise<void>(resolve => {
       resolvePromise = resolve
     })
     mockResetPassword.mockReturnValue(resetPasswordPromise)
-    
+
     render(<ForgotPasswordPage />)
 
     // Fill and submit form
@@ -199,7 +204,7 @@ describe('ForgotPasswordPage', () => {
   it('should handle successful password reset', async () => {
     const user = userEvent.setup()
     mockResetPassword.mockResolvedValue(undefined)
-    
+
     render(<ForgotPasswordPage />)
 
     await user.type(screen.getByTestId('email'), 'test@example.com')
@@ -218,7 +223,7 @@ describe('ForgotPasswordPage', () => {
   it('should handle password reset errors', async () => {
     const user = userEvent.setup()
     mockResetPassword.mockRejectedValue(new Error('Reset failed'))
-    
+
     render(<ForgotPasswordPage />)
 
     await user.type(screen.getByTestId('email'), 'test@example.com')
@@ -236,14 +241,14 @@ describe('ForgotPasswordPage', () => {
 
   it('should reset loading state after error', async () => {
     const user = userEvent.setup()
-    
+
     // Create a controlled promise to test loading state
     let rejectPromise: (error: Error) => void
     const resetPasswordPromise = new Promise<void>((_, reject) => {
       rejectPromise = reject
     })
     mockResetPassword.mockReturnValue(resetPasswordPromise)
-    
+
     render(<ForgotPasswordPage />)
 
     await user.type(screen.getByTestId('email'), 'test@example.com')

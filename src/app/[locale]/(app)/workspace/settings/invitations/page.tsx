@@ -2,6 +2,7 @@
 
 import { formatDistanceToNow } from 'date-fns'
 import { Mail, MoreHorizontal, Copy, RefreshCw, X } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -24,10 +25,24 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { BulkInviteDialog } from '@/components/workspace/bulk-invite-dialog'
-import { InviteMemberDialog } from '@/components/workspace/invite-member-dialog'
 import { useWorkspace, useIsWorkspaceAdmin } from '@/contexts/workspace-context'
 import { api } from '@/trpc/react'
+
+// Lazy load heavy dialog components to reduce initial bundle size
+const BulkInviteDialog = dynamic(
+  () =>
+    import('@/components/workspace/bulk-invite-dialog').then(mod => ({
+      default: mod.BulkInviteDialog,
+    })),
+  { ssr: false }
+)
+const InviteMemberDialog = dynamic(
+  () =>
+    import('@/components/workspace/invite-member-dialog').then(mod => ({
+      default: mod.InviteMemberDialog,
+    })),
+  { ssr: false }
+)
 
 export default function WorkspaceInvitationsPage() {
   const t = useTranslations('workspace.settings.invitations')

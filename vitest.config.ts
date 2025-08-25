@@ -28,7 +28,7 @@ export default defineConfig({
         '**/*.stories.*',
         '**/.next/**',
         '**/coverage/**',
-        '**/dist/**'
+        '**/dist/**',
       ],
       // Global coverage thresholds
       thresholds: {
@@ -36,39 +36,39 @@ export default defineConfig({
           branches: 70,
           functions: 70,
           lines: 70,
-          statements: 70
+          statements: 70,
         },
         // Higher coverage for critical auth modules
         'src/contexts/': {
           branches: 85,
           functions: 85,
           lines: 85,
-          statements: 85
+          statements: 85,
         },
         'src/lib/auth-security.ts': {
           branches: 90,
           functions: 90,
           lines: 90,
-          statements: 90
+          statements: 90,
         },
         'src/lib/session-security.ts': {
           branches: 90,
           functions: 90,
           lines: 90,
-          statements: 90
+          statements: 90,
         },
         'src/server/api/routers/auth.ts': {
           branches: 85,
           functions: 85,
           lines: 85,
-          statements: 85
-        }
-      }
+          statements: 85,
+        },
+      },
     },
     // Mock patterns
     mockReset: true,
     clearMocks: true,
-    restoreMocks: true
+    restoreMocks: true,
   },
   resolve: {
     alias: {
@@ -79,7 +79,7 @@ export default defineConfig({
       '@/server': path.resolve(__dirname, './src/server'),
       '@/contexts': path.resolve(__dirname, './src/contexts'),
       '@/types': path.resolve(__dirname, './src/types'),
-      '@/utils': path.resolve(__dirname, './src/lib/utils')
-    }
-  }
+      '@/utils': path.resolve(__dirname, './src/lib/utils'),
+    },
+  },
 })

@@ -1,7 +1,6 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { toast } from 'sonner'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import SignUpPage from '@/app/[locale]/auth/signup/page'
 
@@ -28,31 +27,31 @@ vi.mock('next-intl', () => ({
   useTranslations: (namespace: string) => (key: string) => {
     const translations: Record<string, Record<string, string>> = {
       'auth.signupPage': {
-        'title': 'Create your account',
-        'subtitle': "Let's get started! Please enter your details.",
-        'subtitleLink': 'Sign in',
-        'nameLabel': 'Full name',
-        'namePlaceholder': 'Enter your full name',
-        'emailLabel': 'Email',
-        'emailPlaceholder': 'Enter your email',
-        'passwordLabel': 'Password',
-        'passwordPlaceholder': 'Enter your password',
-        'submitButton': 'Create account',
-        'divider': 'Or continue with',
-        'verificationEmailSent': 'Check your email for verification link',
-        'legalText': 'By creating an account, you agree to our',
-        'termsOfService': 'Terms of Service',
-        'and': 'and',
-        'privacyPolicy': 'Privacy Policy'
+        title: 'Create your account',
+        subtitle: "Let's get started! Please enter your details.",
+        subtitleLink: 'Sign in',
+        nameLabel: 'Full name',
+        namePlaceholder: 'Enter your full name',
+        emailLabel: 'Email',
+        emailPlaceholder: 'Enter your email',
+        passwordLabel: 'Password',
+        passwordPlaceholder: 'Enter your password',
+        submitButton: 'Create account',
+        divider: 'Or continue with',
+        verificationEmailSent: 'Check your email for verification link',
+        legalText: 'By creating an account, you agree to our',
+        termsOfService: 'Terms of Service',
+        and: 'and',
+        privacyPolicy: 'Privacy Policy',
       },
-      'auth': {
-        'errors.emailAlreadyRegistered': 'This email is already registered'
-      }
+      auth: {
+        'errors.emailAlreadyRegistered': 'This email is already registered',
+      },
     }
     return translations[namespace]?.[key] || key
   },
   useLocale: () => 'en',
-  NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => children
+  NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => children,
 }))
 
 // Mock tRPC
@@ -60,70 +59,81 @@ const mockSignUpMutation = {
   mutateAsync: vi.fn(),
   isPending: false,
   isLoading: false,
-  error: null
+  error: null,
 }
 
 vi.mock('@/trpc/react', () => ({
   api: {
     auth: {
       signUp: {
-        useMutation: vi.fn(() => mockSignUpMutation)
-      }
-    }
-  }
+        useMutation: vi.fn(() => mockSignUpMutation),
+      },
+    },
+  },
 }))
 
 // Mock auth components
 vi.mock('@/components/auth/auth-layout', () => ({
   AuthLayout: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="auth-layout">{children}</div>
-  )
+    <div data-testid='auth-layout'>{children}</div>
+  ),
 }))
 
 vi.mock('@/components/ui/form-input', () => ({
-  FormInput: (props: any) => (
+  FormInput: (props: {
+    id: string
+    type?: string
+    placeholder?: string
+    [key: string]: unknown
+  }) => (
     <input
       data-testid={props.id}
-      type={props.type || 'text'}
-      placeholder={props.placeholder}
+      type={props.type ?? 'text'}
+      placeholder={props.placeholder ?? ''}
       {...props}
     />
-  )
+  ),
 }))
 
 vi.mock('@/components/ui/password-input', () => ({
-  PasswordInput: (props: any) => (
+  PasswordInput: (props: { id: string; placeholder?: string; [key: string]: unknown }) => (
     <input
       data-testid={props.id}
-      type="password"
-      placeholder={props.placeholder}
+      type='password'
+      placeholder={props.placeholder ?? ''}
       {...props}
     />
-  )
+  ),
 }))
 
 vi.mock('@/components/ui/password-strength-indicator', () => ({
   PasswordStrengthIndicator: ({ password }: { password: string }) => (
-    <div data-testid="password-strength" data-password={password}>
+    <div data-testid='password-strength' data-password={password}>
       Password strength indicator
     </div>
-  )
+  ),
 }))
 
 vi.mock('@/components/ui/primary-button', () => ({
-  PrimaryButton: ({ children, isLoading, ...props }: any) => (
-    <button {...props} disabled={isLoading} data-testid="submit-button">
-      {isLoading ? 'Loading...' : children}
+  PrimaryButton: ({
+    children,
+    isLoading,
+    ...props
+  }: {
+    children: React.ReactNode
+    isLoading?: boolean
+    [key: string]: unknown
+  }) => (
+    <button {...props} disabled={isLoading ?? false} data-testid='submit-button'>
+      {isLoading === true ? 'Loading...' : children}
     </button>
-  )
+  ),
 }))
 
 vi.mock('@/components/ui/social-login-button', () => ({
-  SocialLoginButton: ({ provider }: any) => (
-    <button data-testid={`social-login-${provider}`}>
-      Sign up with {provider}
-    </button>
-  )
+  SocialLoginButton: ({ provider }: { provider: string }) => (
+    <button data-testid={`social-login-${provider}`}>Sign up with {provider}</button>
+  ),
 }))
 
 describe('SignUpPage', () => {
@@ -177,10 +187,16 @@ describe('SignUpPage', () => {
     expect(screen.getByText(/By creating an account, you agree to our/i)).toBeInTheDocument()
     expect(screen.getByText('Terms of Service')).toBeInTheDocument()
     expect(screen.getByText('Privacy Policy')).toBeInTheDocument()
-    
+
     // Verify links are present
-    expect(screen.getByRole('link', { name: 'Terms of Service' })).toHaveAttribute('href', '/en/terms')
-    expect(screen.getByRole('link', { name: 'Privacy Policy' })).toHaveAttribute('href', '/en/privacy')
+    expect(screen.getByRole('link', { name: 'Terms of Service' })).toHaveAttribute(
+      'href',
+      '/en/terms'
+    )
+    expect(screen.getByRole('link', { name: 'Privacy Policy' })).toHaveAttribute(
+      'href',
+      '/en/privacy'
+    )
   })
 
   it('should show password strength indicator when typing password', async () => {
@@ -212,7 +228,7 @@ describe('SignUpPage', () => {
     render(<SignUpPage />)
 
     const nameInput = screen.getByTestId('name')
-    
+
     // Test too short name
     await user.type(nameInput, 'A')
     await user.click(screen.getByTestId('submit-button'))
@@ -226,7 +242,7 @@ describe('SignUpPage', () => {
     await user.type(nameInput, 'John Doe')
     await user.type(screen.getByTestId('email'), 'john@example.com')
     await user.type(screen.getByTestId('password'), 'Valid123!')
-    
+
     mockSignUpMutation.mutateAsync.mockResolvedValue(undefined)
     await user.click(screen.getByTestId('submit-button'))
 
@@ -255,7 +271,7 @@ describe('SignUpPage', () => {
 
     await user.type(screen.getByTestId('name'), 'John Doe')
     await user.type(screen.getByTestId('email'), 'john@example.com')
-    
+
     // Test weak password
     await user.type(screen.getByTestId('password'), 'weak')
     await user.click(screen.getByTestId('submit-button'))
@@ -282,7 +298,7 @@ describe('SignUpPage', () => {
   it('should submit form with valid data', async () => {
     const user = userEvent.setup()
     mockSignUpMutation.mutateAsync.mockResolvedValue(undefined)
-    
+
     render(<SignUpPage />)
 
     // Fill form with valid data
@@ -304,9 +320,9 @@ describe('SignUpPage', () => {
   })
 
   it('should show loading state during submission', async () => {
-    const user = userEvent.setup()
+    const _user = userEvent.setup()
     mockSignUpMutation.isPending = true
-    
+
     render(<SignUpPage />)
 
     expect(screen.getByText('Loading...')).toBeInTheDocument()
@@ -315,7 +331,7 @@ describe('SignUpPage', () => {
 
   it('should show success message and redirect on successful signup', async () => {
     const user = userEvent.setup()
-    
+
     // Test that the form calls the mutation with correct data
     mockSignUpMutation.mutateAsync.mockResolvedValue(undefined)
 
@@ -339,7 +355,7 @@ describe('SignUpPage', () => {
 
   it('should handle email already registered error', async () => {
     const user = userEvent.setup()
-    
+
     // Test that the form calls the mutation and handles rejection
     mockSignUpMutation.mutateAsync.mockRejectedValue(new Error('Email already registered'))
 
@@ -358,7 +374,7 @@ describe('SignUpPage', () => {
 
   it('should handle generic signup errors', async () => {
     const user = userEvent.setup()
-    
+
     // Test that the form calls the mutation and handles rejection
     mockSignUpMutation.mutateAsync.mockRejectedValue(new Error('Network error'))
 
@@ -377,23 +393,23 @@ describe('SignUpPage', () => {
 
   it('should reset loading state after error', async () => {
     const user = userEvent.setup()
-    
+
     // This test is more about the component's internal loading state management
     // We'll simplify it to test what we can control
     const testMockSignUpMutation = {
       ...mockSignUpMutation,
       mutateAsync: vi.fn().mockRejectedValue(new Error('Server error')),
-      isPending: false
+      isPending: false,
     }
 
     vi.doMock('@/trpc/react', () => ({
       api: {
         auth: {
           signUp: {
-            useMutation: vi.fn(() => testMockSignUpMutation)
-          }
-        }
-      }
+            useMutation: vi.fn(() => testMockSignUpMutation),
+          },
+        },
+      },
     }))
 
     render(<SignUpPage />)
@@ -402,10 +418,10 @@ describe('SignUpPage', () => {
     await user.type(screen.getByTestId('name'), 'John Doe')
     await user.type(screen.getByTestId('email'), 'john@example.com')
     await user.type(screen.getByTestId('password'), 'MySecur3P@ssw0rd!')
-    
+
     // Submit button should be enabled initially
     expect(screen.getByTestId('submit-button')).not.toBeDisabled()
-    
+
     await user.click(screen.getByTestId('submit-button'))
 
     // After the mutation completes (with error), button should be re-enabled

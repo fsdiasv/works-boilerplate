@@ -19,21 +19,21 @@ export default defineConfig({
     // Desktop browsers
     {
       name: 'chromium',
-      use: { 
+      use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 1280, height: 720 },
       },
     },
     {
       name: 'firefox',
-      use: { 
+      use: {
         ...devices['Desktop Firefox'],
         viewport: { width: 1280, height: 720 },
       },
     },
     {
       name: 'webkit',
-      use: { 
+      use: {
         ...devices['Desktop Safari'],
         viewport: { width: 1280, height: 720 },
       },
@@ -42,7 +42,7 @@ export default defineConfig({
     // Mobile devices - Primary focus for mobile-first PWA
     {
       name: 'Mobile Chrome',
-      use: { 
+      use: {
         ...devices['Pixel 5'],
         isMobile: true,
         hasTouch: true,
@@ -51,7 +51,7 @@ export default defineConfig({
     },
     {
       name: 'Mobile Safari',
-      use: { 
+      use: {
         ...devices['iPhone 12'],
         isMobile: true,
         hasTouch: true,
@@ -60,7 +60,7 @@ export default defineConfig({
     },
     {
       name: 'Samsung Galaxy',
-      use: { 
+      use: {
         ...devices['Galaxy S8'],
         isMobile: true,
         hasTouch: true,
@@ -71,7 +71,7 @@ export default defineConfig({
     // Tablet devices
     {
       name: 'iPad',
-      use: { 
+      use: {
         ...devices['iPad Pro'],
         isMobile: true,
         hasTouch: true,
@@ -81,7 +81,7 @@ export default defineConfig({
     // PWA-specific testing
     {
       name: 'PWA Chrome',
-      use: { 
+      use: {
         ...devices['Desktop Chrome'],
         viewport: { width: 390, height: 844 }, // Mobile viewport on desktop for PWA testing
         contextOptions: {
@@ -94,7 +94,7 @@ export default defineConfig({
     // Slow network testing for offline functionality
     {
       name: 'Mobile Slow 3G',
-      use: { 
+      use: {
         ...devices['Pixel 5'],
         isMobile: true,
         hasTouch: true,

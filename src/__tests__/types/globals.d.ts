@@ -1,5 +1,6 @@
 declare global {
-  var mockSupabaseClient: any
+  // eslint-disable-next-line no-var
+  var mockSupabaseClient: { auth: Record<string, unknown> } | undefined
 }
 
 export {}

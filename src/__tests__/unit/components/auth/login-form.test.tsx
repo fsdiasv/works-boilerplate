@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { toast } from 'sonner'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 
 import LoginPage from '@/app/[locale]/auth/login/page'
 
@@ -34,7 +34,7 @@ const mockAuthContext = {
 }
 
 vi.mock('@/hooks/use-auth', () => ({
-  useAuth: () => mockAuthContext
+  useAuth: () => mockAuthContext,
 }))
 
 // Mock next/navigation
@@ -52,117 +52,136 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => mockSearchParams,
 }))
 
-// Mock next-intl  
+// Mock next-intl
 vi.mock('next-intl', () => ({
   useTranslations: (namespace: string) => (key: string) => {
     const translations: Record<string, Record<string, string>> = {
       'auth.loginPage': {
-        'title': 'Sign in to your account',
-        'subtitle': 'Welcome back! Please enter your details.',
-        'subtitleLink': 'Sign up',
-        'emailLabel': 'Email',
-        'emailPlaceholder': 'Enter your email',
-        'passwordLabel': 'Password',
-        'passwordPlaceholder': 'Enter your password', 
-        'forgotPasswordLink': 'Forgot password?',
-        'submitButton': 'Sign in',
-        'divider': 'Or continue with',
-        'emailVerified': 'Email verified successfully!'
+        title: 'Sign in to your account',
+        subtitle: 'Welcome back! Please enter your details.',
+        subtitleLink: 'Sign up',
+        emailLabel: 'Email',
+        emailPlaceholder: 'Enter your email',
+        passwordLabel: 'Password',
+        passwordPlaceholder: 'Enter your password',
+        forgotPasswordLink: 'Forgot password?',
+        submitButton: 'Sign in',
+        divider: 'Or continue with',
+        emailVerified: 'Email verified successfully!',
       },
       'auth.errors': {
-        'generic': 'Something went wrong',
-        'oauthProviderError': 'OAuth provider error',
-        'oauthMissingCode': 'OAuth missing code',
-        'oauthStateMismatch': 'OAuth state mismatch',
-        'oauthExchangeFailed': 'OAuth exchange failed',
-        'oauthInvalidSession': 'OAuth invalid session',
-        'oauthSessionMismatch': 'OAuth session mismatch',
-        'oauthCodeReused': 'OAuth code reused',
-        'oauthUnexpectedError': 'OAuth unexpected error',
-        'expiredLink': 'Expired link'
+        generic: 'Something went wrong',
+        oauthProviderError: 'OAuth provider error',
+        oauthMissingCode: 'OAuth missing code',
+        oauthStateMismatch: 'OAuth state mismatch',
+        oauthExchangeFailed: 'OAuth exchange failed',
+        oauthInvalidSession: 'OAuth invalid session',
+        oauthSessionMismatch: 'OAuth session mismatch',
+        oauthCodeReused: 'OAuth code reused',
+        oauthUnexpectedError: 'OAuth unexpected error',
+        expiredLink: 'Expired link',
       },
-      'auth': {
-        'signupPage.verificationEmailSent': 'Verification email sent'
-      }
+      auth: {
+        'signupPage.verificationEmailSent': 'Verification email sent',
+      },
     }
     return translations[namespace]?.[key] || key
   },
   useLocale: () => 'en',
-  NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => children
+  NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => children,
 }))
 
 // Mock tRPC
 const mockResendVerificationMutation = {
   mutate: vi.fn(),
   isLoading: false,
-  error: null
+  error: null,
 }
 
 vi.mock('@/trpc/react', () => ({
   api: {
     auth: {
       resendVerificationEmail: {
-        useMutation: vi.fn(() => mockResendVerificationMutation)
-      }
-    }
-  }
+        useMutation: vi.fn(() => mockResendVerificationMutation),
+      },
+    },
+  },
 }))
 
 // Mock auth components
 vi.mock('@/components/auth/auth-layout', () => ({
   AuthLayout: ({ children }: { children: React.ReactNode }) => (
-    <div data-testid="auth-layout">{children}</div>
-  )
+    <div data-testid='auth-layout'>{children}</div>
+  ),
 }))
 
 vi.mock('@/components/ui/form-input', () => ({
-  FormInput: (props: any) => (
+  FormInput: (props: {
+    id: string
+    type?: string
+    placeholder?: string
+    [key: string]: unknown
+  }) => (
     <input
       data-testid={props.id}
-      type={props.type}
-      placeholder={props.placeholder}
+      type={props.type ?? 'text'}
+      placeholder={props.placeholder ?? ''}
       {...props}
     />
-  )
+  ),
 }))
 
 vi.mock('@/components/ui/password-input', () => ({
-  PasswordInput: (props: any) => (
+  PasswordInput: (props: { id: string; placeholder?: string; [key: string]: unknown }) => (
     <input
       data-testid={props.id}
-      type="password"
-      placeholder={props.placeholder}
+      type='password'
+      placeholder={props.placeholder ?? ''}
       {...props}
     />
-  )
+  ),
 }))
 
 vi.mock('@/components/ui/primary-button', () => ({
-  PrimaryButton: ({ children, isLoading, ...props }: any) => (
-    <button {...props} disabled={isLoading} data-testid="submit-button">
-      {isLoading ? 'Loading...' : children}
+  PrimaryButton: ({
+    children,
+    isLoading,
+    ...props
+  }: {
+    children: React.ReactNode
+    isLoading?: boolean
+    [key: string]: unknown
+  }) => (
+    <button {...props} disabled={isLoading ?? false} data-testid='submit-button'>
+      {isLoading === true ? 'Loading...' : children}
     </button>
-  )
+  ),
 }))
 
 vi.mock('@/components/ui/remember-me-checkbox', () => ({
-  RememberMeCheckbox: ({ checked, onCheckedChange, ...props }: any) => (
+  RememberMeCheckbox: ({
+    checked,
+    onCheckedChange,
+    ...props
+  }: {
+    checked?: boolean
+    onCheckedChange?: (checked: boolean) => void
+    [key: string]: unknown
+  }) => (
     <input
-      data-testid="remember-me"
-      type="checkbox"
-      checked={checked}
-      onChange={(e) => onCheckedChange(e.target.checked)}
+      data-testid='remember-me'
+      type='checkbox'
+      checked={checked ?? false}
+      onChange={e => onCheckedChange?.(e.target.checked)}
       {...props}
     />
-  )
+  ),
 }))
 
 vi.mock('@/components/ui/social-login-button', () => ({
-  SocialLoginButton: ({ provider }: any) => (
-    <button data-testid={`social-login-${provider}`}>
-      Sign in with {provider}
-    </button>
-  )
+  SocialLoginButton: ({ provider }: { provider: string }) => (
+    <button data-testid={`social-login-${provider}`}>Sign in with {provider}</button>
+  ),
 }))
 
 describe('LoginPage', () => {
@@ -178,9 +197,9 @@ describe('LoginPage', () => {
       value: {
         setItem: vi.fn(),
         removeItem: vi.fn(),
-        getItem: vi.fn()
+        getItem: vi.fn(),
       },
-      writable: true
+      writable: true,
     })
 
     // Mock matchMedia for next-themes
@@ -237,7 +256,7 @@ describe('LoginPage', () => {
     render(<LoginPage />)
 
     const emailInput = screen.getByTestId('email') as HTMLInputElement
-    expect(emailInput.value).toBe('test@example.com')
+    expect(emailInput.value ?? '').toBe('test@example.com')
   })
 
   it('should handle email verification success message', () => {
@@ -281,7 +300,7 @@ describe('LoginPage', () => {
 
   it('should show loading state during form submission', async () => {
     const user = userEvent.setup()
-    
+
     // Mock signIn to return a promise that takes time
     mockSignIn.mockImplementation(() => new Promise(resolve => setTimeout(resolve, 100)))
 
@@ -302,7 +321,7 @@ describe('LoginPage', () => {
 
   it('should call signIn with correct credentials', async () => {
     const user = userEvent.setup()
-    
+
     mockSignIn.mockResolvedValue(undefined)
 
     render(<LoginPage />)
@@ -356,13 +375,13 @@ describe('LoginPage', () => {
 
     // Simulate custom event
     const customEvent = new CustomEvent('resendVerification', {
-      detail: { email: 'test@example.com' }
+      detail: { email: 'test@example.com' },
     })
 
     window.dispatchEvent(customEvent)
 
-    expect(mockResendVerificationMutation.mutate).toHaveBeenCalledWith({ 
-      email: 'test@example.com' 
+    expect(mockResendVerificationMutation.mutate).toHaveBeenCalledWith({
+      email: 'test@example.com',
     })
   })
 
@@ -372,9 +391,6 @@ describe('LoginPage', () => {
 
     unmount()
 
-    expect(removeEventListenerSpy).toHaveBeenCalledWith(
-      'resendVerification', 
-      expect.any(Function)
-    )
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('resendVerification', expect.any(Function))
   })
 })

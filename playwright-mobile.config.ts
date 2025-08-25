@@ -28,7 +28,7 @@ export default defineConfig({
     },
     {
       name: 'Mobile Firefox',
-      use: { 
+      use: {
         ...devices['iPhone 13 Pro'],
         browserName: 'firefox',
       },
@@ -39,18 +39,20 @@ export default defineConfig({
     },
     {
       name: 'Tablet Chrome',
-      use: { 
+      use: {
         ...devices['iPad Pro'],
         browserName: 'chromium',
       },
     },
   ],
-  ...(process.env.CI ? {} : {
-    webServer: {
-      command: 'pnpm dev',
-      url: 'http://localhost:3000',
-      reuseExistingServer: !process.env.CI,
-      timeout: 120000,
-    }
-  }),
+  ...(process.env.CI
+    ? {}
+    : {
+        webServer: {
+          command: 'pnpm dev',
+          url: 'http://localhost:3000',
+          reuseExistingServer: !process.env.CI,
+          timeout: 120000,
+        },
+      }),
 })
