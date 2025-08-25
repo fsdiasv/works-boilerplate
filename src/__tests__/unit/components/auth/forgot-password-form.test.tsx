@@ -52,7 +52,7 @@ vi.mock('next-intl', () => ({
         backToLoginLink: 'Sign in here',
       },
     }
-    return translations[namespace]?.[key] || key
+    return translations[namespace]?.[key] ?? key
   },
   useLocale: () => 'en',
   NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => children,
@@ -66,20 +66,33 @@ vi.mock('@/components/auth/auth-layout', () => ({
 }))
 
 vi.mock('@/components/ui/form-input', () => ({
-  FormInput: (props: any) => (
+  FormInput: (props: {
+    id: string
+    type?: string
+    placeholder?: string
+    [key: string]: unknown
+  }) => (
     <input
       data-testid={props.id}
-      type={props.type || 'text'}
-      placeholder={props.placeholder}
+      type={props.type ?? 'text'}
+      placeholder={props.placeholder ?? ''}
       {...props}
     />
   ),
 }))
 
 vi.mock('@/components/ui/primary-button', () => ({
-  PrimaryButton: ({ children, isLoading, ...props }: any) => (
-    <button {...props} disabled={isLoading} data-testid='submit-button'>
-      {isLoading ? 'Loading...' : children}
+  PrimaryButton: ({
+    children,
+    isLoading,
+    ...props
+  }: {
+    children: React.ReactNode
+    isLoading?: boolean
+    [key: string]: unknown
+  }) => (
+    <button {...props} disabled={isLoading ?? false} data-testid='submit-button'>
+      {isLoading === true ? 'Loading...' : children}
     </button>
   ),
 }))
@@ -95,7 +108,7 @@ describe('ForgotPasswordPage', () => {
       writable: true,
       value: vi.fn().mockImplementation(query => ({
         matches: false,
-        media: query,
+        media: query as string,
         onchange: null,
         addListener: vi.fn(),
         removeListener: vi.fn(),
@@ -273,7 +286,8 @@ describe('ForgotPasswordPage', () => {
     render(<ForgotPasswordPage />)
 
     // Check that the layout indicates centered content
-    const mainDiv = screen.getByTestId('auth-layout').querySelector('div.w-full.text-center')
+    const authLayout = screen.getByTestId('auth-layout')
+    const mainDiv = authLayout.querySelector('div.w-full.text-center')
     expect(mainDiv).toBeInTheDocument()
   })
 

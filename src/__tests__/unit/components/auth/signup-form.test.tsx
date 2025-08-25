@@ -48,7 +48,7 @@ vi.mock('next-intl', () => ({
         'errors.emailAlreadyRegistered': 'This email is already registered',
       },
     }
-    return translations[namespace]?.[key] || key
+    return translations[namespace]?.[key] ?? key
   },
   useLocale: () => 'en',
   NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => children,
@@ -148,7 +148,7 @@ describe('SignUpPage', () => {
       writable: true,
       value: vi.fn().mockImplementation(query => ({
         matches: false,
-        media: query,
+        media: query as string,
         onchange: null,
         addListener: vi.fn(),
         removeListener: vi.fn(),
@@ -319,8 +319,8 @@ describe('SignUpPage', () => {
     })
   })
 
-  it('should show loading state during submission', async () => {
-    const _user = userEvent.setup()
+  it('should show loading state during submission', () => {
+    userEvent.setup()
     mockSignUpMutation.isPending = true
 
     render(<SignUpPage />)

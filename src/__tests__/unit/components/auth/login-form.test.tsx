@@ -85,7 +85,7 @@ vi.mock('next-intl', () => ({
         'signupPage.verificationEmailSent': 'Verification email sent',
       },
     }
-    return translations[namespace]?.[key] || key
+    return translations[namespace]?.[key] ?? key
   },
   useLocale: () => 'en',
   NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => children,
@@ -207,7 +207,7 @@ describe('LoginPage', () => {
       writable: true,
       value: vi.fn().mockImplementation(query => ({
         matches: false,
-        media: query,
+        media: query as string,
         onchange: null,
         addListener: vi.fn(),
         removeListener: vi.fn(),
@@ -256,7 +256,7 @@ describe('LoginPage', () => {
     render(<LoginPage />)
 
     const emailInput = screen.getByTestId('email') as HTMLInputElement
-    expect(emailInput.value ?? '').toBe('test@example.com')
+    expect(emailInput.value).toBe('test@example.com')
   })
 
   it('should handle email verification success message', () => {

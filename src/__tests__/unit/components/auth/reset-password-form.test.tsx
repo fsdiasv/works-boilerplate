@@ -65,7 +65,7 @@ vi.mock('next-intl', () => ({
         passwordMatch: 'Passwords do not match',
       },
     }
-    return translations[namespace]?.[key] || key
+    return translations[namespace]?.[key] ?? key
   },
   useLocale: () => 'en',
   NextIntlClientProvider: ({ children }: { children: React.ReactNode }) => children,
@@ -79,8 +79,13 @@ vi.mock('@/components/auth/auth-layout', () => ({
 }))
 
 vi.mock('@/components/ui/password-input', () => ({
-  PasswordInput: (props: any) => (
-    <input data-testid={props.id} type='password' placeholder={props.placeholder} {...props} />
+  PasswordInput: (props: { id: string; placeholder?: string; [key: string]: unknown }) => (
+    <input
+      data-testid={props.id}
+      type='password'
+      placeholder={props.placeholder ?? ''}
+      {...props}
+    />
   ),
 }))
 
@@ -93,9 +98,17 @@ vi.mock('@/components/ui/password-strength-indicator', () => ({
 }))
 
 vi.mock('@/components/ui/primary-button', () => ({
-  PrimaryButton: ({ children, isLoading, ...props }: any) => (
-    <button {...props} disabled={isLoading} data-testid='submit-button'>
-      {isLoading ? 'Loading...' : children}
+  PrimaryButton: ({
+    children,
+    isLoading,
+    ...props
+  }: {
+    children: React.ReactNode
+    isLoading?: boolean
+    [key: string]: unknown
+  }) => (
+    <button {...props} disabled={isLoading ?? false} data-testid='submit-button'>
+      {isLoading === true ? 'Loading...' : children}
     </button>
   ),
 }))
@@ -117,7 +130,7 @@ describe('ResetPasswordPage', () => {
       writable: true,
       value: vi.fn().mockImplementation(query => ({
         matches: false,
-        media: query,
+        media: query as string,
         onchange: null,
         addListener: vi.fn(),
         removeListener: vi.fn(),
@@ -280,7 +293,7 @@ describe('ResetPasswordPage', () => {
     expect(true).toBe(true) // Placeholder test
   })
 
-  it('should handle session validation logic', async () => {
+  it('should handle session validation logic', () => {
     // This test would require complex hook mocking and cookie manipulation
     // The session validation logic is complex and tested implicitly through other tests
     expect(true).toBe(true) // Placeholder test

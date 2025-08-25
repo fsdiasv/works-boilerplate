@@ -120,7 +120,7 @@ export const authHandlers = [
   http.get('*/auth/v1/user', ({ request }) => {
     const authHeader = request.headers.get('Authorization')
 
-    if (authHeader?.includes('mock-access-token')) {
+    if (authHeader?.includes('mock-access-token') === true) {
       return HttpResponse.json({
         id: 'test-user-id',
         email: 'test@example.com',
@@ -140,7 +140,7 @@ export const trpcHandlers = [
   http.post('*/api/trpc/auth.getSession*', ({ request }) => {
     const authHeader = request.headers.get('Authorization')
 
-    if (authHeader?.includes('mock-access-token')) {
+    if (authHeader?.includes('mock-access-token') === true) {
       return HttpResponse.json({
         result: {
           data: {
@@ -201,7 +201,7 @@ export const trpcHandlers = [
   http.post('*/api/trpc/workspace.list*', ({ request }) => {
     const authHeader = request.headers.get('Authorization')
 
-    if (authHeader?.includes('mock-access-token')) {
+    if (authHeader?.includes('mock-access-token') === true) {
       return HttpResponse.json({
         result: {
           data: [

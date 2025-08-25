@@ -125,7 +125,7 @@ describe('tRPC Client Integration', () => {
       expect.objectContaining({
         headers: expect.objectContaining({
           'x-trpc-source': 'nextjs-react',
-        }),
+        }) as Record<string, unknown>,
       })
     )
   })
