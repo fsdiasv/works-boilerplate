@@ -14,22 +14,32 @@ const intlMiddleware = createMiddleware({
 
 // Define protected routes patterns
 const protectedRoutes = [
-  '/dashboard',
   '/profile',
   '/settings',
   '/admin',
   '/workspace',
   '/faturamento',
+  '/analytics', // SECURITY FIX: Analytics now requires authentication
+]
+
+// Define public routes that don't require authentication
+const publicRoutes: string[] = [
+  // Analytics removed from public routes for security
+  // Add other public routes here as needed
 ]
 
 // Define auth routes (where authenticated users shouldn't be)
 const authRoutes = ['/login', '/signup', '/forgot-password']
 
 // Define routes that require an active workspace
-const workspaceRequiredRoutes = ['/dashboard', '/faturamento', '/workspace/settings']
+const workspaceRequiredRoutes = ['/faturamento', '/workspace/settings', '/analytics']
 
 function isProtectedRoute(pathname: string): boolean {
   return protectedRoutes.some(route => pathname.includes(route))
+}
+
+function isPublicRoute(pathname: string): boolean {
+  return publicRoutes.some(route => pathname.includes(route))
 }
 
 function isAuthRoute(pathname: string): boolean {
@@ -72,11 +82,8 @@ export default async function middleware(request: NextRequest) {
   // First, handle i18n for all other routes
   const intlResponse = intlMiddleware(request)
 
-  // Only bail out if next-intl performed a rewrite or redirect
-  const i18nHandled =
-    intlResponse.headers.has('x-middleware-rewrite') ||
-    intlResponse.headers.has('x-middleware-redirect')
-  if (i18nHandled) {
+  // If intl middleware returns a response (redirect or rewrite), return it
+  if (intlResponse instanceof NextResponse) {
     return intlResponse
   }
 
@@ -90,6 +97,14 @@ export default async function middleware(request: NextRequest) {
 
   // Get locale from pathname or default
   const locale = locales.find(l => pathname.startsWith(`/${l}`)) ?? defaultLocale
+
+  // Allow public routes without authentication
+  if (isPublicRoute(pathnameWithoutLocale)) {
+    // Skip auth checks for public routes like analytics
+    const isDev = env.NODE_ENV === 'development'
+    addCSPHeaders(authResponse.headers, isDev)
+    return authResponse
+  }
 
   // Check if the route is protected
   if (isProtectedRoute(pathnameWithoutLocale)) {
@@ -141,11 +156,6 @@ export default async function middleware(request: NextRequest) {
   // Add CSP headers
   const isDev = env.NODE_ENV === 'development'
   addCSPHeaders(authResponse.headers, isDev)
-
-  // Merge any cookies set by i18n (e.g., NEXT_LOCALE) into the final response
-  for (const { name, value, ...options } of intlResponse.cookies.getAll()) {
-    authResponse.cookies.set(name, value, options)
-  }
 
   // Return the response with any auth cookie updates and CSP headers
   return authResponse

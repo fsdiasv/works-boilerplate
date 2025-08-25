@@ -19,6 +19,17 @@ export const env = createEnv({
     VERCEL_URL: z.string().optional(),
     PORT: z.coerce.number().default(3000),
     GOOGLE_SITE_VERIFICATION: z.string().optional(),
+    // Exchange rates for analytics currency conversion
+    EXCHANGE_RATE_USD_TO_BRL: z
+      .string()
+      .regex(/^\d+(\.\d+)?$/)
+      .optional()
+      .default('5.50'),
+    EXCHANGE_RATE_EUR_TO_BRL: z
+      .string()
+      .regex(/^\d+(\.\d+)?$/)
+      .optional()
+      .default('6.00'),
   },
   client: {
     NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
@@ -45,6 +56,8 @@ export const env = createEnv({
     VERCEL_URL: process.env.VERCEL_URL,
     PORT: process.env.PORT,
     GOOGLE_SITE_VERIFICATION: process.env.GOOGLE_SITE_VERIFICATION,
+    EXCHANGE_RATE_USD_TO_BRL: process.env.EXCHANGE_RATE_USD_TO_BRL,
+    EXCHANGE_RATE_EUR_TO_BRL: process.env.EXCHANGE_RATE_EUR_TO_BRL,
     // Client
     NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL,
     NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
