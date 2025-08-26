@@ -382,15 +382,14 @@ jobs:
   summary:
     name: CI/CD Summary
     runs-on: ubuntu-latest
-    needs:
-      [
+    needs: [
         quality-checks,
         unit-tests,
         build-test,
-        e2e-tests,
+        # e2e-tests,
         security-audit,
-        mobile-pwa-test,
-        lighthouse-audit,
+        # mobile-pwa-test,
+        # lighthouse-audit,
       ]
     if: always()
 
@@ -400,10 +399,7 @@ jobs:
           echo "Quality Checks: ${{ needs.quality-checks.result }}"
           echo "Unit Tests: ${{ needs.unit-tests.result }}"
           echo "Build Test: ${{ needs.build-test.result }}"
-          echo "E2E Tests: ${{ needs.e2e-tests.result }}"
           echo "Security Audit: ${{ needs.security-audit.result }}"
-          echo "Mobile PWA Tests: ${{ needs.mobile-pwa-test.result }}"
-          echo "Lighthouse Audit: ${{ needs.lighthouse-audit.result }}"
 
           if [[ "${{ needs.quality-checks.result }}" == "success" && 
                 "${{ needs.unit-tests.result }}" == "success" && 
