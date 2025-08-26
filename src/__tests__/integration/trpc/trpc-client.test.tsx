@@ -42,14 +42,45 @@ describe('tRPC Client Integration', () => {
   beforeEach(() => {
     vi.clearAllMocks()
 
-    // Mock fetch to prevent actual API calls
+    // Mock fetch to prevent actual API calls with proper streaming support
+    const mockResponseData = JSON.stringify([
+      {
+        result: {
+          data: { user: null, session: null },
+        },
+      },
+    ])
+
+    // Create a mock ReadableStream with getReader method
+    const mockStream = {
+      getReader: vi.fn().mockReturnValue({
+        read: vi
+          .fn()
+          .mockResolvedValueOnce({
+            done: false,
+            value: new TextEncoder().encode(mockResponseData),
+          })
+          .mockResolvedValueOnce({
+            done: true,
+            value: undefined,
+          }),
+        releaseLock: vi.fn(),
+      }),
+      cancel: vi.fn(),
+      locked: false,
+    }
+
     global.fetch = vi.fn().mockResolvedValue({
       ok: true,
       status: 200,
       json: vi.fn().mockResolvedValue({
         result: { data: null },
       }),
-      headers: new Headers(),
+      text: vi.fn().mockResolvedValue(mockResponseData),
+      body: mockStream,
+      headers: new Headers({
+        'content-type': 'application/json',
+      }),
     })
   })
 

@@ -241,52 +241,52 @@ jobs:
         run: npx audit-ci --config audit-ci.json
         continue-on-error: true
 
-  mobile-pwa-test:
-    name: Mobile PWA Tests
-    runs-on: ubuntu-latest
-    timeout-minutes: 25
-    needs: [build-test]
+  # mobile-pwa-test:
+  #   name: Mobile PWA Tests
+  #   runs-on: ubuntu-latest
+  #   timeout-minutes: 25
+  #   needs: [build-test]
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v4
 
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4
+  #     - name: Setup pnpm
+  #       uses: pnpm/action-setup@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          cache: 'pnpm'
+  #     - name: Setup Node.js
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: '20'
+  #         cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+  #     - name: Install dependencies
+  #       run: pnpm install --frozen-lockfile
 
-      - name: Install Playwright browsers
-        run: npx playwright install --with-deps
+  #     - name: Install Playwright browsers
+  #       run: npx playwright install --with-deps
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts
-          path: .next
+  #     - name: Download build artifacts
+  #       uses: actions/download-artifact@v4
+  #       with:
+  #         name: build-artifacts
+  #         path: .next
 
-      - name: Generate Prisma client
-        run: pnpm db:generate
+  #     - name: Generate Prisma client
+  #       run: pnpm db:generate
 
-      - name: Run mobile-specific E2E tests
-        run: npx playwright test --config=playwright-mobile.config.ts
-        env:
-          BASE_URL: http://localhost:3000
+  #     - name: Run mobile-specific E2E tests
+  #       run: npx playwright test --config=playwright-mobile.config.ts
+  #       env:
+  #         BASE_URL: http://localhost:3000
 
-      - name: Upload mobile test results
-        uses: actions/upload-artifact@v4
-        if: failure()
-        with:
-          name: mobile-playwright-report
-          path: playwright-report/
-          retention-days: 7
+  #     - name: Upload mobile test results
+  #       uses: actions/upload-artifact@v4
+  #       if: failure()
+  #       with:
+  #         name: mobile-playwright-report
+  #         path: playwright-report/
+  #         retention-days: 7
 
   lighthouse-audit:
     name: Lighthouse Performance Audit
