@@ -3,6 +3,7 @@
 import { type WorkspaceRole } from '@prisma/client'
 import { formatDistanceToNow } from 'date-fns'
 import { Search, UserPlus, MoreHorizontal } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import { useTranslations } from 'next-intl'
 import { useState } from 'react'
 
@@ -26,11 +27,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { ChangeRoleDialog } from '@/components/workspace/change-role-dialog'
-import { InviteMemberDialog } from '@/components/workspace/invite-member-dialog'
 import { MemberCard } from '@/components/workspace/member-card'
-import { RemoveMemberDialog } from '@/components/workspace/remove-member-dialog'
-import { TransferOwnershipDialog } from '@/components/workspace/transfer-ownership-dialog'
 import { useAuth } from '@/contexts/auth-context'
 import {
   useWorkspace,
@@ -39,6 +36,36 @@ import {
 } from '@/contexts/workspace-context'
 import { getInitials } from '@/lib/utils/get-initials'
 import { api } from '@/trpc/react'
+
+// Lazy load heavy dialog components to reduce initial bundle size
+const ChangeRoleDialog = dynamic(
+  () =>
+    import('@/components/workspace/change-role-dialog').then(mod => ({
+      default: mod.ChangeRoleDialog,
+    })),
+  { ssr: false }
+)
+const InviteMemberDialog = dynamic(
+  () =>
+    import('@/components/workspace/invite-member-dialog').then(mod => ({
+      default: mod.InviteMemberDialog,
+    })),
+  { ssr: false }
+)
+const RemoveMemberDialog = dynamic(
+  () =>
+    import('@/components/workspace/remove-member-dialog').then(mod => ({
+      default: mod.RemoveMemberDialog,
+    })),
+  { ssr: false }
+)
+const TransferOwnershipDialog = dynamic(
+  () =>
+    import('@/components/workspace/transfer-ownership-dialog').then(mod => ({
+      default: mod.TransferOwnershipDialog,
+    })),
+  { ssr: false }
+)
 
 export default function WorkspaceMembersPage() {
   const t = useTranslations('workspace.settings.members')

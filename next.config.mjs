@@ -99,7 +99,7 @@ const nextConfig = {
     // ppr: true, // Partial Prerendering - only available in canary
     // reactCompiler: true, // React Compiler - requires additional setup
 
-    // Mobile optimizations
+    // Mobile optimizations with enhanced tree shaking
     optimizePackageImports: [
       '@/components',
       '@/lib',
@@ -115,6 +115,16 @@ const nextConfig = {
       'class-variance-authority',
       'clsx',
       'tailwind-merge',
+      '@radix-ui/react-dialog',
+      '@radix-ui/react-dropdown-menu',
+      '@radix-ui/react-select',
+      '@radix-ui/react-popover',
+      '@radix-ui/react-tooltip',
+      '@radix-ui/react-accordion',
+      '@radix-ui/react-tabs',
+      '@radix-ui/react-checkbox',
+      '@radix-ui/react-radio-group',
+      'date-fns',
     ],
   },
 
@@ -134,11 +144,11 @@ const nextConfig = {
 
   // Bundle optimization
   webpack: (config, { isServer }) => {
-    // Mobile bundle size limits
+    // More aggressive bundle size limits for mobile optimization
     config.performance = {
-      maxAssetSize: 300000, // 300KB limit (temporary increase)
-      maxEntrypointSize: 600000, // 600KB limit for entry points
-      hints: 'warning', // Changed to warning for development
+      maxAssetSize: 280000, // 280KB limit for individual assets
+      maxEntrypointSize: 550000, // 550KB limit for entry points
+      hints: 'warning',
     }
 
     // SVG handling
@@ -153,29 +163,62 @@ const nextConfig = {
         ...config.optimization,
         splitChunks: {
           chunks: 'all',
+          maxInitialRequests: 25,
+          maxAsyncRequests: 25,
+          minSize: 20000,
+          maxSize: 250000,
           cacheGroups: {
             default: false,
             vendors: false,
-            // Split large vendor libraries
+            // Split large vendor libraries with better granularity
             supabase: {
               test: /[\\/]node_modules[\\/](@supabase)[\\/]/,
               name: 'supabase',
-              priority: 10,
+              priority: 15,
+              chunks: 'async',
             },
             framer: {
               test: /[\\/]node_modules[\\/](framer-motion)[\\/]/,
               name: 'framer',
-              priority: 10,
+              priority: 15,
+              chunks: 'async',
             },
             recharts: {
               test: /[\\/]node_modules[\\/](recharts|d3-.*|victory-.*)[\\/]/,
               name: 'charts',
-              priority: 10,
+              priority: 15,
+              chunks: 'async',
+              maxSize: 250000, // 250KB limit per chunk
+            },
+            radixCore: {
+              test: /[\\/]node_modules[\\/](@radix-ui[\\/]react-(dialog|dropdown-menu|select|popover|tooltip))[\\/]/,
+              name: 'radix-interactive',
+              priority: 12,
+              chunks: 'async',
+            },
+            radixLayout: {
+              test: /[\\/]node_modules[\\/](@radix-ui[\\/]react-(accordion|collapsible|tabs|separator))[\\/]/,
+              name: 'radix-layout',
+              priority: 12,
+              chunks: 'async',
+            },
+            radixForm: {
+              test: /[\\/]node_modules[\\/](@radix-ui[\\/]react-(checkbox|radio-group|slider|switch))[\\/]/,
+              name: 'radix-form',
+              priority: 12,
+              chunks: 'async',
             },
             ui: {
               test: /[\\/]components[\\/]ui[\\/]/,
               name: 'ui',
-              priority: 5,
+              priority: 8,
+              chunks: 'async',
+            },
+            workspace: {
+              test: /[\\/]components[\\/]workspace[\\/]/,
+              name: 'workspace',
+              priority: 8,
+              chunks: 'async',
             },
             commons: {
               minChunks: 2,

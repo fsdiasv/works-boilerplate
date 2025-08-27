@@ -570,6 +570,8 @@
     "passwordUppercase": "Password must contain at least one uppercase letter",
     "passwordLowercase": "Password must contain at least one lowercase letter",
     "passwordNumber": "Password must contain at least one number",
+    "passwordSpecialChar": "Password must contain at least one special character",
+    "passwordCommonWords": "Avoid common words like \"password\", \"admin\", \"user\", etc.",
     "validInput": "Valid input",
     "invalidInput": "Invalid input"
   },

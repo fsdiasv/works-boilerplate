@@ -4,7 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useTranslations, useLocale } from 'next-intl'
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
@@ -17,38 +17,51 @@ import { PrimaryButton } from '@/components/ui/primary-button'
 import { SocialLoginButton } from '@/components/ui/social-login-button'
 import { api } from '@/trpc/react'
 
-const signupSchema = z.object({
-  name: z.string().min(2, 'Name must be at least 2 characters').max(100, 'Name is too long'),
-  email: z.string().email('Invalid email address').min(1, 'Email is required'),
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters')
-    .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-    .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-    .regex(/[0-9]/, 'Password must contain at least one number')
-    .regex(
-      /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>?]/,
-      'Password must contain at least one special character'
-    )
-    .refine(
-      password => {
-        // Check for dictionary words
-        const commonWords = ['password', 'admin', 'user', 'login', 'welcome', 'secret', 'access']
-        const lowerPassword = password.toLowerCase()
-        return !commonWords.some(word => lowerPassword.includes(word))
-      },
-      { message: 'Avoid common words like "password", "admin", "user", etc.' }
-    ),
-})
-
-type SignupFormData = z.infer<typeof signupSchema>
-
 export default function SignUpPage() {
   const t = useTranslations('auth.signupPage')
   const tAuth = useTranslations('auth')
+  const tValidation = useTranslations('validation')
   const locale = useLocale()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+
+  const signupSchema = useMemo(
+    () =>
+      z.object({
+        name: z
+          .string()
+          .min(2, tValidation('nameMinLength'))
+          .max(100, tValidation('max', { max: 100 })),
+        email: z.string().email(tValidation('email')).min(1, tValidation('required')),
+        password: z
+          .string()
+          .min(8, tValidation('passwordMinLength'))
+          .regex(/[A-Z]/, tValidation('passwordUppercase'))
+          .regex(/[a-z]/, tValidation('passwordLowercase'))
+          .regex(/[0-9]/, tValidation('passwordNumber'))
+          .regex(/[!@#$%^&*()_+\-=[\]{};':"\\|,.<>?]/, tValidation('passwordSpecialChar'))
+          .refine(
+            password => {
+              // Check for dictionary words
+              const commonWords = [
+                'password',
+                'admin',
+                'user',
+                'login',
+                'welcome',
+                'secret',
+                'access',
+              ]
+              const lowerPassword = password.toLowerCase()
+              return !commonWords.some(word => lowerPassword.includes(word))
+            },
+            { message: tValidation('passwordCommonWords') }
+          ),
+      }),
+    [tValidation]
+  )
+
+  type SignupFormData = z.infer<typeof signupSchema>
 
   const {
     register,
