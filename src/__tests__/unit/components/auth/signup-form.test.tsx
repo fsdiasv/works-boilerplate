@@ -357,7 +357,11 @@ describe('SignUpPage', () => {
     const user = userEvent.setup()
 
     // Test that the form calls the mutation and handles rejection
-    mockSignUpMutation.mutateAsync.mockRejectedValue(new Error('Email already registered'))
+    const rejectedPromise = Promise.reject(new Error('Email already registered'))
+    mockSignUpMutation.mutateAsync.mockReturnValue(rejectedPromise)
+
+    // Add catch handler to prevent unhandled rejection
+    rejectedPromise.catch(() => {})
 
     render(<SignUpPage />)
 
@@ -376,7 +380,11 @@ describe('SignUpPage', () => {
     const user = userEvent.setup()
 
     // Test that the form calls the mutation and handles rejection
-    mockSignUpMutation.mutateAsync.mockRejectedValue(new Error('Network error'))
+    const rejectedPromise = Promise.reject(new Error('Network error'))
+    mockSignUpMutation.mutateAsync.mockReturnValue(rejectedPromise)
+
+    // Add catch handler to prevent unhandled rejection
+    rejectedPromise.catch(() => {})
 
     render(<SignUpPage />)
 

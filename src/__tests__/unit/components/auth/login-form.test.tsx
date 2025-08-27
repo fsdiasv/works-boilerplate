@@ -256,7 +256,7 @@ describe('LoginPage', () => {
     render(<LoginPage />)
 
     const emailInput = screen.getByTestId('email')
-    expect(emailInput).toHaveAttribute('value', 'test@example.com')
+    expect(emailInput).toHaveDisplayValue('test@example.com')
   })
 
   it('should handle email verification success message', () => {

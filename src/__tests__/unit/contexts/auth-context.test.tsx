@@ -80,31 +80,46 @@ function TestComponent() {
       <div data-testid='user-email'>{auth.user?.email || 'No user'}</div>
       <div data-testid='loading'>{auth.loading ? 'Loading' : 'Not loading'}</div>
       <div data-testid='error'>{auth.error?.message || 'No error'}</div>
-      <button data-testid='sign-in' onClick={() => auth.signIn('test@example.com', 'password')}>
+      <button
+        data-testid='sign-in'
+        onClick={() => auth.signIn('test@example.com', 'password').catch(() => {})}
+      >
         Sign In
       </button>
-      <button data-testid='sign-out' onClick={() => auth.signOut()}>
+      <button data-testid='sign-out' onClick={() => auth.signOut().catch(() => {})}>
         Sign Out
       </button>
-      <button data-testid='sign-in-google' onClick={() => auth.signInWithProvider('google')}>
+      <button
+        data-testid='sign-in-google'
+        onClick={() => auth.signInWithProvider('google').catch(() => {})}
+      >
         Sign In with Google
       </button>
-      <button data-testid='reset-password' onClick={() => auth.resetPassword('test@example.com')}>
+      <button
+        data-testid='reset-password'
+        onClick={() => auth.resetPassword('test@example.com').catch(() => {})}
+      >
         Reset Password
       </button>
-      <button data-testid='update-password' onClick={() => auth.updatePassword('newpassword')}>
+      <button
+        data-testid='update-password'
+        onClick={() => auth.updatePassword('newpassword').catch(() => {})}
+      >
         Update Password
       </button>
-      <button data-testid='update-email' onClick={() => auth.updateEmail('new@example.com')}>
+      <button
+        data-testid='update-email'
+        onClick={() => auth.updateEmail('new@example.com').catch(() => {})}
+      >
         Update Email
       </button>
       <button
         data-testid='update-profile'
-        onClick={() => auth.updateProfile({ full_name: 'New Name' })}
+        onClick={() => auth.updateProfile({ full_name: 'New Name' }).catch(() => {})}
       >
         Update Profile
       </button>
-      <button data-testid='refresh-session' onClick={() => auth.refreshSession()}>
+      <button data-testid='refresh-session' onClick={() => auth.refreshSession().catch(() => {})}>
         Refresh Session
       </button>
     </div>
@@ -151,15 +166,22 @@ describe('AuthContext', () => {
   })
 
   describe('Provider Initialization', () => {
-    it('should initialize with no session when no initialSession provided', () => {
+    it('should initialize with no session when no initialSession provided', async () => {
       render(
         <AuthProvider>
           <TestComponent />
         </AuthProvider>
       )
 
-      expect(screen.getByTestId('user-email')).toHaveTextContent('No user')
+      // Check initial loading state immediately
       expect(screen.getByTestId('loading')).toHaveTextContent('Loading')
+
+      // Wait for auth state to settle
+      await act(async () => {
+        await new Promise(resolve => setTimeout(resolve, 0))
+      })
+
+      expect(screen.getByTestId('user-email')).toHaveTextContent('No user')
       expect(screen.getByTestId('error')).toHaveTextContent('No error')
     })
 
@@ -189,12 +211,14 @@ describe('AuthContext', () => {
   })
 
   describe('Authentication Methods', () => {
-    beforeEach(() => {
-      render(
-        <AuthProvider>
-          <TestComponent />
-        </AuthProvider>
-      )
+    beforeEach(async () => {
+      await act(async () => {
+        render(
+          <AuthProvider>
+            <TestComponent />
+          </AuthProvider>
+        )
+      })
     })
 
     describe('signIn', () => {
