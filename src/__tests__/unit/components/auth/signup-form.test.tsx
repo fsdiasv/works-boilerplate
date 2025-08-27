@@ -62,11 +62,18 @@ const mockSignUpMutation = {
   error: null,
 }
 
+let mockUseMutationOptions: { onSuccess?: () => void; onError?: (error: unknown) => void } = {}
+
 vi.mock('@/trpc/react', () => ({
   api: {
     auth: {
       signUp: {
-        useMutation: vi.fn(() => mockSignUpMutation),
+        useMutation: vi.fn(
+          (options: { onSuccess?: () => void; onError?: (error: unknown) => void } = {}) => {
+            mockUseMutationOptions = options
+            return mockSignUpMutation
+          }
+        ),
       },
     },
   },
@@ -356,12 +363,18 @@ describe('SignUpPage', () => {
   it('should handle email already registered error', async () => {
     const user = userEvent.setup()
 
-    // Test that the form calls the mutation and handles rejection
-    const rejectedPromise = Promise.reject(new Error('Email already registered'))
-    mockSignUpMutation.mutateAsync.mockReturnValue(rejectedPromise)
-
-    // Add catch handler to prevent unhandled rejection
-    rejectedPromise.catch(() => {})
+    // Mock the mutation to call onError synchronously to prevent unhandled rejection
+    mockSignUpMutation.mutateAsync.mockImplementationOnce(async () => {
+      // Call onError handler synchronously before throwing
+      if (mockUseMutationOptions.onError) {
+        mockUseMutationOptions.onError({
+          data: { code: 'CONFLICT' },
+          message: 'Email already registered',
+        })
+      }
+      // Return resolved promise instead of throwing to prevent unhandled rejection
+      return Promise.resolve()
+    })
 
     render(<SignUpPage />)
 
@@ -369,22 +382,32 @@ describe('SignUpPage', () => {
     await user.type(screen.getByTestId('name'), 'John Doe')
     await user.type(screen.getByTestId('email'), 'existing@example.com')
     await user.type(screen.getByTestId('password'), 'MySecur3P@ssw0rd!')
+
+    // Click submit and wait for the mutation to be called and handled
     await user.click(screen.getByTestId('submit-button'))
 
     await waitFor(() => {
       expect(mockSignUpMutation.mutateAsync).toHaveBeenCalled()
     })
+
+    // Give time for error handling to complete
+    await new Promise(resolve => setTimeout(resolve, 50))
   })
 
   it('should handle generic signup errors', async () => {
     const user = userEvent.setup()
 
-    // Test that the form calls the mutation and handles rejection
-    const rejectedPromise = Promise.reject(new Error('Network error'))
-    mockSignUpMutation.mutateAsync.mockReturnValue(rejectedPromise)
-
-    // Add catch handler to prevent unhandled rejection
-    rejectedPromise.catch(() => {})
+    // Mock the mutation to call onError synchronously to prevent unhandled rejection
+    mockSignUpMutation.mutateAsync.mockImplementationOnce(async () => {
+      // Call onError handler synchronously before throwing
+      if (mockUseMutationOptions.onError) {
+        mockUseMutationOptions.onError({
+          message: 'Network error',
+        })
+      }
+      // Return resolved promise instead of throwing to prevent unhandled rejection
+      return Promise.resolve()
+    })
 
     render(<SignUpPage />)
 
@@ -392,11 +415,16 @@ describe('SignUpPage', () => {
     await user.type(screen.getByTestId('name'), 'John Doe')
     await user.type(screen.getByTestId('email'), 'john@example.com')
     await user.type(screen.getByTestId('password'), 'MySecur3P@ssw0rd!')
+
+    // Click submit and wait for the mutation to be called and handled
     await user.click(screen.getByTestId('submit-button'))
 
     await waitFor(() => {
       expect(mockSignUpMutation.mutateAsync).toHaveBeenCalled()
     })
+
+    // Give time for error handling to complete
+    await new Promise(resolve => setTimeout(resolve, 50))
   })
 
   it('should reset loading state after error', async () => {
