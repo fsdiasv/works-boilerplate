@@ -47,14 +47,20 @@ export async function clearAllUserData(): Promise<void> {
       const eqPos = cookie.indexOf('=')
       const name = eqPos > -1 ? cookie.substring(0, eqPos).trim() : cookie.trim()
 
-      // Don't clear essential cookies
-      if (!['theme', 'locale'].includes(name)) {
+      // Don't clear essential cookies and guard against empty names
+      if (name && !['theme', 'locale'].includes(name)) {
+        const hostname = window.location.hostname
+        const hasDomain = hostname.includes('.')
+
         // Clear for current path
         document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
-        // Clear for domain
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${window.location.hostname}`
-        // Clear for parent domain (if subdomain)
-        document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.${window.location.hostname}`
+
+        // Clear for domain (only if hostname has a domain)
+        if (hasDomain) {
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=${hostname}`
+          // Clear for parent domain (if subdomain)
+          document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.${hostname}`
+        }
       }
     })
 

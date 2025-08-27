@@ -9,7 +9,8 @@ import {
   validateDateRange,
   adjustTimezone,
 } from '@/lib/analytics-utils'
-import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
+import { env } from '@/lib/env'
+import { createTRPCRouter, workspaceAdminProcedure } from '@/server/api/trpc'
 
 // Input validation schemas
 const analyticsFiltersSchema = z.object({
@@ -123,16 +124,27 @@ const salesByHourSchema = z.object({
 export const analyticsRouter = createTRPCRouter({
   /**
    * Get comprehensive KPIs for the dashboard
+   * SECURITY: Requires workspace admin role and filters by workspace
    */
-  kpis: publicProcedure
+  kpis: workspaceAdminProcedure
     .input(analyticsFiltersSchema)
     .output(kpisOutputSchema)
     .query(async ({ ctx, input }) => {
       const { from, to, tz, product, gateway, country } = input
+      const workspaceId = ctx.activeWorkspace.id
 
       // Validate date range
       const fromDate = new Date(from)
       const toDate = new Date(to)
+      
+      // Enhanced date validation (incorporating security feedback)
+      if (fromDate >= toDate) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: 'From date must be before to date',
+        })
+      }
+      
       const validation = validateDateRange(fromDate, toDate)
 
       if (!validation.valid) {
@@ -395,8 +407,9 @@ export const analyticsRouter = createTRPCRouter({
 
   /**
    * Get daily revenue time series
+   * SECURITY: Requires workspace admin role and filters by workspace
    */
-  revenueTimeseries: publicProcedure
+  revenueTimeseries: workspaceAdminProcedure
     .input(analyticsFiltersSchema)
     .output(z.array(timeseriesPointSchema))
     .query(async ({ ctx, input }) => {
@@ -455,7 +468,7 @@ export const analyticsRouter = createTRPCRouter({
   /**
    * Get daily orders time series
    */
-  ordersTimeseries: publicProcedure
+  ordersTimeseries: workspaceAdminProcedure
     .input(analyticsFiltersSchema)
     .output(z.array(ordersTimeseriesPointSchema))
     .query(async ({ ctx, input }) => {
@@ -520,7 +533,7 @@ export const analyticsRouter = createTRPCRouter({
   /**
    * Get top products by revenue
    */
-  productsTop: publicProcedure
+  productsTop: workspaceAdminProcedure
     .input(analyticsFiltersSchema.extend({ limit: productsLimitSchema }))
     .output(z.array(productSchema))
     .query(async ({ ctx, input }) => {
@@ -607,7 +620,7 @@ export const analyticsRouter = createTRPCRouter({
   /**
    * Get subscriptions summary
    */
-  subscriptionsSummary: publicProcedure
+  subscriptionsSummary: workspaceAdminProcedure
     .input(analyticsFiltersSchema)
     .output(subscriptionsSummarySchema)
     .query(async ({ ctx, input }) => {
@@ -737,7 +750,7 @@ export const analyticsRouter = createTRPCRouter({
   /**
    * Get disputes/chargebacks summary
    */
-  disputesSummary: publicProcedure
+  disputesSummary: workspaceAdminProcedure
     .input(z.object({ from: z.string().datetime(), to: z.string().datetime() }))
     .output(disputesSummarySchema)
     .query(async ({ ctx, input }) => {
@@ -783,7 +796,7 @@ export const analyticsRouter = createTRPCRouter({
   /**
    * Get recent payments
    */
-  paymentsRecent: publicProcedure
+  paymentsRecent: workspaceAdminProcedure
     .input(z.object({ limit: limitSchema }))
     .output(z.array(recentPaymentSchema))
     .query(async ({ ctx, input }) => {
@@ -860,7 +873,7 @@ export const analyticsRouter = createTRPCRouter({
   /**
    * Get sales by product with quantities and percentages
    */
-  salesByProduct: publicProcedure
+  salesByProduct: workspaceAdminProcedure
     .input(analyticsFiltersSchema)
     .output(z.array(salesByProductSchema))
     .query(async ({ ctx, input }) => {
@@ -923,7 +936,7 @@ export const analyticsRouter = createTRPCRouter({
   /**
    * Get revenue by product with amounts and percentages
    */
-  revenueByProduct: publicProcedure
+  revenueByProduct: workspaceAdminProcedure
     .input(analyticsFiltersSchema)
     .output(z.array(revenueByProductSchema))
     .query(async ({ ctx, input }) => {
@@ -998,7 +1011,7 @@ export const analyticsRouter = createTRPCRouter({
   /**
    * Get sales distribution by day of week
    */
-  salesByDayOfWeek: publicProcedure
+  salesByDayOfWeek: workspaceAdminProcedure
     .input(analyticsFiltersSchema)
     .output(z.array(salesByDayOfWeekSchema))
     .query(async ({ ctx, input }) => {
@@ -1068,7 +1081,7 @@ export const analyticsRouter = createTRPCRouter({
   /**
    * Get sales distribution by hour of day
    */
-  salesByHour: publicProcedure
+  salesByHour: workspaceAdminProcedure
     .input(analyticsFiltersSchema)
     .output(z.array(salesByHourSchema))
     .query(async ({ ctx, input }) => {
@@ -1127,6 +1140,30 @@ export const analyticsRouter = createTRPCRouter({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to fetch sales by hour',
         })
+      }
+    }),
+
+  /**
+   * Get exchange rates configuration
+   * SECURITY: Requires workspace admin role
+   */
+  exchangeRates: workspaceAdminProcedure
+    .output(
+      z.object({
+        usd_to_brl: z.number(),
+        eur_to_brl: z.number(),
+        last_updated: z.string(),
+      })
+    )
+    .query(({ ctx }) => {
+      const workspaceId = ctx.activeWorkspace.id
+      // eslint-disable-next-line no-console -- Intentional logging for development
+      console.log(`[Analytics Exchange Rates] Workspace: ${workspaceId}`)
+
+      return {
+        usd_to_brl: Number(env.EXCHANGE_RATE_USD_TO_BRL) || 5.5,
+        eur_to_brl: Number(env.EXCHANGE_RATE_EUR_TO_BRL) || 6.0,
+        last_updated: new Date().toISOString(),
       }
     }),
 })

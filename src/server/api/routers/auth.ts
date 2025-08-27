@@ -51,19 +51,21 @@ export const authRouter = createTRPCRouter({
     if (!user) return null
 
     // Get additional user data from database
+    const includeWorkspaceMemberships =
+      ctx.activeWorkspace?.id !== undefined
+        ? {
+            where: { workspaceId: ctx.activeWorkspace.id },
+            select: { role: true },
+            take: 1,
+          }
+        : undefined
+
     const dbUser = await ctx.db.user.findUnique({
       where: { id: user.id },
       include: {
         profile: true,
         activeWorkspace: true,
-        workspaceMemberships:
-          ctx.activeWorkspace?.id !== undefined
-            ? {
-                where: { workspaceId: ctx.activeWorkspace.id },
-                select: { role: true },
-                take: 1,
-              }
-            : false,
+        ...(includeWorkspaceMemberships && { workspaceMemberships: includeWorkspaceMemberships }),
       },
     })
 
@@ -99,13 +101,13 @@ export const authRouter = createTRPCRouter({
       // Get translations for error messages
       const tAuth = await getTranslations({ locale: ctx.locale, namespace: 'auth.validation' })
 
-      // Sanitize inputs
-      const email = sanitizeAuthInput(rawEmail)
+      // Sanitize and normalize inputs
+      const normalizedEmail = sanitizeAuthInput(rawEmail).toLowerCase()
       const fullName =
         rawFullName !== undefined && rawFullName !== '' ? sanitizeAuthInput(rawFullName) : undefined
 
       // Additional email security validation
-      const emailSecurity = validateEmailSecurity(email)
+      const emailSecurity = validateEmailSecurity(normalizedEmail)
       if (!emailSecurity.isValid || !emailSecurity.isSecure) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
@@ -125,7 +127,7 @@ export const authRouter = createTRPCRouter({
 
       // Check if user already exists in database
       const existingUser = await ctx.db.user.findUnique({
-        where: { email },
+        where: { email: normalizedEmail },
       })
 
       if (existingUser) {
@@ -136,9 +138,9 @@ export const authRouter = createTRPCRouter({
       }
 
       // Sign up with Supabase
-      // console.log('🔄 Starting Supabase signup for:', email)
+      // console.log('🔄 Starting Supabase signup for:', normalizedEmail)
       const { data, error } = await ctx.supabase.auth.signUp({
-        email,
+        email: normalizedEmail,
         password,
         options: {
           data: {
@@ -181,52 +183,59 @@ export const authRouter = createTRPCRouter({
       const workspaceName =
         fullName !== undefined && fullName !== ''
           ? `${fullName}'s Workspace`
-          : `${email.split('@')[0]}'s Workspace`
+          : `${normalizedEmail.split('@')[0]}'s Workspace`
 
       const workspaceSlug = `workspace-${user.id.slice(0, 8)}`
 
-      // Use a transaction to ensure atomicity
-      const result = await ctx.db.$transaction(async tx => {
-        // Create user in database
-        const dbUser = await tx.user.create({
-          data: {
-            id: user.id,
-            email,
-            fullName: fullName ?? null,
-            locale: locale ?? 'en',
-            timezone: timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
-          },
-        })
-
-        // Create empty profile
-        await tx.profile.create({
-          data: {
-            userId: dbUser.id,
-          },
-        })
-
-        // Create workspace and add user as owner
-        const workspace = await tx.workspace.create({
-          data: {
-            name: workspaceName,
-            slug: workspaceSlug,
-            members: {
-              create: {
-                userId: dbUser.id,
-                role: 'owner',
+      // Use a transaction to ensure atomicity with optimized structure
+      const result = await ctx.db.$transaction(
+        async tx => {
+          // Create user in database with all initial data
+          const dbUser = await tx.user.create({
+            data: {
+              id: user.id,
+              email: normalizedEmail,
+              fullName: fullName ?? null,
+              locale: locale ?? 'en',
+              timezone: timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
+              profile: {
+                create: {
+                  // Create profile in the same operation
+                },
               },
             },
-          },
-        })
+            include: {
+              profile: true,
+            },
+          })
 
-        // Set as active workspace
-        await tx.user.update({
-          where: { id: dbUser.id },
-          data: { activeWorkspaceId: workspace.id },
-        })
+          // Create workspace with member in single operation
+          const workspace = await tx.workspace.create({
+            data: {
+              name: workspaceName,
+              slug: workspaceSlug,
+              members: {
+                create: {
+                  userId: dbUser.id,
+                  role: 'owner',
+                },
+              },
+            },
+          })
 
-        return { dbUser, workspace }
-      })
+          // Update user to set active workspace
+          await tx.user.update({
+            where: { id: dbUser.id },
+            data: { activeWorkspaceId: workspace.id },
+          })
+
+          return { dbUser, workspace }
+        },
+        {
+          // Set a reasonable timeout to prevent long-running transactions
+          timeout: 10000, // 10 seconds
+        }
+      )
 
       return {
         user,
@@ -416,16 +425,27 @@ export const authRouter = createTRPCRouter({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      const { email } = input
+      const { email: rawEmail } = input
+      const normalizedEmail = sanitizeAuthInput(rawEmail).toLowerCase()
+
+      // Add artificial delay to normalize response times and prevent timing attacks
+      const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+      const startTime = Date.now()
 
       // Check if user exists in custom database
       const existingUser = await ctx.db.user.findUnique({
-        where: { email },
+        where: { email: normalizedEmail },
       })
 
       // Always return success to prevent email enumeration
       // but only send email if user exists
       if (!existingUser) {
+        // Add delay to match the time taken for existing users
+        const elapsed = Date.now() - startTime
+        const minDelay = 200 // Minimum 200ms delay
+        if (elapsed < minDelay) {
+          await delay(minDelay - elapsed)
+        }
         return { success: true }
       }
 
@@ -442,7 +462,7 @@ export const authRouter = createTRPCRouter({
         },
         body: JSON.stringify({
           type: 'signup',
-          email,
+          email: normalizedEmail,
         }),
       })
 
@@ -450,7 +470,7 @@ export const authRouter = createTRPCRouter({
         // Try alternative method using Supabase client
         const { error: resendError } = await serviceClient.auth.resend({
           type: 'signup',
-          email,
+          email: normalizedEmail,
         })
 
         if (resendError) {
@@ -460,6 +480,13 @@ export const authRouter = createTRPCRouter({
             console.error('Failed to resend verification email:', resendError)
           }
         }
+      }
+
+      // Ensure consistent timing for all paths
+      const elapsed = Date.now() - startTime
+      const minDelay = 200 // Minimum 200ms delay
+      if (elapsed < minDelay) {
+        await delay(minDelay - elapsed)
       }
 
       return { success: true }

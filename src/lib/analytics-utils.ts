@@ -201,7 +201,7 @@ export function normalizePaymentStatus(status: string, gateway: string): string 
     return 'unknown'
   }
 
-  return gatewayMap[status.toLowerCase()] || 'unknown'
+  return gatewayMap[status.toLowerCase()] ?? 'unknown'
 }
 
 /**
@@ -224,7 +224,7 @@ export function exportToCSV(data: Record<string, unknown>[], filename: string = 
   if (!data.length) return ''
 
   // Get headers from first object
-  const headers = Object.keys(data[0])
+  const headers = Object.keys(data[0] ?? {})
 
   // Create CSV content
   const csvContent = [
@@ -236,10 +236,10 @@ export function exportToCSV(data: Record<string, unknown>[], filename: string = 
         .map(header => {
           const value = row[header]
           // Handle values that might contain commas or quotes
-          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          if (typeof value === 'string' && value && (value.includes(',') || value.includes('"'))) {
             return `"${value.replace(/"/g, '""')}"`
           }
-          return value?.toString() || ''
+          return value?.toString() ?? ''
         })
         .join(',')
     ),
@@ -263,7 +263,7 @@ export function downloadCSV(csvContent: string, filename: string): void {
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
 
-  if (link.download !== undefined) {
+  if ('download' in link) {
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
     link.setAttribute('download', `${filename}.csv`)
@@ -323,8 +323,8 @@ export function getDateRange(
 
     case 'custom':
       return {
-        from: customFrom || today,
-        to: customTo || new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1),
+        from: customFrom ?? today,
+        to: customTo ?? new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1),
       }
 
     default:

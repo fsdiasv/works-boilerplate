@@ -1,13 +1,14 @@
 import { MetadataRoute } from 'next'
 
 import { locales } from '@/i18n/config'
+import { env } from '@/lib/env'
 import { getRouteModificationTimes, getChangeFrequency } from 'src/lib/sitemap-utils'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL ?? 'https://localhost:3000'
+  const baseUrl = env.NEXT_PUBLIC_BASE_URL ?? 'https://localhost:3000'
 
-  // Define your app routes here
-  const routes = ['/', '/dashboard', '/profile', '/settings']
+  // Define your app routes here - only include routes that actually exist
+  const routes = ['/']
 
   // Get actual modification times for all routes
   const routeModTimes = await getRouteModificationTimes(routes)

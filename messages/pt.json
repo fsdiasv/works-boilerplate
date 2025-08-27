@@ -12,6 +12,9 @@
       "home": "Início",
       "mainMenu": "Menu Principal",
       "billing": "Faturamento",
+      "contentRadar": "Radar de Conteúdo",
+      "createPost": "Criar Post",
+      "calendar": "Calendário",
       "socialAccounts": "Contas Sociais",
       "apiKeys": "Chaves de API",
       "pricing": "Preços",
@@ -44,7 +47,6 @@
       "close": "Fechar",
       "retry": "Tentar novamente"
     },
-    "save": "Salvar",
     "status": {
       "online": "Online",
       "offline": "Offline",
@@ -88,8 +90,7 @@
       "legalText": "Ao criar uma conta você concorda com nossos",
       "termsOfService": "Termos de Serviço",
       "and": "e nossa",
-      "privacyPolicy": "Política de Privacidade",
-      "verificationEmailSent": "E-mail de verificação enviado! Verifique sua caixa de entrada para confirmar sua conta."
+      "privacyPolicy": "Política de Privacidade"
     },
     "loginPage": {
       "title": "Bem-vindo de volta!",
@@ -185,15 +186,15 @@
       "currentPasswordRequired": "A senha atual é obrigatória",
       "urlInvalid": "URL inválida",
       "bioMaxLength": "A biografia não deve exceder 500 caracteres",
-      "emailAlreadyExists": "Este e-mail já está cadastrado",
-      "workspaceSlugExists": "Esta URL de workspace já existe",
-      "emailAlreadyRegisteredVerify": "E-mail já cadastrado. Verifique sua caixa de entrada ou tente fazer login.",
+      "emailAlreadyExists": "Usuário com este e-mail já existe",
+      "workspaceSlugExists": "Um workspace com esta URL já existe",
+      "emailAlreadyRegisteredVerify": "E-mail já cadastrado. Verifique seu e-mail para verificação ou tente fazer login.",
       "failedToCreateUser": "Falha ao criar usuário"
     },
     "errors": {
       "generic": "Falha na autenticação. Por favor, tente novamente.",
       "emailAlreadyRegistered": "Este e-mail já está cadastrado. Se você esqueceu sua senha, clique em 'Esqueceu a senha?' na tela de login.",
-      "emailNotVerified": "Seu e-mail ainda não foi verificado. Verifique sua caixa de entrada e spam.",
+      "emailNotVerified": "Seu e-mail ainda não foi verificado. Verifique sua caixa de entrada e pasta de spam.",
       "expiredLink": "O link de verificação expirou. Por favor, solicite um novo link.",
       "oauthProviderError": "O provedor de autenticação encontrou um erro. Por favor, tente novamente.",
       "oauthMissingCode": "Código de autorização ausente. Por favor, tente fazer login novamente.",
@@ -226,6 +227,18 @@
     "recentActivity": "Atividade recente",
     "statistics": "Estatísticas",
     "noData": "Sem dados disponíveis",
+    "openMenu": "Abrir menu",
+    "edit": "Editar",
+    "viewDetails": "Ver detalhes",
+    "duplicate": "Duplicar",
+    "delete": "Excluir",
+    "number": "#",
+    "header": "Cabeçalho",
+    "sectionType": "Tipo de Seção",
+    "status": "Status",
+    "target": "Meta",
+    "limit": "Limite",
+    "reviewer": "Revisor",
     "meta": {
       "title": "Painel - Acme Inc.",
       "description": "Visualize suas métricas de negócios, documentos e análises"
@@ -301,15 +314,150 @@
       "admin": "Administrador",
       "member": "Membro"
     },
-    "createSuccess": "Workspace criado com sucesso!",
     "settings": {
+      "title": "Configurações de {workspace}",
+      "description": "Gerencie as configurações e preferências do seu workspace",
+      "back": "Voltar ao painel",
+      "openMenu": "Abrir menu de navegação",
+      "nav": {
+        "title": "Navegação de Configurações",
+        "general": "Geral",
+        "members": "Membros",
+        "invitations": "Convites",
+        "billing": "Cobrança",
+        "dangerZone": "Zona de Perigo",
+        "comingSoon": "Em breve"
+      },
+      "general": {
+        "title": "Configurações Gerais",
+        "description": "Atualize as informações e preferências do seu workspace",
+        "workspaceInfo": "Informações do Workspace",
+        "workspaceInfoDescription": "Informações básicas sobre seu workspace",
+        "name": "Nome do Workspace",
+        "nameDescription": "Este é o nome de exibição do seu workspace",
+        "slug": "URL do Workspace",
+        "slugDescription": "Este é o identificador único da URL do seu workspace",
+        "slugTaken": "Esta URL já está em uso",
+        "workspaceLogo": "Logo do Workspace",
+        "workspaceLogoDescription": "Envie um logo para seu workspace",
+        "uploadLogo": "Enviar Logo",
+        "changeLogo": "Alterar Logo",
+        "removeLogo": "Remover Logo",
+        "logoRequirements": "PNG, JPG ou GIF. Máx 2MB.",
+        "updateSuccess": "Configurações do workspace atualizadas com sucesso"
+      },
       "members": {
+        "title": "Membros",
+        "description": "Gerencie membros do workspace e suas funções",
+        "searchPlaceholder": "Buscar membros...",
+        "inviteMember": "Convidar Membro",
+        "role": "Função",
+        "owner": "Proprietário",
+        "admin": "Administrador",
+        "member": "Membro",
+        "joinedAt": "Entrou em",
+        "joined": "Entrou",
+        "actions": "Ações",
+        "openMenu": "Abrir menu de ações",
+        "invite": "Convidar",
+        "changeRole": "Alterar Função",
+        "removeMember": "Remover Membro",
+        "leaveWorkspace": "Sair do Workspace",
+        "transferOwnership": "Transferir Propriedade",
+        "removeConfirmTitle": "Remover Membro",
+        "removeConfirmDescription": "Tem certeza que deseja remover {name} deste workspace?",
+        "transferConfirmTitle": "Transferir Propriedade",
+        "transferConfirmDescription": "Tem certeza que deseja transferir a propriedade para {name}? Você se tornará um administrador.",
+        "leaveConfirmTitle": "Sair do Workspace",
+        "leaveConfirmDescription": "Tem certeza que deseja sair deste workspace?",
+        "updateSuccess": "Membro atualizado com sucesso",
+        "removeSuccess": "Membro removido com sucesso",
+        "transferSuccess": "Propriedade transferida com sucesso",
+        "leaveSuccess": "Você saiu do workspace",
+        "noMembersFound": "Nenhum membro encontrado",
+        "noMembersYet": "Ainda não há membros",
         "cancel": "Cancelar",
+        "changing": "Alterando...",
+        "change": "Alterar Função",
+        "removing": "Removendo...",
         "remove": "Remover",
         "leave": "Sair",
-        "removing": "Removendo...",
-        "noMembersFound": "Nenhum membro encontrado",
-        "noMembersYet": "Ainda não há membros"
+        "changeRoleDescription": "Alterar função para {name}",
+        "selectNewRole": "Selecionar nova função",
+        "updating": "Atualizando...",
+        "updateRole": "Atualizar Função",
+        "selectMemberPrompt": "Selecione um membro para transferir a propriedade",
+        "selectNewOwner": "Selecionar novo proprietário",
+        "selectMemberPlaceholder": "Selecionar um membro",
+        "transferring": "Transferindo..."
+      },
+      "invitations": {
+        "title": "Convites",
+        "description": "Gerencie convites pendentes",
+        "sendInvitation": "Enviar Convite",
+        "bulkInvite": "Convite em Massa",
+        "pending": "Pendente",
+        "expired": "Expirado",
+        "resend": "Reenviar",
+        "cancel": "Cancelar",
+        "copyLink": "Copiar Link",
+        "email": "E-mail",
+        "role": "Função",
+        "invitedBy": "Convidado por",
+        "expiresAt": "Expira em",
+        "noInvitations": "Nenhum convite pendente",
+        "inviteTitle": "Convidar Membro",
+        "inviteDescription": "Envie um convite para entrar neste workspace",
+        "emailPlaceholder": "colega@exemplo.com",
+        "bulkTitle": "Convite em Massa",
+        "bulkDescription": "Convide vários membros de uma vez",
+        "bulkPlaceholder": "Envie arquivo CSV ou cole e-mails",
+        "sendSuccess": "Convite enviado com sucesso",
+        "resendSuccess": "Convite reenviado com sucesso",
+        "cancelSuccess": "Convite cancelado",
+        "linkCopied": "Link do convite copiado para a área de transferência",
+        "copyLinkError": "Falha ao copiar link",
+        "status": "Status",
+        "actions": "Ações",
+        "openMenu": "Abrir menu",
+        "bulkSendSuccess": "{count, plural, =1 {1 convite enviado com sucesso} other {# convites enviados com sucesso}}",
+        "bulkSendError": "{count, plural, =1 {1 convite falhou} other {# convites falharam}}",
+        "invalidFileType": "Por favor, envie um arquivo CSV",
+        "fileReadError": "Falha ao ler arquivo",
+        "enterValidEmail": "Por favor, digite pelo menos um e-mail válido",
+        "uploadCSV": "Enviar CSV",
+        "orPasteEmails": "Ou cole e-mails",
+        "emailFormatHelp": "Um e-mail por linha ou separado por vírgulas",
+        "defaultRole": "Função padrão",
+        "sending": "Enviando...",
+        "sendInvitations": "Enviar Convites"
+      },
+      "danger": {
+        "title": "Zona de Perigo",
+        "description": "Ações irreversíveis e destrutivas",
+        "deleteWorkspace": "Excluir Workspace",
+        "deleteDescription": "Uma vez excluído, este workspace e todos os seus dados serão permanentemente removidos.",
+        "deleteButton": "Excluir Workspace",
+        "deleteConfirmTitle": "Excluir Workspace",
+        "deleteConfirmDescription": "Esta ação não pode ser desfeita. Isso excluirá permanentemente o workspace {workspace} e todos os dados associados.",
+        "deleteConfirmInput": "Digite DELETE para confirmar",
+        "deleteConfirmationPlaceholder": "DELETE",
+        "restrictedTitle": "Acesso Restrito",
+        "restrictedDescription": "Apenas proprietários do workspace podem acessar ações destrutivas.",
+        "archiveWorkspace": "Arquivar Workspace",
+        "archiveDescription": "Arquive este workspace. Ele pode ser restaurado mais tarde.",
+        "archiveButton": "Arquivar Workspace",
+        "exportData": "Exportar Dados",
+        "exportDescription": "Exporte todos os dados do workspace",
+        "exportButton": "Exportar Dados",
+        "deleteSuccess": "Workspace excluído com sucesso",
+        "archiveSuccess": "Workspace arquivado com sucesso",
+        "exportSuccess": "Exportação iniciada. Você receberá um e-mail quando estiver pronta.",
+        "cancel": "Cancelar",
+        "deleting": "Excluindo...",
+        "delete": "Excluir",
+        "exporting": "Exportando...",
+        "archiving": "Arquivando..."
       },
       "billing": {
         "title": "Faturamento",
@@ -319,7 +467,7 @@
           "description": "Você está atualmente no plano Gratuito",
           "freePlan": "Plano Gratuito",
           "freePlanDescription": "Até 3 membros",
-          "upgradePlan": "Fazer Upgrade"
+          "upgradePlan": "Fazer Upgrade do Plano"
         },
         "paymentMethod": {
           "title": "Método de Pagamento",
@@ -422,6 +570,8 @@
     "passwordUppercase": "A senha deve conter pelo menos uma letra maiúscula",
     "passwordLowercase": "A senha deve conter pelo menos uma letra minúscula",
     "passwordNumber": "A senha deve conter pelo menos um número",
+    "passwordSpecialChar": "A senha deve conter pelo menos um caractere especial",
+    "passwordCommonWords": "Evite palavras comuns como \"senha\", \"admin\", \"usuário\", etc.",
     "validInput": "Entrada válida",
     "invalidInput": "Entrada inválida"
   },
@@ -639,216 +789,5 @@
     },
     "signOut": "Sair",
     "signingOut": "Saindo..."
-  },
-  "ProductsTable": {
-    "search": {
-      "placeholder": "Buscar por código ou nome..."
-    },
-    "export": {
-      "csv": "Exportar CSV"
-    },
-    "summary": {
-      "showing": "Mostrando {count} de {total} produtos",
-      "filtered": "(filtrado por \"{term}\")",
-      "total": "{total} produtos encontrados"
-    },
-    "empty": {
-      "noProducts": "Nenhum produto encontrado",
-      "noData": "Nenhum dado disponível"
-    },
-    "error": {
-      "loading": "Erro ao carregar produtos"
-    },
-    "headers": {
-      "code": "Código",
-      "orders": "Pedidos",
-      "revenue": "Receita",
-      "averageTicket": "Ticket Médio",
-      "refunds": "Reembolsos",
-      "status": "Status"
-    },
-    "footer": {
-      "totalOrders": "Total de Pedidos:",
-      "totalRevenue": "Receita Total:",
-      "averageTicketGeneral": "Ticket Médio Geral:",
-      "averageRefundRate": "Taxa Média de Reembolso:"
-    },
-    "status": {
-      "active": "Ativo",
-      "inactive": "Inativo",
-      "discontinued": "Descontinuado"
-    }
-  },
-  "RevenueChart": {
-    "error": {
-      "loading": "Erro ao carregar dados"
-    },
-    "empty": {
-      "noData": "Nenhum dado disponível",
-      "suggestion": "Selecione um período diferente ou verifique os filtros"
-    },
-    "tooltip": {
-      "revenue": "Receita:",
-      "orders": "Pedidos:",
-      "averageTicket": "Ticket Médio:"
-    },
-    "legend": {
-      "revenue": "Receita (R$)",
-      "orders": "Pedidos"
-    },
-    "reference": {
-      "average": "Média: {value}"
-    }
-  },
-  "Analytics": {
-    "title": "Analytics",
-    "subtitle": "Dashboard de vendas e assinaturas",
-    "filters": {
-      "title": "Filtros",
-      "subtitle": "Ajuste os filtros para personalizar a visualização dos dados",
-      "period": "Período",
-      "from": "Data Inicial",
-      "to": "Data Final",
-      "timezone": "Fuso Horário",
-      "product": "Produto",
-      "productPlaceholder": "Código do produto",
-      "gateway": "Gateway",
-      "country": "País",
-      "periods": {
-        "today": "Hoje",
-        "7d": "Últimos 7 dias",
-        "30d": "Últimos 30 dias",
-        "90d": "Últimos 90 dias",
-        "mtd": "Mês atual",
-        "custom": "Personalizado"
-      },
-      "gateways": {
-        "all": "Todos",
-        "stripe": "Stripe",
-        "paypal": "PayPal",
-        "mercadopago": "Mercado Pago",
-        "pagseguro": "PagSeguro"
-      },
-      "countries": {
-        "all": "Todos",
-        "BR": "Brasil",
-        "US": "Estados Unidos",
-        "AR": "Argentina",
-        "MX": "México",
-        "PT": "Portugal"
-      }
-    },
-    "metrics": {
-      "grossRevenue": "Receita Bruta",
-      "netRevenue": "Receita Líquida",
-      "orders": "Pedidos",
-      "aov": "Ticket Médio",
-      "taxes": "Impostos",
-      "taxesDescription": "Total de impostos no período",
-      "refundRate": "Taxa de Reembolso",
-      "refundRateDescription": "Percentual de reembolsos sobre vendas",
-      "chargebackRate": "Taxa de Chargeback",
-      "chargebackRateDescription": "Percentual de chargebacks sobre receita bruta",
-      "payments": "Pagamentos",
-      "paymentsDescription": "Total de pagamentos aprovados",
-      "subscriptions": "Assinaturas Ativas",
-      "mrr": "MRR Realizado",
-      "newSubscriptions": "Novas Assinaturas",
-      "newSubscriptionsDescription": "Assinaturas criadas no período"
-    },
-    "charts": {
-      "dailyRevenue": "Receita Diária",
-      "dailyRevenueDescription": "Evolução da receita por dia no período selecionado",
-      "dailyOrders": "Pedidos Diários",
-      "dailyOrdersDescription": "Número de pedidos por dia",
-      "revenueAndOrders": "Receita e Pedidos",
-      "revenueAndOrdersDescription": "Visão combinada de receita e volume de pedidos"
-    },
-    "tables": {
-      "topProducts": "Top Produtos",
-      "topProductsByRevenue": "Top Produtos por Receita",
-      "topProductsDescription": "Produtos com maior receita no período selecionado",
-      "disputes": "Disputas",
-      "disputesAndChargebacks": "Disputas e Chargebacks",
-      "disputesDescription": "Resumo de disputas e chargebacks no período",
-      "recentSales": "Vendas Recentes",
-      "recentPayments": "Vendas Recentes",
-      "recentPaymentsDescription": "Últimos pagamentos aprovados",
-      "noDataMessage": "Tabela de disputas detalhada estará disponível quando conectada à base de dados",
-      "noSalesDataMessage": "Tabela de vendas recentes estará disponível quando conectada à base de dados"
-    },
-    "disputes": {
-      "totalDisputes": "Total de Disputas",
-      "netLosses": "Perdas Líquidas",
-      "winRate": "Taxa de Vitória"
-    },
-    "products": {
-      "title": "Análise de Produtos",
-      "backToDashboard": "Voltar ao Dashboard",
-      "detailedAnalysis": "Análise detalhada do produto:",
-      "generalAnalysis": "Análise detalhada de performance por produto",
-      "filters": {
-        "title": "Filtros de Produtos",
-        "subtitle": "Ajuste os filtros para personalizar a análise de produtos",
-        "specificProduct": "Produto Específico",
-        "results": "Resultados",
-        "top10": "Top 10",
-        "top25": "Top 25",
-        "top50": "Top 50"
-      },
-      "singleProduct": {
-        "overview": "Análise Detalhada",
-        "description": "Performance detalhada do produto no período selecionado",
-        "dailyRevenue": "Receita Diária",
-        "dailyRevenueDescription": "Evolução da receita do produto por dia",
-        "dailyOrders": "Pedidos Diários",
-        "dailyOrdersDescription": "Volume de pedidos do produto por dia",
-        "comparison": "Comparação com Outros Produtos",
-        "comparisonDescription": "Como este produto se compara com os demais"
-      },
-      "multiProduct": {
-        "totalProducts": "Total de Produtos",
-        "totalProductsDescription": "Produtos com vendas no período",
-        "totalRevenue": "Receita Total",
-        "totalRevenueDescription": "Soma da receita de todos os produtos",
-        "totalOrders": "Pedidos Total",
-        "totalOrdersDescription": "Total de pedidos de todos os produtos",
-        "generalAov": "Ticket Médio Geral",
-        "generalAovDescription": "Ticket médio considerando todos os produtos",
-        "ranking": "Ranking de Produtos por Performance",
-        "rankingDescription": "Produtos ordenados por receita no período selecionado"
-      },
-      "tabs": {
-        "table": "Tabela de Produtos",
-        "insights": "Insights e Análises",
-        "export": "Exportar Dados"
-      },
-      "insights": {
-        "topThree": "Top 3 Produtos",
-        "topThreeDescription": "Melhores produtos por receita",
-        "performance": "Insights de Performance",
-        "performanceDescription": "Análise automática dos dados",
-        "bestAov": "Produto com melhor AOV:",
-        "mostOrders": "Produto com mais pedidos:",
-        "lowestRefund": "Produto com menor taxa de reembolso:",
-        "concentration": "Concentração:",
-        "concentrationText": "Os top 3 produtos representam {percentage}% da receita total"
-      },
-      "export": {
-        "title": "Exportar Dados de Produtos",
-        "description": "Download dos dados em diferentes formatos",
-        "csvButton": "Exportar como CSV",
-        "excelButton": "Exportar como Excel",
-        "comingSoon": "(Em breve)",
-        "csvDescription": "O arquivo CSV incluirá todos os produtos mostrados na tabela com as seguintes colunas:",
-        "columns": {
-          "productCode": "Código do Produto",
-          "orders": "Número de Pedidos",
-          "revenue": "Receita Total (BRL)",
-          "aov": "Ticket Médio (BRL)",
-          "refundRate": "Taxa de Reembolso (%)"
-        }
-      }
-    }
   }
 }

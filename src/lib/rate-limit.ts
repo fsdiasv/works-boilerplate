@@ -129,6 +129,15 @@ export const rateLimiters =
           analytics: true,
           prefix: 'ratelimit:heavy',
         }),
+        authCallback: new Ratelimit({
+          redis: new Redis({
+            url: env.UPSTASH_REDIS_REST_URL,
+            token: env.UPSTASH_REDIS_REST_TOKEN,
+          }),
+          limiter: Ratelimit.slidingWindow(10, '5 m'), // 10 callbacks per 5 minutes
+          analytics: true,
+          prefix: 'ratelimit:auth-callback',
+        }),
       }
     : {
         // Development rate limiters using in-memory storage
@@ -137,6 +146,7 @@ export const rateLimiters =
         passwordReset: new SimpleRateLimiter(3, parseDuration('1 h')),
         accountDeletion: new SimpleRateLimiter(1, parseDuration('24 h')),
         heavy: new SimpleRateLimiter(5, parseDuration('1 h')),
+        authCallback: new SimpleRateLimiter(10, parseDuration('5 m')),
       }
 
 /**
@@ -162,9 +172,16 @@ export function getRateLimitHeaders(result: {
   remaining: number
   reset: number
 }): Record<string, string> {
+  // result.reset is either an absolute timestamp (Upstash) or relative ms (SimpleRateLimiter)
+  // For SimpleRateLimiter, it's an absolute timestamp, but let's handle both cases safely
+  const resetTime =
+    result.reset > Date.now() + 1000 * 60 * 60 * 24 * 365
+      ? result.reset // Already an absolute timestamp
+      : Date.now() + result.reset // Relative ms, convert to absolute
+
   return {
     'X-RateLimit-Limit': result.limit.toString(),
     'X-RateLimit-Remaining': result.remaining.toString(),
-    'X-RateLimit-Reset': new Date(result.reset).toISOString(),
+    'X-RateLimit-Reset': Math.floor(resetTime / 1000).toString(), // Unix timestamp in seconds
   }
 }

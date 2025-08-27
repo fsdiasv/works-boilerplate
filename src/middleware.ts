@@ -13,16 +13,26 @@ const intlMiddleware = createMiddleware({
 })
 
 // Define protected routes patterns
-const protectedRoutes = ['/profile', '/settings', '/admin', '/workspace', '/faturamento']
+const protectedRoutes = [
+  '/profile',
+  '/settings',
+  '/admin',
+  '/workspace',
+  '/faturamento',
+  '/analytics', // SECURITY FIX: Analytics now requires authentication
+]
 
 // Define public routes that don't require authentication
-const publicRoutes = ['/analytics']
+const publicRoutes: string[] = [
+  // Analytics removed from public routes for security
+  // Add other public routes here as needed
+]
 
 // Define auth routes (where authenticated users shouldn't be)
 const authRoutes = ['/login', '/signup', '/forgot-password']
 
 // Define routes that require an active workspace
-const workspaceRequiredRoutes = ['/faturamento', '/workspace/settings']
+const workspaceRequiredRoutes = ['/faturamento', '/workspace/settings', '/analytics']
 
 function isProtectedRoute(pathname: string): boolean {
   return protectedRoutes.some(route => pathname.includes(route))
