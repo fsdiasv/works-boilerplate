@@ -1,4 +1,4 @@
-# Works Boilerplate
+# DS Club
 
 A mobile-first, production-ready SaaS starter kit built with Next.js 15, React
 19, and TypeScript.
@@ -44,15 +44,20 @@ See [MCP Setup Guide](docs/MCP_SETUP.md) for detailed instructions.
 **⚠️ READ THIS BEFORE ANY DATABASE OPERATIONS ⚠️**
 
 ### 🛡️ Protect Your Data
+
 - **NEVER** use `pnpm db:push` on databases with existing data
 - **ALWAYS** create backups before schema changes: `pnpm db:backup`
 - **ALWAYS** use `pnpm db:migrate` for safe schema changes
-- **READ** the full safety guide: [`docs/CRITICAL-DATABASE-SAFETY.md`](docs/CRITICAL-DATABASE-SAFETY.md)
+- **READ** the full safety guide:
+  [`docs/CRITICAL-DATABASE-SAFETY.md`](docs/CRITICAL-DATABASE-SAFETY.md)
 
 ### 🔴 One Wrong Command = Data Loss
-Database operations can **permanently destroy** all your data in seconds. Follow the safety protocols religiously.
 
-📖 **Required Reading**: [`docs/CRITICAL-DATABASE-SAFETY.md`](docs/CRITICAL-DATABASE-SAFETY.md)
+Database operations can **permanently destroy** all your data in seconds. Follow
+the safety protocols religiously.
+
+📖 **Required Reading**:
+[`docs/CRITICAL-DATABASE-SAFETY.md`](docs/CRITICAL-DATABASE-SAFETY.md)
 
 ---
 

@@ -70,15 +70,16 @@ export function RevenueChart({
   }))
 
   // Calculate average revenue for reference line
-  const avgRevenue = chartData.length > 0
-    ? chartData.reduce((sum, point) => sum + point.revenue, 0) / chartData.length
-    : 0
+  const avgRevenue =
+    chartData.length > 0
+      ? chartData.reduce((sum, point) => sum + point.revenue, 0) / chartData.length
+      : 0
 
   if (loading) {
     return (
       <div className={`h-[${height}px] w-full ${className}`}>
         <div className='flex h-full items-center justify-center'>
-          <div className='space-y-4 w-full p-6'>
+          <div className='w-full space-y-4 p-6'>
             <Skeleton className='h-4 w-48' />
             <Skeleton className='h-64 w-full' />
             <div className='flex justify-center space-x-4'>
@@ -95,13 +96,9 @@ export function RevenueChart({
     return (
       <div className={`h-[${height}px] w-full ${className}`}>
         <div className='flex h-full items-center justify-center'>
-          <div className='text-center space-y-2'>
-            <div className='text-red-500 text-sm font-medium'>
-              {t('error.loading')}
-            </div>
-            <div className='text-muted-foreground text-xs'>
-              {error}
-            </div>
+          <div className='space-y-2 text-center'>
+            <div className='text-sm font-medium text-red-500'>{t('error.loading')}</div>
+            <div className='text-muted-foreground text-xs'>{error}</div>
           </div>
         </div>
       </div>
@@ -112,13 +109,9 @@ export function RevenueChart({
     return (
       <div className={`h-[${height}px] w-full ${className}`}>
         <div className='flex h-full items-center justify-center'>
-          <div className='text-center space-y-2'>
-            <div className='text-muted-foreground text-sm'>
-              {t('empty.noData')}
-            </div>
-            <div className='text-muted-foreground text-xs'>
-              {t('empty.suggestion')}
-            </div>
+          <div className='space-y-2 text-center'>
+            <div className='text-muted-foreground text-sm'>{t('empty.noData')}</div>
+            <div className='text-muted-foreground text-xs'>{t('empty.suggestion')}</div>
           </div>
         </div>
       </div>
@@ -142,7 +135,7 @@ export function RevenueChart({
             stroke={isDark ? '#374151' : '#e5e7eb'}
             vertical={false}
           />
-          
+
           <XAxis
             dataKey='date'
             axisLine={false}
@@ -154,7 +147,7 @@ export function RevenueChart({
             tickMargin={8}
             interval='preserveStartEnd'
           />
-          
+
           <YAxis
             yAxisId='left'
             axisLine={false}
@@ -164,9 +157,9 @@ export function RevenueChart({
               fill: isDark ? '#9ca3af' : '#6b7280',
             }}
             tickMargin={8}
-            tickFormatter={(value) => formatBRL(value, { locale, showSymbol: false })}
+            tickFormatter={value => formatBRL(value, { locale, showSymbol: false })}
           />
-          
+
           {showOrders && (
             <YAxis
               yAxisId='right'
@@ -178,10 +171,10 @@ export function RevenueChart({
                 fill: isDark ? '#9ca3af' : '#6b7280',
               }}
               tickMargin={8}
-              tickFormatter={(value) => value.toLocaleString(locale)}
+              tickFormatter={value => value.toLocaleString(locale)}
             />
           )}
-          
+
           <Tooltip
             content={({ active, payload, label }) => {
               if (active && payload && payload.length > 0) {
@@ -204,7 +197,7 @@ export function RevenueChart({
                           {data?.formattedRevenue}
                         </span>
                       </div>
-                      
+
                       {showOrders && data?.orders && (
                         <div className='flex items-center gap-2 text-sm'>
                           <div
@@ -219,7 +212,7 @@ export function RevenueChart({
                           </span>
                         </div>
                       )}
-                      
+
                       {showAOV && data?.aov && (
                         <div className='flex items-center gap-2 text-sm'>
                           <div
@@ -241,14 +234,17 @@ export function RevenueChart({
               return null
             }}
           />
-          
+
           {avgRevenue > 0 && (
             <ReferenceLine
               y={avgRevenue}
+              yAxisId='left'
               stroke={isDark ? '#6b7280' : '#9ca3af'}
               strokeDasharray='5 5'
               label={{
-                value: t('reference.average', { value: formatBRL(avgRevenue, { locale, showSymbol: false }) }),
+                value: t('reference.average', {
+                  value: formatBRL(avgRevenue, { locale, showSymbol: false }),
+                }),
                 position: 'topRight',
                 style: {
                   fontSize: '12px',
@@ -257,7 +253,7 @@ export function RevenueChart({
               }}
             />
           )}
-          
+
           <Line
             yAxisId='left'
             type='monotone'
@@ -276,7 +272,7 @@ export function RevenueChart({
               fill: '#fff',
             }}
           />
-          
+
           {showOrders && (
             <Line
               type='monotone'
@@ -291,7 +287,7 @@ export function RevenueChart({
               }}
             />
           )}
-          
+
           {(showOrders || showAOV) && (
             <Legend
               verticalAlign='top'
@@ -372,7 +368,7 @@ export function DualAxisRevenueChart({
             stroke={isDark ? '#374151' : '#e5e7eb'}
             vertical={false}
           />
-          
+
           <XAxis
             dataKey='date'
             axisLine={false}
@@ -384,7 +380,7 @@ export function DualAxisRevenueChart({
             tickMargin={8}
             interval='preserveStartEnd'
           />
-          
+
           <YAxis
             yAxisId='left'
             axisLine={false}
@@ -394,9 +390,9 @@ export function DualAxisRevenueChart({
               fill: isDark ? '#9ca3af' : '#6b7280',
             }}
             tickMargin={8}
-            tickFormatter={(value) => formatBRL(value, { locale, showSymbol: false })}
+            tickFormatter={value => formatBRL(value, { locale, showSymbol: false })}
           />
-          
+
           <YAxis
             yAxisId='right'
             orientation='right'
@@ -407,9 +403,9 @@ export function DualAxisRevenueChart({
               fill: isDark ? '#9ca3af' : '#6b7280',
             }}
             tickMargin={8}
-            tickFormatter={(value) => value.toLocaleString(locale)}
+            tickFormatter={value => value.toLocaleString(locale)}
           />
-          
+
           <Tooltip
             content={({ active, payload, label }) => {
               if (active && payload && payload.length > 0) {
@@ -445,7 +441,7 @@ export function DualAxisRevenueChart({
               return null
             }}
           />
-          
+
           <Legend
             verticalAlign='top'
             height={36}
@@ -455,7 +451,7 @@ export function DualAxisRevenueChart({
               color: isDark ? '#9ca3af' : '#6b7280',
             }}
           />
-          
+
           <Line
             yAxisId='left'
             type='monotone'
@@ -475,7 +471,7 @@ export function DualAxisRevenueChart({
               fill: '#fff',
             }}
           />
-          
+
           <Line
             yAxisId='right'
             type='monotone'

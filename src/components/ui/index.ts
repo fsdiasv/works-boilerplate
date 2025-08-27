@@ -1,4 +1,4 @@
-// shadcn/ui component exports for Works Boilerplate
+// shadcn/ui component exports for DS Club
 // All components are mobile-optimized with 44px+ touch targets
 
 // Core Components

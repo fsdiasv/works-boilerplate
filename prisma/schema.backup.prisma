@@ -1,0 +1,313 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                   String            @id @default(uuid())
+  email                String            @unique
+  fullName             String?           @map("full_name")
+  avatarUrl            String?           @map("avatar_url")
+  emailVerified        Boolean           @default(false) @map("email_verified")
+  phone                String?
+  locale               String            @default("en")
+  timezone             String            @default("UTC")
+  metadata             Json?
+  activeWorkspaceId    String?           @map("active_workspace_id")
+  lastActiveAt         DateTime          @default(now()) @map("last_active_at")
+  createdAt            DateTime          @default(now()) @map("created_at")
+  updatedAt            DateTime          @updatedAt @map("updated_at")
+  disputes             Dispute[]
+  invitationsSent      Invitation[]
+  orderItems           OrderItem[]
+  orders               Order[]
+  profile              Profile?
+  sessions             Session[]
+  subscriptions        Subscription[]
+  activeWorkspace      Workspace?        @relation("UserActiveWorkspace", fields: [activeWorkspaceId], references: [id])
+  workspaceMemberships WorkspaceMember[]
+
+  @@map("users")
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  userId    String   @unique @map("user_id")
+  bio       String?
+  website   String?
+  company   String?
+  jobTitle  String?  @map("job_title")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  token        String   @unique
+  expiresAt    DateTime @map("expires_at")
+  ipAddress    String?  @map("ip_address")
+  userAgent    String?  @map("user_agent")
+  createdAt    DateTime @default(now()) @map("created_at")
+  lastActiveAt DateTime @default(now()) @map("last_active_at")
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+
+model Workspace {
+  id          String            @id @default(uuid())
+  name        String
+  slug        String            @unique
+  logo        String?
+  settings    Json              @default("{}")
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+  deletedAt   DateTime?         @map("deleted_at")
+  invitations Invitation[]
+  activeUsers User[]            @relation("UserActiveWorkspace")
+  members     WorkspaceMember[]
+
+  @@index([slug])
+  @@map("workspaces")
+}
+
+model WorkspaceMember {
+  userId      String        @map("user_id")
+  workspaceId String        @map("workspace_id")
+  role        WorkspaceRole
+  joinedAt    DateTime      @default(now()) @map("joined_at")
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@id([userId, workspaceId])
+  @@index([workspaceId])
+  @@index([userId])
+  @@map("workspace_members")
+}
+
+model Invitation {
+  id          String        @id @default(uuid())
+  workspaceId String        @map("workspace_id")
+  email       String
+  role        WorkspaceRole
+  invitedById String        @map("invited_by_id")
+  token       String        @unique @default(uuid())
+  expiresAt   DateTime      @map("expires_at")
+  acceptedAt  DateTime?     @map("accepted_at")
+  createdAt   DateTime      @default(now()) @map("created_at")
+  invitedBy   User          @relation(fields: [invitedById], references: [id], onDelete: Cascade)
+  workspace   Workspace     @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@index([token])
+  @@index([email])
+  @@index([workspaceId])
+  @@map("invitations")
+}
+
+model Product {
+  id                String                   @id @default(uuid())
+  productCode       String                   @unique @map("product_code")
+  baseName          String?                  @map("base_name")
+  niche             String?
+  gender            String?
+  description       String?
+  marketingBriefing Json?                    @map("marketing_briefing")
+  createdAt         DateTime                 @default(now()) @map("created_at")
+  updatedAt         DateTime                 @updatedAt @map("updated_at")
+  languageVersions  ProductLanguageVersion[]
+
+  @@map("products")
+}
+
+model ProductLanguageVersion {
+  id                 String      @id @default(uuid())
+  productId          String      @map("product_id")
+  languageCode       String      @map("language_code")
+  productCode        String      @map("product_code")
+  translatedTitle    String?     @map("translated_title")
+  author             String?
+  salesPageUrl       String?     @map("sales_page_url")
+  publicContentUrl   String?     @map("public_content_url")
+  internalDriveUrl   String?     @map("internal_drive_url")
+  internalContentUrl String?     @map("internal_content_url")
+  createdAt          DateTime    @default(now()) @map("created_at")
+  updatedAt          DateTime    @updatedAt @map("updated_at")
+  funnels            Funnel[]
+  orderItems         OrderItem[]
+  product            Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@map("product_language_versions")
+}
+
+model Funnel {
+  id               String                  @id @default(uuid())
+  systemeFunnelId  Int                     @unique @map("systeme_funnel_id")
+  name             String?
+  productVersionId String?                 @map("product_version_id")
+  updatedAt        DateTime                @default(now()) @map("updated_at")
+  productVersion   ProductLanguageVersion? @relation(fields: [productVersionId], references: [id])
+  orders           Order[]
+
+  @@map("funnels")
+}
+
+model Order {
+  id              String      @id @default(uuid())
+  userId          String      @map("user_id")
+  systemeOrderId  Int?        @map("systeme_order_id")
+  systemeFunnelId Int?        @map("systeme_funnel_id")
+  currency        String?
+  gateway         String?
+  status          String?
+  clientIp        String?     @map("client_ip")
+  trafficMetadata Json?       @map("traffic_metadata")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+  orderItems      OrderItem[]
+  funnel          Funnel?     @relation(fields: [systemeFunnelId], references: [systemeFunnelId])
+  user            User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id                  String                  @id @default(uuid())
+  orderId             String?                 @map("order_id")
+  productVersionId    String?                 @map("product_version_id")
+  userId              String                  @map("user_id")
+  itemType            String?                 @map("item_type")
+  pricingType         String?                 @map("pricing_type")
+  price               Decimal?                @db.Decimal(10, 2)
+  systemeOrderItemId  Int?                    @map("systeme_order_item_id")
+  systemeFunnelStepId Int?                    @map("systeme_funnel_step_id")
+  description         String?
+  createdAt           DateTime                @default(now()) @map("created_at")
+  updatedAt           DateTime                @updatedAt @map("updated_at")
+  disputes            Dispute[]
+  order               Order?                  @relation(fields: [orderId], references: [id])
+  productVersion      ProductLanguageVersion? @relation(fields: [productVersionId], references: [id])
+  user                User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  payments            Payment[]
+  refunds             Refund[]
+  subscriptions       Subscription[]
+
+  @@map("order_items")
+}
+
+model Payment {
+  id                   String     @id @default(uuid())
+  orderItemId          String?    @map("order_item_id")
+  gateway              String?
+  gatewayTransactionId String?    @map("gateway_transaction_id")
+  amount               Decimal?   @db.Decimal(10, 2)
+  amountBrl            Decimal?   @map("amount_brl") @db.Decimal(10, 2)
+  taxBrl               Decimal?   @map("tax_brl") @db.Decimal(10, 2)
+  currency             String?
+  status               String?
+  paymentMethod        String?    @map("payment_method")
+  cardLastFour         String?    @map("card_last_four")
+  cardBrand            String?    @map("card_brand")
+  clientIp             String?    @map("client_ip")
+  statementDescriptor  String?    @map("statement_descriptor")
+  createdAt            DateTime   @default(now()) @map("created_at")
+  updatedAt            DateTime   @updatedAt @map("updated_at")
+  disputes             Dispute[]
+  orderItem            OrderItem? @relation(fields: [orderItemId], references: [id])
+  refunds              Refund[]
+
+  @@index([createdAt])
+  @@index([status])
+  @@index([gateway])
+  @@map("payments")
+}
+
+model Refund {
+  id           String     @id @default(uuid())
+  paymentId    String?    @map("payment_id")
+  orderItemId  String?    @map("order_item_id")
+  disputeId    String?    @map("dispute_id")
+  type         String?
+  reason       String?
+  amount       Decimal?   @db.Decimal(10, 2)
+  amountBrl    Decimal?   @map("amount_brl") @db.Decimal(10, 2)
+  taxRefundBrl Decimal?   @map("tax_refund_brl") @db.Decimal(10, 2)
+  createdAt    DateTime   @default(now()) @map("created_at")
+  updatedAt    DateTime   @updatedAt @map("updated_at")
+  dispute      Dispute?   @relation(fields: [disputeId], references: [id])
+  orderItem    OrderItem? @relation(fields: [orderItemId], references: [id])
+  payment      Payment?   @relation(fields: [paymentId], references: [id])
+
+  @@index([createdAt])
+  @@map("refunds")
+}
+
+model Dispute {
+  id                String     @id @default(uuid())
+  paymentId         String?    @map("payment_id")
+  orderItemId       String?    @map("order_item_id")
+  userId            String     @map("user_id")
+  gateway           String
+  gatewayDisputeId  String     @unique @map("gateway_dispute_id")
+  type              String
+  originalType      String?    @map("original_type")
+  status            String
+  reasonCode        String?    @map("reason_code")
+  reasonDescription String?    @map("reason_description")
+  amount            Decimal    @db.Decimal(10, 2)
+  amountBrl         Decimal    @map("amount_brl") @db.Decimal(10, 2)
+  feeAmount         Decimal    @default(0) @map("fee_amount") @db.Decimal(10, 2)
+  feeAmountBrl      Decimal    @default(0) @map("fee_amount_brl") @db.Decimal(10, 2)
+  netLossBrl        Decimal?   @map("net_loss_brl") @db.Decimal(10, 2)
+  openedAt          DateTime   @map("opened_at")
+  escalatedAt       DateTime?  @map("escalated_at")
+  responseDueDate   DateTime?  @map("response_due_date")
+  resolvedAt        DateTime?  @map("resolved_at")
+  outcome           String?
+  createdAt         DateTime   @default(now()) @map("created_at")
+  updatedAt         DateTime   @updatedAt @map("updated_at")
+  orderItem         OrderItem? @relation(fields: [orderItemId], references: [id])
+  payment           Payment?   @relation(fields: [paymentId], references: [id])
+  user              User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  refunds           Refund[]
+
+  @@index([openedAt])
+  @@index([resolvedAt])
+  @@index([status])
+  @@map("disputes")
+}
+
+model Subscription {
+  id              String     @id @default(uuid())
+  orderItemId     String?    @map("order_item_id")
+  userId          String     @map("user_id")
+  status          String?
+  billingInterval String?    @map("billing_interval")
+  startDate       DateTime   @map("start_date")
+  canceledAt      DateTime?  @map("canceled_at")
+  createdAt       DateTime   @default(now()) @map("created_at")
+  updatedAt       DateTime   @updatedAt @map("updated_at")
+  orderItem       OrderItem? @relation(fields: [orderItemId], references: [id])
+  user            User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([startDate])
+  @@index([canceledAt])
+  @@index([status])
+  @@map("subscriptions")
+}
+
+enum WorkspaceRole {
+  owner
+  admin
+  member
+}

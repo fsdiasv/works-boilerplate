@@ -55,12 +55,12 @@ interface DisputesFilters {
   outcome?: string | undefined
 }
 
-function DisputesFilters({ 
-  filters, 
-  onFiltersChange 
-}: { 
+function DisputesFilters({
+  filters,
+  onFiltersChange,
+}: {
   filters: DisputesFilters
-  onFiltersChange: (filters: DisputesFilters) => void 
+  onFiltersChange: (filters: DisputesFilters) => void
 }) {
   const handlePeriodChange = (period: DisputesFilters['period']) => {
     const dateRange = getDateRange(period, filters.timezone)
@@ -83,19 +83,17 @@ function DisputesFilters({
     <Card className='mb-6'>
       <CardHeader>
         <CardTitle className='text-lg'>Filtros de Disputas e Reembolsos</CardTitle>
-        <CardDescription>
-          Ajuste os filtros para personalizar a análise de disputas
-        </CardDescription>
+        <CardDescription>Ajuste os filtros para personalizar a análise de disputas</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4'>
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6'>
           {/* Period Selector */}
           <div className='space-y-2'>
             <label className='text-sm font-medium'>Período</label>
             <select
               value={filters.period}
-              onChange={(e) => handlePeriodChange(e.target.value as DisputesFilters['period'])}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handlePeriodChange(e.target.value as DisputesFilters['period'])}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             >
               <option value='today'>Hoje</option>
               <option value='7d'>Últimos 7 dias</option>
@@ -111,8 +109,8 @@ function DisputesFilters({
             <label className='text-sm font-medium'>Fuso Horário</label>
             <select
               value={filters.timezone}
-              onChange={(e) => handleFilterChange('timezone', e.target.value)}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handleFilterChange('timezone', e.target.value)}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             >
               <option value='America/Sao_Paulo'>São Paulo (BRT)</option>
               <option value='UTC'>UTC</option>
@@ -126,8 +124,8 @@ function DisputesFilters({
             <label className='text-sm font-medium'>Gateway</label>
             <select
               value={filters.gateway || ''}
-              onChange={(e) => handleFilterChange('gateway', e.target.value)}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handleFilterChange('gateway', e.target.value)}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             >
               <option value=''>Todos</option>
               <option value='stripe'>Stripe</option>
@@ -142,8 +140,8 @@ function DisputesFilters({
             <label className='text-sm font-medium'>Status</label>
             <select
               value={filters.status || ''}
-              onChange={(e) => handleFilterChange('status', e.target.value)}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handleFilterChange('status', e.target.value)}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             >
               <option value=''>Todos</option>
               <option value='open'>Em Aberto</option>
@@ -159,8 +157,8 @@ function DisputesFilters({
             <label className='text-sm font-medium'>Resultado</label>
             <select
               value={filters.outcome || ''}
-              onChange={(e) => handleFilterChange('outcome', e.target.value)}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handleFilterChange('outcome', e.target.value)}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             >
               <option value=''>Todos</option>
               <option value='won'>Vitória</option>
@@ -175,13 +173,7 @@ function DisputesFilters({
 }
 
 // Disputes insights component
-function DisputesInsights({ 
-  data, 
-  loading 
-}: { 
-  data?: DisputesSummary
-  loading: boolean 
-}) {
+function DisputesInsights({ data, loading }: { data?: DisputesSummary; loading: boolean }) {
   if (loading) {
     return (
       <div className='space-y-3'>
@@ -193,77 +185,70 @@ function DisputesInsights({
   }
 
   if (!data) {
-    return (
-      <p className='text-muted-foreground'>Nenhum dado disponível para análise</p>
-    )
+    return <p className='text-muted-foreground'>Nenhum dado disponível para análise</p>
   }
 
   const winRate = data.resolvidas > 0 ? (data.ganhas / data.resolvidas) * 100 : 0
   const resolutionRate = data.total_disputas > 0 ? (data.resolvidas / data.total_disputas) * 100 : 0
-  const avgLossPerDispute = data.total_disputas > 0 ? parseFloat(data.cb_losses_brl) / data.total_disputas : 0
+  const avgLossPerDispute =
+    data.total_disputas > 0 ? parseFloat(data.cb_losses_brl) / data.total_disputas : 0
 
   return (
     <div className='space-y-4'>
       {/* Win Rate */}
-      <div className={`p-4 rounded-lg border ${
-        winRate >= 70 
-          ? 'bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800' 
-          : winRate >= 50
-          ? 'bg-yellow-50 dark:bg-yellow-950 border-yellow-200 dark:border-yellow-800'
-          : 'bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800'
-      }`}>
-        <div className='flex items-center gap-2 mb-2'>
+      <div
+        className={`rounded-lg border p-4 ${
+          winRate >= 70
+            ? 'border-green-200 bg-green-50 dark:border-green-800 dark:bg-green-950'
+            : winRate >= 50
+              ? 'border-yellow-200 bg-yellow-50 dark:border-yellow-800 dark:bg-yellow-950'
+              : 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950'
+        }`}
+      >
+        <div className='mb-2 flex items-center gap-2'>
           <Shield className='h-5 w-5 text-green-600' />
           <h4 className='font-semibold'>Taxa de Vitória</h4>
         </div>
-        <div className='text-2xl font-bold mb-1'>
-          {winRate.toFixed(1)}%
-        </div>
-        <div className='text-sm text-muted-foreground'>
+        <div className='mb-1 text-2xl font-bold'>{winRate.toFixed(1)}%</div>
+        <div className='text-muted-foreground text-sm'>
           {data.ganhas} de {data.resolvidas} disputas resolvidas
         </div>
       </div>
 
       {/* Resolution Rate */}
-      <div className='p-4 rounded-lg border bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800'>
-        <div className='flex items-center gap-2 mb-2'>
+      <div className='rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-950'>
+        <div className='mb-2 flex items-center gap-2'>
           <CheckCircle className='h-5 w-5 text-blue-600' />
           <h4 className='font-semibold'>Taxa de Resolução</h4>
         </div>
-        <div className='text-2xl font-bold mb-1'>
-          {resolutionRate.toFixed(1)}%
-        </div>
-        <div className='text-sm text-muted-foreground'>
+        <div className='mb-1 text-2xl font-bold'>{resolutionRate.toFixed(1)}%</div>
+        <div className='text-muted-foreground text-sm'>
           {data.resolvidas} de {data.total_disputas} disputas resolvidas
         </div>
       </div>
 
       {/* Average Loss */}
-      <div className='p-4 rounded-lg border bg-red-50 dark:bg-red-950 border-red-200 dark:border-red-800'>
-        <div className='flex items-center gap-2 mb-2'>
+      <div className='rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950'>
+        <div className='mb-2 flex items-center gap-2'>
           <XCircle className='h-5 w-5 text-red-600' />
           <h4 className='font-semibold'>Perda Média por Disputa</h4>
         </div>
-        <div className='text-2xl font-bold mb-1'>
+        <div className='mb-1 text-2xl font-bold'>
           {formatBRL(avgLossPerDispute, { locale: 'pt-BR' })}
         </div>
-        <div className='text-sm text-muted-foreground'>
-          Impacto financeiro médio por disputa
-        </div>
+        <div className='text-muted-foreground text-sm'>Impacto financeiro médio por disputa</div>
       </div>
 
       {/* Risk Assessment */}
-      <div className='p-4 rounded-lg border bg-purple-50 dark:bg-purple-950 border-purple-200 dark:border-purple-800'>
-        <div className='flex items-center gap-2 mb-2'>
+      <div className='rounded-lg border border-purple-200 bg-purple-50 p-4 dark:border-purple-800 dark:bg-purple-950'>
+        <div className='mb-2 flex items-center gap-2'>
           <AlertTriangle className='h-5 w-5 text-purple-600' />
           <h4 className='font-semibold'>Nível de Risco</h4>
         </div>
-        <div className='text-2xl font-bold mb-1'>
+        <div className='mb-1 text-2xl font-bold'>
           {winRate >= 70 ? 'Baixo' : winRate >= 50 ? 'Médio' : 'Alto'}
         </div>
-        <div className='text-sm text-muted-foreground'>
-          Baseado na taxa de vitória e volume
-        </div>
+        <div className='text-muted-foreground text-sm'>Baseado na taxa de vitória e volume</div>
       </div>
     </div>
   )
@@ -271,13 +256,13 @@ function DisputesInsights({
 
 export default function DisputesAnalyticsPage() {
   const searchParams = useSearchParams()
-  
+
   // Initialize filters
   const [filters, setFilters] = useState<DisputesFilters>(() => {
     const period = (searchParams.get('period') as DisputesFilters['period']) || '30d'
     const timezone = searchParams.get('timezone') || 'America/Sao_Paulo'
     const dateRange = getDateRange(period, timezone)
-    
+
     return {
       period,
       from: searchParams.get('from') || dateRange.from.toISOString(),
@@ -290,7 +275,11 @@ export default function DisputesAnalyticsPage() {
   })
 
   // API queries
-  const { data: disputesData, isLoading: disputesLoading, error: disputesError } = api.analytics.disputesSummary.useQuery({
+  const {
+    data: disputesData,
+    isLoading: disputesLoading,
+    error: disputesError,
+  } = api.analytics.disputesSummary.useQuery({
     from: filters.from,
     to: filters.to,
   })
@@ -307,9 +296,7 @@ export default function DisputesAnalyticsPage() {
             </Button>
           </Link>
           <div>
-            <h2 className='text-3xl font-bold tracking-tight'>
-              Disputas e Reembolsos
-            </h2>
+            <h2 className='text-3xl font-bold tracking-tight'>Disputas e Reembolsos</h2>
             <p className='text-muted-foreground'>
               Análise detalhada de chargebacks, disputas e reembolsos
             </p>
@@ -318,10 +305,7 @@ export default function DisputesAnalyticsPage() {
       </div>
 
       {/* Filters */}
-      <DisputesFilters 
-        filters={filters} 
-        onFiltersChange={setFilters} 
-      />
+      <DisputesFilters filters={filters} onFiltersChange={setFilters} />
 
       {/* Main Metrics */}
       <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
@@ -333,7 +317,7 @@ export default function DisputesAnalyticsPage() {
           loading={disputesLoading}
           error={disputesError?.message}
         />
-        
+
         <SalesMetricCard
           title='Perdas Líquidas'
           value={disputesData?.cb_losses_brl || '0'}
@@ -342,7 +326,7 @@ export default function DisputesAnalyticsPage() {
           loading={disputesLoading}
           error={disputesError?.message}
         />
-        
+
         <SalesMetricCard
           title='Disputas Abertas'
           value={disputesData?.abertas || 0}
@@ -351,11 +335,13 @@ export default function DisputesAnalyticsPage() {
           loading={disputesLoading}
           error={disputesError?.message}
         />
-        
+
         <SalesMetricCard
           title='Taxa de Vitória'
-          value={disputesData && disputesData.resolvidas > 0 ? 
-            (disputesData.ganhas / disputesData.resolvidas) * 100 : 0
+          value={
+            disputesData && disputesData.resolvidas > 0
+              ? (disputesData.ganhas / disputesData.resolvidas) * 100
+              : 0
           }
           type='percentage'
           description='Percentual de disputas ganhas'
@@ -373,7 +359,7 @@ export default function DisputesAnalyticsPage() {
           description='Total de disputas finalizadas'
           loading={disputesLoading}
         />
-        
+
         <SalesMetricCard
           title='Disputas Ganhas'
           value={disputesData?.ganhas || 0}
@@ -381,7 +367,7 @@ export default function DisputesAnalyticsPage() {
           description='Disputas resolvidas a favor'
           loading={disputesLoading}
         />
-        
+
         <SalesMetricCard
           title='Disputas Perdidas'
           value={disputesData?.perdidas || 0}
@@ -398,14 +384,12 @@ export default function DisputesAnalyticsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Tendência de Disputas</CardTitle>
-              <CardDescription>
-                Volume de disputas e perdas ao longo do tempo
-              </CardDescription>
+              <CardDescription>Volume de disputas e perdas ao longo do tempo</CardDescription>
             </CardHeader>
             <CardContent className='p-0'>
-              <div className='h-[400px] flex items-center justify-center text-muted-foreground'>
+              <div className='text-muted-foreground flex h-[400px] items-center justify-center'>
                 <div className='text-center'>
-                  <AlertTriangle className='h-12 w-12 mx-auto mb-4 opacity-50' />
+                  <AlertTriangle className='mx-auto mb-4 h-12 w-12 opacity-50' />
                   <p>Gráfico de tendência estará disponível quando conectado à base de dados</p>
                 </div>
               </div>
@@ -417,15 +401,10 @@ export default function DisputesAnalyticsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Insights de Disputas</CardTitle>
-            <CardDescription>
-              Análise de performance e riscos
-            </CardDescription>
+            <CardDescription>Análise de performance e riscos</CardDescription>
           </CardHeader>
           <CardContent>
-            <DisputesInsights 
-              data={disputesData}
-              loading={disputesLoading}
-            />
+            <DisputesInsights data={disputesData} loading={disputesLoading} />
           </CardContent>
         </Card>
       </div>
@@ -444,16 +423,14 @@ export default function DisputesAnalyticsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Lista Detalhada de Disputas</CardTitle>
-              <CardDescription>
-                Todas as disputas no período selecionado
-              </CardDescription>
+              <CardDescription>Todas as disputas no período selecionado</CardDescription>
             </CardHeader>
             <CardContent>
               {/* Note: This would show actual disputes data when connected to database */}
-              <div className='text-center py-12 text-muted-foreground'>
-                <Shield className='h-12 w-12 mx-auto mb-4 opacity-50' />
-                <h3 className='text-lg font-semibold mb-2'>Lista de Disputas</h3>
-                <p className='max-w-md mx-auto'>
+              <div className='text-muted-foreground py-12 text-center'>
+                <Shield className='mx-auto mb-4 h-12 w-12 opacity-50' />
+                <h3 className='mb-2 text-lg font-semibold'>Lista de Disputas</h3>
+                <p className='mx-auto max-w-md'>
                   A tabela detalhada de disputas estará disponível quando conectada à base de dados.
                   Mostrará ID da disputa, gateway, status, valor, resultado e timeline.
                 </p>
@@ -468,43 +445,44 @@ export default function DisputesAnalyticsPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Disputas por Gateway</CardTitle>
-                <CardDescription>
-                  Performance de disputas por gateway de pagamento
-                </CardDescription>
+                <CardDescription>Performance de disputas por gateway de pagamento</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className='space-y-4'>
-                  {disputesLoading ? (
-                    Array.from({ length: 4 }).map((_, i) => (
-                      <Skeleton key={i} className='h-16 w-full' />
-                    ))
-                  ) : (
-                    ['Stripe', 'PayPal', 'Mercado Pago', 'PagSeguro'].map((gateway, index) => (
-                      <div key={gateway} className='flex items-center justify-between p-4 border rounded-lg'>
-                        <div className='flex items-center gap-3'>
-                          <div className={`w-3 h-3 rounded-full ${
-                            index === 0 ? 'bg-blue-500' :
-                            index === 1 ? 'bg-yellow-500' :
-                            index === 2 ? 'bg-cyan-500' : 'bg-orange-500'
-                          }`} />
-                          <div>
-                            <div className='font-medium'>{gateway}</div>
-                            <div className='text-sm text-muted-foreground'>
-                              {Math.floor(Math.random() * 20)} disputas
+                  {disputesLoading
+                    ? Array.from({ length: 4 }).map((_, i) => (
+                        <Skeleton key={i} className='h-16 w-full' />
+                      ))
+                    : ['Stripe', 'PayPal', 'Mercado Pago', 'PagSeguro'].map((gateway, index) => (
+                        <div
+                          key={gateway}
+                          className='flex items-center justify-between rounded-lg border p-4'
+                        >
+                          <div className='flex items-center gap-3'>
+                            <div
+                              className={`h-3 w-3 rounded-full ${
+                                index === 0
+                                  ? 'bg-blue-500'
+                                  : index === 1
+                                    ? 'bg-yellow-500'
+                                    : index === 2
+                                      ? 'bg-cyan-500'
+                                      : 'bg-orange-500'
+                              }`}
+                            />
+                            <div>
+                              <div className='font-medium'>{gateway}</div>
+                              <div className='text-muted-foreground text-sm'>
+                                {Math.floor(Math.random() * 20)} disputas
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <div className='text-right'>
-                          <div className='font-bold'>
-                            {(Math.random() * 100).toFixed(1)}%
-                          </div>
-                          <div className='text-sm text-muted-foreground'>
-                            taxa de vitória
+                          <div className='text-right'>
+                            <div className='font-bold'>{(Math.random() * 100).toFixed(1)}%</div>
+                            <div className='text-muted-foreground text-sm'>taxa de vitória</div>
                           </div>
                         </div>
-                      </div>
-                    ))
-                  )}
+                      ))}
                 </div>
               </CardContent>
             </Card>
@@ -513,44 +491,46 @@ export default function DisputesAnalyticsPage() {
             <Card>
               <CardHeader>
                 <CardTitle>Recomendações</CardTitle>
-                <CardDescription>
-                  Sugestões para otimizar gestão de disputas
-                </CardDescription>
+                <CardDescription>Sugestões para otimizar gestão de disputas</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className='space-y-3'>
-                  <div className='p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg'>
+                  <div className='rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950'>
                     <div className='flex items-start gap-2'>
-                      <CheckCircle className='h-4 w-4 text-green-600 mt-0.5' />
+                      <CheckCircle className='mt-0.5 h-4 w-4 text-green-600' />
                       <div className='text-sm'>
-                        <strong>Mantenha documentação:</strong> Tenha sempre comprovantes de entrega e comunicação com clientes.
+                        <strong>Mantenha documentação:</strong> Tenha sempre comprovantes de entrega
+                        e comunicação com clientes.
                       </div>
                     </div>
                   </div>
-                  
-                  <div className='p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg'>
+
+                  <div className='rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950'>
                     <div className='flex items-start gap-2'>
-                      <Shield className='h-4 w-4 text-blue-600 mt-0.5' />
+                      <Shield className='mt-0.5 h-4 w-4 text-blue-600' />
                       <div className='text-sm'>
-                        <strong>Responda rapidamente:</strong> Disputas respondidas em até 7 dias têm maior chance de vitória.
+                        <strong>Responda rapidamente:</strong> Disputas respondidas em até 7 dias
+                        têm maior chance de vitória.
                       </div>
                     </div>
                   </div>
-                  
-                  <div className='p-3 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg'>
+
+                  <div className='rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-950'>
                     <div className='flex items-start gap-2'>
-                      <AlertTriangle className='h-4 w-4 text-yellow-600 mt-0.5' />
+                      <AlertTriangle className='mt-0.5 h-4 w-4 text-yellow-600' />
                       <div className='text-sm'>
-                        <strong>Monitore padrões:</strong> Identifique produtos ou clientes com maior índice de disputas.
+                        <strong>Monitore padrões:</strong> Identifique produtos ou clientes com
+                        maior índice de disputas.
                       </div>
                     </div>
                   </div>
-                  
-                  <div className='p-3 bg-purple-50 dark:bg-purple-950 border border-purple-200 dark:border-purple-800 rounded-lg'>
+
+                  <div className='rounded-lg border border-purple-200 bg-purple-50 p-3 dark:border-purple-800 dark:bg-purple-950'>
                     <div className='flex items-start gap-2'>
-                      <XCircle className='h-4 w-4 text-purple-600 mt-0.5' />
+                      <XCircle className='mt-0.5 h-4 w-4 text-purple-600' />
                       <div className='text-sm'>
-                        <strong>Prevenção:</strong> Melhore descrições de produtos e políticas de reembolso claras.
+                        <strong>Prevenção:</strong> Melhore descrições de produtos e políticas de
+                        reembolso claras.
                       </div>
                     </div>
                   </div>
@@ -564,17 +544,16 @@ export default function DisputesAnalyticsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Disputas por Motivo</CardTitle>
-              <CardDescription>
-                Principais razões de disputas e chargebacks
-              </CardDescription>
+              <CardDescription>Principais razões de disputas e chargebacks</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className='text-center py-12 text-muted-foreground'>
-                <AlertTriangle className='h-12 w-12 mx-auto mb-4 opacity-50' />
-                <h3 className='text-lg font-semibold mb-2'>Análise por Motivo</h3>
-                <p className='max-w-md mx-auto'>
-                  Breakdown detalhado por códigos de razão estará disponível quando conectado à base de dados.
-                  Incluirá fraude, produto não recebido, qualidade, cancelamento não processado, etc.
+              <div className='text-muted-foreground py-12 text-center'>
+                <AlertTriangle className='mx-auto mb-4 h-12 w-12 opacity-50' />
+                <h3 className='mb-2 text-lg font-semibold'>Análise por Motivo</h3>
+                <p className='mx-auto max-w-md'>
+                  Breakdown detalhado por códigos de razão estará disponível quando conectado à base
+                  de dados. Incluirá fraude, produto não recebido, qualidade, cancelamento não
+                  processado, etc.
                 </p>
               </div>
             </CardContent>
@@ -585,17 +564,15 @@ export default function DisputesAnalyticsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Timeline de Disputas</CardTitle>
-              <CardDescription>
-                Histórico e prazos de resolução
-              </CardDescription>
+              <CardDescription>Histórico e prazos de resolução</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className='text-center py-12 text-muted-foreground'>
-                <Shield className='h-12 w-12 mx-auto mb-4 opacity-50' />
-                <h3 className='text-lg font-semibold mb-2'>Timeline Detalhada</h3>
-                <p className='max-w-md mx-auto'>
-                  Timeline com marcos importantes (abertura, resposta, escalação, resolução) 
-                  estará disponível quando conectada à base de dados.
+              <div className='text-muted-foreground py-12 text-center'>
+                <Shield className='mx-auto mb-4 h-12 w-12 opacity-50' />
+                <h3 className='mb-2 text-lg font-semibold'>Timeline Detalhada</h3>
+                <p className='mx-auto max-w-md'>
+                  Timeline com marcos importantes (abertura, resposta, escalação, resolução) estará
+                  disponível quando conectada à base de dados.
                 </p>
               </div>
             </CardContent>
@@ -622,14 +599,14 @@ export default function DisputesAnalyticsPage() {
                   >
                     Exportar Resumo CSV
                   </Button>
-                  
+
                   <Button variant='outline' disabled>
                     Exportar Relatório Detalhado
-                    <span className='ml-2 text-xs text-muted-foreground'>(Em breve)</span>
+                    <span className='text-muted-foreground ml-2 text-xs'>(Em breve)</span>
                   </Button>
                 </div>
-                
-                <div className='text-sm text-muted-foreground'>
+
+                <div className='text-muted-foreground text-sm'>
                   <p>O arquivo de resumo incluirá:</p>
                   <ul className='mt-2 ml-4 list-disc space-y-1'>
                     <li>Total de disputas por status</li>
@@ -640,12 +617,13 @@ export default function DisputesAnalyticsPage() {
                   </ul>
                 </div>
 
-                <div className='p-4 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg'>
+                <div className='rounded-lg border border-yellow-200 bg-yellow-50 p-4 dark:border-yellow-800 dark:bg-yellow-950'>
                   <div className='flex items-start gap-2'>
-                    <AlertTriangle className='h-4 w-4 text-yellow-600 mt-0.5' />
+                    <AlertTriangle className='mt-0.5 h-4 w-4 text-yellow-600' />
                     <div className='text-sm'>
-                      <strong>Dados Sensíveis:</strong> Os relatórios de disputas podem conter informações sensíveis. 
-                      Certifique-se de que apenas pessoas autorizadas tenham acesso.
+                      <strong>Dados Sensíveis:</strong> Os relatórios de disputas podem conter
+                      informações sensíveis. Certifique-se de que apenas pessoas autorizadas tenham
+                      acesso.
                     </div>
                   </div>
                 </div>

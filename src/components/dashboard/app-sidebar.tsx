@@ -33,12 +33,7 @@ import { cn } from 'src/lib/utils'
 
 import { DesktopSidebarToggle } from './desktop-sidebar-toggle'
 
-const menuPrincipal = [
-  { href: '/dashboard', icon: Home, labelKey: 'dashboard' },
-  { href: '/radar', icon: Search, labelKey: 'contentRadar' },
-  { href: '/criar-post', icon: Edit3, labelKey: 'createPost' },
-  { href: '/calendario', icon: Calendar, labelKey: 'calendar' },
-]
+const menuPrincipal = [{ href: '/analytics', icon: Home, labelKey: 'dashboard' }]
 
 const configuracoes = [
   { href: '/perfil', icon: User, labelKey: 'profile' },
@@ -56,7 +51,7 @@ export function AppSidebar() {
 
   // Remove locale prefix from pathname for comparison
   const pathSegments = pathname.split('/')
-  const pathnameWithoutLocale = `/${pathSegments.slice(2).join('/')}` || '/dashboard'
+  const pathnameWithoutLocale = `/${pathSegments.slice(2).join('/')}` || '/analytics'
 
   const renderMenuItems = (items: typeof menuPrincipal) => {
     return items.map(item => {
@@ -119,14 +114,14 @@ export function AppSidebar() {
       >
         {isCollapsed ? (
           // Only show logo when collapsed
-          <Link href={`/${locale}/dashboard`} className='flex items-center justify-center'>
+          <Link href={`/${locale}/analytics`} className='flex items-center justify-center'>
             <div className='bg-sw-accent-purple flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg'>
               <Zap className='text-primary-foreground h-5 w-5' />
             </div>
           </Link>
         ) : (
           // Show logo + text when expanded
-          <Link href={`/${locale}/dashboard`} className='flex items-center gap-2 overflow-hidden'>
+          <Link href={`/${locale}/analytics`} className='flex items-center gap-2 overflow-hidden'>
             <div className='bg-sw-accent-purple flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg'>
               <Zap className='text-primary-foreground h-5 w-5' />
             </div>

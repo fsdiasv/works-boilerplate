@@ -1,6 +1,7 @@
 'use client'
 
 import { format, parseISO } from 'date-fns'
+import { formatInTimeZone } from 'date-fns-tz'
 import { ptBR, enUS } from 'date-fns/locale'
 import { useTheme } from 'next-themes'
 import React from 'react'
@@ -60,20 +61,21 @@ export function OrdersChart({
   // Transform data for chart
   const chartData = data.map(point => ({
     ...point,
-    date: format(parseISO(point.day), 'dd/MM', { locale: dateLocale }),
-    fullDate: format(parseISO(point.day), 'dd/MM/yyyy', { locale: dateLocale }),
+    date: formatInTimeZone(parseISO(point.day), timezone, 'dd/MM', { locale: dateLocale }),
+    fullDate: formatInTimeZone(parseISO(point.day), timezone, 'dd/MM/yyyy', { locale: dateLocale }),
     orders: point.pedidos,
   }))
 
   // Calculate average orders for reference line
-  const avgOrders = chartData.length > 0
-    ? chartData.reduce((sum, point) => sum + point.orders, 0) / chartData.length
-    : 0
+  const avgOrders =
+    chartData.length > 0
+      ? chartData.reduce((sum, point) => sum + point.orders, 0) / chartData.length
+      : 0
 
   // Determine bar colors based on threshold
   const getBarColor = (value: number) => {
     if (!colorThreshold) return '#3b82f6' // Default blue
-    
+
     if (value >= colorThreshold) {
       return '#10b981' // Green for good performance
     } else if (value >= colorThreshold * 0.7) {
@@ -87,7 +89,7 @@ export function OrdersChart({
     return (
       <div className={`h-[${height}px] w-full ${className}`}>
         <div className='flex h-full items-center justify-center'>
-          <div className='space-y-4 w-full p-6'>
+          <div className='w-full space-y-4 p-6'>
             <Skeleton className='h-4 w-48' />
             <Skeleton className='h-64 w-full' />
             <div className='flex justify-center space-x-4'>
@@ -104,13 +106,9 @@ export function OrdersChart({
     return (
       <div className={`h-[${height}px] w-full ${className}`}>
         <div className='flex h-full items-center justify-center'>
-          <div className='text-center space-y-2'>
-            <div className='text-red-500 text-sm font-medium'>
-              Erro ao carregar dados
-            </div>
-            <div className='text-muted-foreground text-xs'>
-              {error}
-            </div>
+          <div className='space-y-2 text-center'>
+            <div className='text-sm font-medium text-red-500'>Erro ao carregar dados</div>
+            <div className='text-muted-foreground text-xs'>{error}</div>
           </div>
         </div>
       </div>
@@ -121,10 +119,8 @@ export function OrdersChart({
     return (
       <div className={`h-[${height}px] w-full ${className}`}>
         <div className='flex h-full items-center justify-center'>
-          <div className='text-center space-y-2'>
-            <div className='text-muted-foreground text-sm'>
-              Nenhum dado disponível
-            </div>
+          <div className='space-y-2 text-center'>
+            <div className='text-muted-foreground text-sm'>Nenhum dado disponível</div>
             <div className='text-muted-foreground text-xs'>
               Selecione um período diferente ou verifique os filtros
             </div>
@@ -151,7 +147,7 @@ export function OrdersChart({
             stroke={isDark ? '#374151' : '#e5e7eb'}
             vertical={false}
           />
-          
+
           <XAxis
             dataKey='date'
             axisLine={false}
@@ -163,8 +159,9 @@ export function OrdersChart({
             tickMargin={8}
             interval='preserveStartEnd'
           />
-          
+
           <YAxis
+            yAxisId='left'
             axisLine={false}
             tickLine={false}
             tick={{
@@ -172,9 +169,9 @@ export function OrdersChart({
               fill: isDark ? '#9ca3af' : '#6b7280',
             }}
             tickMargin={8}
-            tickFormatter={(value) => value.toLocaleString(locale)}
+            tickFormatter={value => value.toLocaleString(locale)}
           />
-          
+
           <Tooltip
             content={({ active, payload, label }) => {
               if (active && payload && payload.length > 0) {
@@ -190,32 +187,26 @@ export function OrdersChart({
                           className='h-3 w-3 rounded-full'
                           style={{ backgroundColor: getBarColor(data?.orders || 0) }}
                         />
-                        <span className='text-gray-600 dark:text-gray-400'>
-                          Pedidos:
-                        </span>
+                        <span className='text-gray-600 dark:text-gray-400'>Pedidos:</span>
                         <span className='font-medium text-gray-900 dark:text-gray-100'>
                           {data?.orders?.toLocaleString(locale)}
                         </span>
                       </div>
-                      
+
                       {data?.revenue && (
                         <div className='flex items-center gap-2 text-sm'>
                           <div className='h-3 w-3 rounded-full bg-blue-500' />
-                          <span className='text-gray-600 dark:text-gray-400'>
-                            Receita:
-                          </span>
+                          <span className='text-gray-600 dark:text-gray-400'>Receita:</span>
                           <span className='font-medium text-gray-900 dark:text-gray-100'>
                             R$ {data.revenue.toLocaleString(locale, { minimumFractionDigits: 2 })}
                           </span>
                         </div>
                       )}
-                      
+
                       {data?.aov && (
                         <div className='flex items-center gap-2 text-sm'>
                           <div className='h-3 w-3 rounded-full bg-orange-500' />
-                          <span className='text-gray-600 dark:text-gray-400'>
-                            Ticket Médio:
-                          </span>
+                          <span className='text-gray-600 dark:text-gray-400'>Ticket Médio:</span>
                           <span className='font-medium text-gray-900 dark:text-gray-100'>
                             R$ {data.aov.toLocaleString(locale, { minimumFractionDigits: 2 })}
                           </span>
@@ -228,10 +219,11 @@ export function OrdersChart({
               return null
             }}
           />
-          
+
           {showAverage && avgOrders > 0 && (
             <ReferenceLine
               y={avgOrders}
+              yAxisId='left'
               stroke={isDark ? '#6b7280' : '#9ca3af'}
               strokeDasharray='5 5'
               label={{
@@ -244,16 +236,10 @@ export function OrdersChart({
               }}
             />
           )}
-          
-          <Bar
-            dataKey='orders'
-            radius={[2, 2, 0, 0]}
-          >
+
+          <Bar dataKey='orders' yAxisId='left' radius={[2, 2, 0, 0]}>
             {chartData.map((entry, index) => (
-              <Cell
-                key={`cell-${index}`}
-                fill={getBarColor(entry.orders)}
-              />
+              <Cell key={`cell-${index}`} fill={getBarColor(entry.orders)} />
             ))}
           </Bar>
         </BarChart>
@@ -277,6 +263,7 @@ interface SubscriptionsChartProps {
   error?: string
   height?: number
   locale?: string
+  timezone?: string
   className?: string
 }
 
@@ -286,6 +273,7 @@ export function SubscriptionsChart({
   error,
   height = 400,
   locale = 'pt-BR',
+  timezone = 'UTC',
   className,
 }: SubscriptionsChartProps) {
   const { theme } = useTheme()
@@ -295,8 +283,10 @@ export function SubscriptionsChart({
   // Transform data for chart
   const chartData = data.map(point => ({
     ...point,
-    date: format(parseISO(point.day), 'dd/MM', { locale: dateLocale }),
-    fullDate: format(parseISO(point.day), 'dd/MM/yyyy', { locale: dateLocale }),
+    date: formatInTimeZone(parseISO(point.day), timezone || 'UTC', 'dd/MM', { locale: dateLocale }),
+    fullDate: formatInTimeZone(parseISO(point.day), timezone || 'UTC', 'dd/MM/yyyy', {
+      locale: dateLocale,
+    }),
     new: point.novas,
     churned: -point.churn, // Negative for visual representation
     net: point.novas - point.churn,
@@ -306,7 +296,7 @@ export function SubscriptionsChart({
     return (
       <div className={`h-[${height}px] w-full ${className}`}>
         <div className='flex h-full items-center justify-center'>
-          <div className='space-y-4 w-full p-6'>
+          <div className='w-full space-y-4 p-6'>
             <Skeleton className='h-4 w-48' />
             <Skeleton className='h-64 w-full' />
           </div>
@@ -319,10 +309,8 @@ export function SubscriptionsChart({
     return (
       <div className={`h-[${height}px] w-full ${className}`}>
         <div className='flex h-full items-center justify-center'>
-          <div className='text-center space-y-2'>
-            <div className='text-muted-foreground text-sm'>
-              {error || 'Nenhum dado disponível'}
-            </div>
+          <div className='space-y-2 text-center'>
+            <div className='text-muted-foreground text-sm'>{error || 'Nenhum dado disponível'}</div>
           </div>
         </div>
       </div>
@@ -346,7 +334,7 @@ export function SubscriptionsChart({
             stroke={isDark ? '#374151' : '#e5e7eb'}
             vertical={false}
           />
-          
+
           <XAxis
             dataKey='date'
             axisLine={false}
@@ -357,8 +345,9 @@ export function SubscriptionsChart({
             }}
             tickMargin={8}
           />
-          
+
           <YAxis
+            yAxisId='left'
             axisLine={false}
             tickLine={false}
             tick={{
@@ -366,9 +355,9 @@ export function SubscriptionsChart({
               fill: isDark ? '#9ca3af' : '#6b7280',
             }}
             tickMargin={8}
-            tickFormatter={(value) => Math.abs(value).toLocaleString(locale)}
+            tickFormatter={value => Math.abs(value).toLocaleString(locale)}
           />
-          
+
           <Tooltip
             content={({ active, payload, label }) => {
               if (active && payload && payload.length > 0) {
@@ -381,34 +370,31 @@ export function SubscriptionsChart({
                     <div className='mt-2 space-y-1'>
                       <div className='flex items-center gap-2 text-sm'>
                         <div className='h-3 w-3 rounded-full bg-green-500' />
-                        <span className='text-gray-600 dark:text-gray-400'>
-                          Novas:
-                        </span>
+                        <span className='text-gray-600 dark:text-gray-400'>Novas:</span>
                         <span className='font-medium text-gray-900 dark:text-gray-100'>
                           {data?.new?.toLocaleString(locale)}
                         </span>
                       </div>
                       <div className='flex items-center gap-2 text-sm'>
                         <div className='h-3 w-3 rounded-full bg-red-500' />
-                        <span className='text-gray-600 dark:text-gray-400'>
-                          Churn:
-                        </span>
+                        <span className='text-gray-600 dark:text-gray-400'>Churn:</span>
                         <span className='font-medium text-gray-900 dark:text-gray-100'>
                           {data?.churn?.toLocaleString(locale)}
                         </span>
                       </div>
-                      <div className='flex items-center gap-2 text-sm border-t pt-1'>
-                        <span className='text-gray-600 dark:text-gray-400'>
-                          Líquido:
-                        </span>
-                        <span className={`font-medium ${
-                          data?.net > 0 
-                            ? 'text-green-600 dark:text-green-400' 
-                            : data?.net < 0
-                            ? 'text-red-600 dark:text-red-400'
-                            : 'text-gray-900 dark:text-gray-100'
-                        }`}>
-                          {data?.net > 0 ? '+' : ''}{data?.net?.toLocaleString(locale)}
+                      <div className='flex items-center gap-2 border-t pt-1 text-sm'>
+                        <span className='text-gray-600 dark:text-gray-400'>Líquido:</span>
+                        <span
+                          className={`font-medium ${
+                            data?.net > 0
+                              ? 'text-green-600 dark:text-green-400'
+                              : data?.net < 0
+                                ? 'text-red-600 dark:text-red-400'
+                                : 'text-gray-900 dark:text-gray-100'
+                          }`}
+                        >
+                          {data?.net > 0 ? '+' : ''}
+                          {data?.net?.toLocaleString(locale)}
                         </span>
                       </div>
                     </div>
@@ -418,25 +404,21 @@ export function SubscriptionsChart({
               return null
             }}
           />
-          
+
           {/* Zero reference line */}
-          <ReferenceLine y={0} stroke={isDark ? '#4b5563' : '#6b7280'} />
-          
+          <ReferenceLine y={0} yAxisId='left' stroke={isDark ? '#4b5563' : '#6b7280'} />
+
           {/* New subscriptions (positive) */}
           <Bar
             dataKey='new'
+            yAxisId='left'
             fill='#10b981'
             radius={[2, 2, 0, 0]}
             name='Novas Assinaturas'
           />
-          
+
           {/* Churned subscriptions (negative) */}
-          <Bar
-            dataKey='churned'
-            fill='#ef4444'
-            radius={[0, 0, 2, 2]}
-            name='Churn'
-          />
+          <Bar dataKey='churned' yAxisId='left' fill='#ef4444' radius={[0, 0, 2, 2]} name='Churn' />
         </BarChart>
       </ResponsiveContainer>
     </div>

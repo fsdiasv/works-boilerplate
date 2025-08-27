@@ -1,10 +1,12 @@
 # Restaurando Autenticação para o Dashboard de Analytics
 
-Este documento descreve os passos necessários para restaurar a obrigatoriedade de login para acessar as rotas do dashboard de analytics.
+Este documento descreve os passos necessários para restaurar a obrigatoriedade
+de login para acessar as rotas do dashboard de analytics.
 
 ## Resumo das Alterações Necessárias
 
-Para voltar a exigir autenticação no dashboard de analytics, você precisará reverter as mudanças que tornaram essas rotas públicas.
+Para voltar a exigir autenticação no dashboard de analytics, você precisará
+reverter as mudanças que tornaram essas rotas públicas.
 
 ## Passos para Restaurar a Autenticação
 
@@ -16,9 +18,7 @@ Remova `/analytics` da lista de rotas públicas:
 
 ```typescript
 // Antes (configuração atual - sem autenticação)
-const publicRoutes = [
-  '/analytics',
-]
+const publicRoutes = ['/analytics']
 
 // Depois (configuração com autenticação obrigatória)
 const publicRoutes = [
@@ -38,27 +38,35 @@ export const analyticsRouter = createTRPCRouter({
   kpis: publicProcedure
     .input(analyticsFiltersSchema)
     .output(kpisOutputSchema)
-    .query(async ({ ctx, input }) => { /* ... */ }),
+    .query(async ({ ctx, input }) => {
+      /* ... */
+    }),
 
   revenueTimeseries: publicProcedure
     .input(analyticsFiltersSchema)
     .output(revenueTimeseriesOutputSchema)
-    .query(async ({ ctx, input }) => { /* ... */ }),
+    .query(async ({ ctx, input }) => {
+      /* ... */
+    }),
 
   // ... outros procedures com publicProcedure
 })
 
 // Depois (configuração com autenticação obrigatória)
 export const analyticsRouter = createTRPCRouter({
-  kpis: protectedProcedure  // Mudança aqui
+  kpis: protectedProcedure // Mudança aqui
     .input(analyticsFiltersSchema)
     .output(kpisOutputSchema)
-    .query(async ({ ctx, input }) => { /* ... */ }),
+    .query(async ({ ctx, input }) => {
+      /* ... */
+    }),
 
-  revenueTimeseries: protectedProcedure  // Mudança aqui
+  revenueTimeseries: protectedProcedure // Mudança aqui
     .input(analyticsFiltersSchema)
     .output(revenueTimeseriesOutputSchema)
-    .query(async ({ ctx, input }) => { /* ... */ }),
+    .query(async ({ ctx, input }) => {
+      /* ... */
+    }),
 
   // ... todos os outros procedures também devem usar protectedProcedure
 })
@@ -91,11 +99,15 @@ const { data: session, isLoading } = api.auth.getSession.useQuery(undefined, {
 
 Após implementar essas alterações:
 
-1. **Teste de Acesso Não Autenticado:** Acesse `/analytics` sem estar logado - você deve ser redirecionado para a página de login.
+1. **Teste de Acesso Não Autenticado:** Acesse `/analytics` sem estar logado -
+   você deve ser redirecionado para a página de login.
 
-2. **Teste de Acesso Autenticado:** Faça login e acesse `/analytics` - você deve conseguir acessar normalmente.
+2. **Teste de Acesso Autenticado:** Faça login e acesse `/analytics` - você deve
+   conseguir acessar normalmente.
 
-3. **Teste das Sub-rotas:** Verifique se `/analytics/products`, `/analytics/subscriptions` e `/analytics/disputes` também exigem autenticação.
+3. **Teste das Sub-rotas:** Verifique se `/analytics/products`,
+   `/analytics/subscriptions` e `/analytics/disputes` também exigem
+   autenticação.
 
 ## Rotas Afetadas
 
@@ -108,13 +120,17 @@ As seguintes rotas voltarão a exigir autenticação:
 
 ## Notas de Segurança
 
-- ✅ **Controle de Acesso:** Com a autenticação restaurada, apenas usuários autenticados poderão acessar dados sensíveis de analytics.
-- ✅ **Workspace Context:** O WorkspaceProvider funcionará normalmente para usuários autenticados.
-- ✅ **Proteção de Dados:** Os dados financeiros e de vendas estarão protegidos por autenticação.
+- ✅ **Controle de Acesso:** Com a autenticação restaurada, apenas usuários
+  autenticados poderão acessar dados sensíveis de analytics.
+- ✅ **Workspace Context:** O WorkspaceProvider funcionará normalmente para
+  usuários autenticados.
+- ✅ **Proteção de Dados:** Os dados financeiros e de vendas estarão protegidos
+  por autenticação.
 
 ## Implementação de RBAC (Futuro)
 
-Para maior segurança, considere implementar controle de acesso baseado em funções (RBAC) no futuro:
+Para maior segurança, considere implementar controle de acesso baseado em
+funções (RBAC) no futuro:
 
 - Apenas usuários com role `admin` ou `owner` podem acessar analytics
 - Filtrar dados baseado no workspace do usuário

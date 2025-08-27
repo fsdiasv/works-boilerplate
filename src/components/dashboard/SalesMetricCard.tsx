@@ -21,6 +21,12 @@ export interface SalesMetricCardProps {
   // Additional props for specific metric types
   showTrend?: boolean
   locale?: string
+  // Multi-currency support
+  currencyBreakdown?: {
+    BRL?: string
+    USD?: string
+    EUR?: string
+  }
 }
 
 /**
@@ -39,6 +45,7 @@ export function SalesMetricCard({
   className,
   showTrend = true,
   locale = 'pt-BR',
+  currencyBreakdown,
 }: SalesMetricCardProps) {
   if (loading) {
     return (
@@ -50,7 +57,7 @@ export function SalesMetricCard({
           <Skeleton className='h-4 w-4' />
         </CardHeader>
         <CardContent>
-          <Skeleton className='h-8 w-32 mb-2' />
+          <Skeleton className='mb-2 h-8 w-32' />
           <Skeleton className='h-4 w-20' />
         </CardContent>
       </Card>
@@ -59,7 +66,12 @@ export function SalesMetricCard({
 
   if (error) {
     return (
-      <Card className={cn('relative border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950', className)}>
+      <Card
+        className={cn(
+          'relative border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950',
+          className
+        )}
+      >
         <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
           <CardTitle className='text-sm font-medium text-red-700 dark:text-red-300'>
             {title}
@@ -67,9 +79,7 @@ export function SalesMetricCard({
           <div className='h-4 w-4 rounded-full bg-red-500' />
         </CardHeader>
         <CardContent>
-          <div className='text-sm text-red-600 dark:text-red-400'>
-            Erro ao carregar dados
-          </div>
+          <div className='text-sm text-red-600 dark:text-red-400'>Erro ao carregar dados</div>
         </CardContent>
       </Card>
     )
@@ -81,18 +91,42 @@ export function SalesMetricCard({
     switch (type) {
       case 'currency':
         return formatBRL(numValue, { locale, showSymbol: true })
-      
+
       case 'aov':
         return formatBRL(numValue, { locale, showSymbol: true })
-      
+
       case 'percentage':
         return `${numValue.toFixed(2)}%`
-      
+
       case 'count':
         return numValue.toLocaleString(locale)
-      
+
       default:
         return val.toString()
+    }
+  }
+
+  const formatCurrencyValue = (value: string, currency: 'BRL' | 'USD' | 'EUR'): string => {
+    const numValue = parseFloat(value)
+    if (numValue === 0) return ''
+
+    switch (currency) {
+      case 'BRL':
+        return formatBRL(numValue, { locale, showSymbol: true })
+      case 'USD':
+        return new Intl.NumberFormat(locale, {
+          style: 'currency',
+          currency: 'USD',
+          minimumFractionDigits: 2,
+        }).format(numValue)
+      case 'EUR':
+        return new Intl.NumberFormat(locale, {
+          style: 'currency',
+          currency: 'EUR',
+          minimumFractionDigits: 2,
+        }).format(numValue)
+      default:
+        return value
     }
   }
 
@@ -100,19 +134,19 @@ export function SalesMetricCard({
     switch (type) {
       case 'currency':
       case 'aov':
-        return <DollarSign className='h-4 w-4 text-muted-foreground' />
+        return <DollarSign className='text-muted-foreground h-4 w-4' />
       case 'percentage':
-        return <Percent className='h-4 w-4 text-muted-foreground' />
+        return <Percent className='text-muted-foreground h-4 w-4' />
       case 'count':
-        return <TrendingUp className='h-4 w-4 text-muted-foreground' />
+        return <TrendingUp className='text-muted-foreground h-4 w-4' />
       default:
-        return <TrendingUp className='h-4 w-4 text-muted-foreground' />
+        return <TrendingUp className='text-muted-foreground h-4 w-4' />
     }
   }
 
   const getTrendIcon = () => {
     if (!showTrend || change === undefined) return null
-    
+
     switch (changeDirection) {
       case 'up':
         return <ArrowUp className='h-3 w-3 text-green-500' />
@@ -125,7 +159,7 @@ export function SalesMetricCard({
 
   const getTrendColor = () => {
     if (!showTrend || change === undefined) return ''
-    
+
     switch (changeDirection) {
       case 'up':
         return 'text-green-600 dark:text-green-400'
@@ -142,37 +176,44 @@ export function SalesMetricCard({
   return (
     <Card className={cn('relative', className)}>
       <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-        <CardTitle className='text-sm font-medium text-muted-foreground'>
-          {title}
-        </CardTitle>
+        <CardTitle className='text-muted-foreground text-sm font-medium'>{title}</CardTitle>
         {getIcon()}
       </CardHeader>
       <CardContent>
         <div className='flex items-baseline space-x-2'>
-          <div className='text-2xl font-bold leading-none tracking-tight'>
-            {formattedValue}
-          </div>
+          <div className='text-2xl leading-none font-bold tracking-tight'>{formattedValue}</div>
           {hasChange && (
             <div className={cn('flex items-center text-xs font-medium', getTrendColor())}>
               {getTrendIcon()}
-              <span className='ml-1'>
-                {Math.abs(change).toFixed(1)}%
-              </span>
+              <span className='ml-1'>{Math.abs(change).toFixed(1)}%</span>
             </div>
           )}
         </div>
-        
-        {description && (
-          <p className='text-xs text-muted-foreground mt-1'>
-            {description}
-          </p>
+
+        {/* Currency breakdown display */}
+        {currencyBreakdown && (type === 'currency' || type === 'aov') && (
+          <div className='mt-2 space-y-1'>
+            {currencyBreakdown.USD && formatCurrencyValue(currencyBreakdown.USD, 'USD') && (
+              <div className='text-muted-foreground text-xs'>
+                USD: {formatCurrencyValue(currencyBreakdown.USD, 'USD')}
+              </div>
+            )}
+            {currencyBreakdown.EUR && formatCurrencyValue(currencyBreakdown.EUR, 'EUR') && (
+              <div className='text-muted-foreground text-xs'>
+                EUR: {formatCurrencyValue(currencyBreakdown.EUR, 'EUR')}
+              </div>
+            )}
+            {currencyBreakdown.BRL && formatCurrencyValue(currencyBreakdown.BRL, 'BRL') && (
+              <div className='text-muted-foreground text-xs'>
+                BRL: {formatCurrencyValue(currencyBreakdown.BRL, 'BRL')}
+              </div>
+            )}
+          </div>
         )}
-        
-        {hasChange && (
-          <p className='text-xs text-muted-foreground mt-1'>
-            vs. período anterior
-          </p>
-        )}
+
+        {description && <p className='text-muted-foreground mt-1 text-xs'>{description}</p>}
+
+        {hasChange && <p className='text-muted-foreground mt-1 text-xs'>vs. período anterior</p>}
       </CardContent>
     </Card>
   )
@@ -192,20 +233,21 @@ interface RevenueCardProps {
   type?: 'gross' | 'net'
 }
 
-export function RevenueCard({ 
-  value, 
-  change, 
-  changeDirection, 
-  loading, 
-  error, 
+export function RevenueCard({
+  value,
+  change,
+  changeDirection,
+  loading,
+  error,
   className,
-  type = 'gross'
+  type = 'gross',
 }: RevenueCardProps) {
   const title = type === 'gross' ? 'Receita Bruta' : 'Receita Líquida'
-  const description = type === 'gross' 
-    ? 'Total de vendas antes de impostos e reembolsos'
-    : 'Receita após impostos, reembolsos e chargebacks'
-  
+  const description =
+    type === 'gross'
+      ? 'Total de vendas antes de impostos e reembolsos'
+      : 'Receita após impostos, reembolsos e chargebacks'
+
   return (
     <SalesMetricCard
       title={title}
@@ -230,13 +272,13 @@ interface OrdersCardProps {
   className?: string
 }
 
-export function OrdersCard({ 
-  value, 
-  change, 
-  changeDirection, 
-  loading, 
-  error, 
-  className 
+export function OrdersCard({
+  value,
+  change,
+  changeDirection,
+  loading,
+  error,
+  className,
 }: OrdersCardProps) {
   return (
     <SalesMetricCard
@@ -262,13 +304,13 @@ interface AOVCardProps {
   className?: string
 }
 
-export function AOVCard({ 
-  value, 
-  change, 
-  changeDirection, 
-  loading, 
-  error, 
-  className 
+export function AOVCard({
+  value,
+  change,
+  changeDirection,
+  loading,
+  error,
+  className,
 }: AOVCardProps) {
   return (
     <SalesMetricCard
@@ -294,17 +336,18 @@ interface RefundRateCardProps {
   className?: string
 }
 
-export function RefundRateCard({ 
-  value, 
-  change, 
-  changeDirection, 
-  loading, 
-  error, 
-  className 
+export function RefundRateCard({
+  value,
+  change,
+  changeDirection,
+  loading,
+  error,
+  className,
 }: RefundRateCardProps) {
   // For refund rate, down is good (green), up is bad (red)
-  const adjustedDirection = changeDirection === 'up' ? 'down' : changeDirection === 'down' ? 'up' : 'neutral'
-  
+  const adjustedDirection =
+    changeDirection === 'up' ? 'down' : changeDirection === 'down' ? 'up' : 'neutral'
+
   return (
     <SalesMetricCard
       title='Taxa de Reembolso'
@@ -329,13 +372,13 @@ interface SubscriptionsCardProps {
   className?: string
 }
 
-export function SubscriptionsCard({ 
-  value, 
-  change, 
-  changeDirection, 
-  loading, 
-  error, 
-  className 
+export function SubscriptionsCard({
+  value,
+  change,
+  changeDirection,
+  loading,
+  error,
+  className,
 }: SubscriptionsCardProps) {
   return (
     <SalesMetricCard
@@ -361,13 +404,13 @@ interface MRRCardProps {
   className?: string
 }
 
-export function MRRCard({ 
-  value, 
-  change, 
-  changeDirection, 
-  loading, 
-  error, 
-  className 
+export function MRRCard({
+  value,
+  change,
+  changeDirection,
+  loading,
+  error,
+  className,
 }: MRRCardProps) {
   return (
     <SalesMetricCard

@@ -4,7 +4,7 @@
 
 Account deletion is a sensitive operation that requires careful handling to
 avoid security vulnerabilities. This document explains the secure implementation
-of account deletion in the Works Boilerplate.
+of account deletion in the DS Club.
 
 ## Security Issue
 

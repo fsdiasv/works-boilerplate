@@ -88,12 +88,13 @@ export function DisputesTable({
 
     // Apply search filter
     if (searchTerm) {
-      filtered = filtered.filter(item =>
-        item.gateway_dispute_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.gateway.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.product_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.reason_description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        item.user_email?.toLowerCase().includes(searchTerm.toLowerCase())
+      filtered = filtered.filter(
+        item =>
+          item.gateway_dispute_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.gateway.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.product_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.reason_description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          item.user_email?.toLowerCase().includes(searchTerm.toLowerCase())
       )
     }
 
@@ -130,7 +131,7 @@ export function DisputesTable({
       // String comparison
       const aStr = String(aValue || '').toLowerCase()
       const bStr = String(bValue || '').toLowerCase()
-      
+
       if (sortDirection === 'asc') {
         return aStr.localeCompare(bStr)
       } else {
@@ -159,19 +160,19 @@ export function DisputesTable({
     // Default export implementation
     const exportData = processedData.map(item => ({
       'ID da Disputa': item.gateway_dispute_id,
-      'Gateway': item.gateway,
-      'Tipo': item.type,
-      'Status': item.status,
+      Gateway: item.gateway,
+      Tipo: item.type,
+      Status: item.status,
       'Código da Razão': item.reason_code || '',
-      'Descrição': item.reason_description || '',
+      Descrição: item.reason_description || '',
       'Valor (R$)': item.amount_brl,
       'Perda Líquida (R$)': item.net_loss_brl || '',
-      'Resultado': item.outcome || '',
-      'Produto': item.product_code || '',
-      'Pedido': item.order_id || '',
-      'Cliente': item.user_email || '',
+      Resultado: item.outcome || '',
+      Produto: item.product_code || '',
+      Pedido: item.order_id || '',
+      Cliente: item.user_email || '',
       'Aberta em': formatDateWithTimezone(item.opened_at, timezone, locale, 'dd/MM/yyyy HH:mm'),
-      'Resolvida em': item.resolved_at 
+      'Resolvida em': item.resolved_at
         ? formatDateWithTimezone(item.resolved_at, timezone, locale, 'dd/MM/yyyy HH:mm')
         : '',
     }))
@@ -182,60 +183,52 @@ export function DisputesTable({
 
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) {
-      return <ArrowUpDown className='h-4 w-4 text-muted-foreground' />
+      return <ArrowUpDown className='text-muted-foreground h-4 w-4' />
     }
-    
+
     return (
-      <ArrowUpDown 
+      <ArrowUpDown
         className={cn(
           'h-4 w-4',
-          sortDirection === 'asc' ? 'text-blue-500 rotate-180' : 'text-blue-500'
-        )} 
+          sortDirection === 'asc' ? 'rotate-180 text-blue-500' : 'text-blue-500'
+        )}
       />
     )
   }
 
   const getStatusBadge = (status: string) => {
     const statusLower = status.toLowerCase()
-    
+
     switch (statusLower) {
       case 'open':
       case 'pending':
       case 'under_review':
         return (
-          <Badge variant='outline' className='bg-yellow-50 text-yellow-700 border-yellow-200'>
-            <AlertTriangle className='w-3 h-3 mr-1' />
+          <Badge variant='outline' className='border-yellow-200 bg-yellow-50 text-yellow-700'>
+            <AlertTriangle className='mr-1 h-3 w-3' />
             Em Aberto
           </Badge>
         )
       case 'won':
       case 'resolved_won':
         return (
-          <Badge variant='outline' className='bg-green-50 text-green-700 border-green-200'>
-            <CheckCircle className='w-3 h-3 mr-1' />
+          <Badge variant='outline' className='border-green-200 bg-green-50 text-green-700'>
+            <CheckCircle className='mr-1 h-3 w-3' />
             Ganha
           </Badge>
         )
       case 'lost':
       case 'resolved_lost':
         return (
-          <Badge variant='outline' className='bg-red-50 text-red-700 border-red-200'>
-            <XCircle className='w-3 h-3 mr-1' />
+          <Badge variant='outline' className='border-red-200 bg-red-50 text-red-700'>
+            <XCircle className='mr-1 h-3 w-3' />
             Perdida
           </Badge>
         )
       case 'closed':
-        return (
-          <Badge variant='secondary'>
-            Fechada
-          </Badge>
-        )
+        return <Badge variant='secondary'>Fechada</Badge>
       default:
-        return (
-          <Badge variant='outline'>
-            {status}
-          </Badge>
-        )
+        return <Badge variant='outline'>{status}</Badge>
     }
   }
 
@@ -246,9 +239,9 @@ export function DisputesTable({
       mercadopago: 'bg-cyan-50 text-cyan-700 border-cyan-200',
       pagseguro: 'bg-orange-50 text-orange-700 border-orange-200',
     }
-    
+
     const colorClass = colors[gateway.toLowerCase()] || 'bg-gray-50 text-gray-700 border-gray-200'
-    
+
     return (
       <Badge variant='outline' className={colorClass}>
         {gateway}
@@ -296,13 +289,16 @@ export function DisputesTable({
 
   if (error) {
     return (
-      <div className={cn('rounded-md border border-red-200 bg-red-50 p-8 text-center dark:border-red-800 dark:bg-red-950', className)}>
-        <div className='text-red-700 dark:text-red-300 font-medium mb-2'>
+      <div
+        className={cn(
+          'rounded-md border border-red-200 bg-red-50 p-8 text-center dark:border-red-800 dark:bg-red-950',
+          className
+        )}
+      >
+        <div className='mb-2 font-medium text-red-700 dark:text-red-300'>
           Erro ao carregar disputas
         </div>
-        <div className='text-red-600 dark:text-red-400 text-sm'>
-          {error}
-        </div>
+        <div className='text-sm text-red-600 dark:text-red-400'>{error}</div>
       </div>
     )
   }
@@ -310,24 +306,24 @@ export function DisputesTable({
   return (
     <div className={cn('space-y-4', className)}>
       {/* Search and Filters Header */}
-      <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4'>
-        <div className='flex flex-col sm:flex-row gap-4 flex-1'>
+      <div className='flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center'>
+        <div className='flex flex-1 flex-col gap-4 sm:flex-row'>
           {showSearch && (
-            <div className='relative flex-1 max-w-sm'>
-              <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+            <div className='relative max-w-sm flex-1'>
+              <Search className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
               <Input
                 placeholder='Buscar por ID, gateway, produto...'
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={e => setSearchTerm(e.target.value)}
                 className='pl-9'
               />
             </div>
           )}
-          
+
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className='px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+            onChange={e => setStatusFilter(e.target.value)}
+            className='border-input bg-background focus:ring-ring rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
           >
             <option value='all'>Todos os Status</option>
             {uniqueStatuses.map(status => (
@@ -337,7 +333,7 @@ export function DisputesTable({
             ))}
           </select>
         </div>
-        
+
         <Button
           variant='outline'
           size='sm'
@@ -350,14 +346,12 @@ export function DisputesTable({
       </div>
 
       {/* Results Summary */}
-      <div className='text-sm text-muted-foreground'>
+      <div className='text-muted-foreground text-sm'>
         {searchTerm || statusFilter !== 'all' ? (
           <>
             Mostrando {processedData.length} de {data.length} disputas
             {processedData.length !== data.length && (
-              <span className='ml-2 text-blue-600 dark:text-blue-400'>
-                (filtrado)
-              </span>
+              <span className='ml-2 text-blue-600 dark:text-blue-400'>(filtrado)</span>
             )}
           </>
         ) : (
@@ -366,12 +360,9 @@ export function DisputesTable({
       </div>
 
       {/* Table */}
-      <div 
-        className='rounded-md border overflow-auto'
-        style={{ maxHeight }}
-      >
+      <div className='overflow-auto rounded-md border' style={{ maxHeight }}>
         <Table>
-          <TableHeader className='sticky top-0 bg-background z-10'>
+          <TableHeader className='bg-background sticky top-0 z-10'>
             <TableRow>
               <TableHead className='min-w-[140px]'>
                 <Button
@@ -406,7 +397,7 @@ export function DisputesTable({
                   {getSortIcon('status')}
                 </Button>
               </TableHead>
-              <TableHead className='text-right min-w-[100px]'>
+              <TableHead className='min-w-[100px] text-right'>
                 <Button
                   variant='ghost'
                   size='sm'
@@ -417,7 +408,7 @@ export function DisputesTable({
                   {getSortIcon('amount')}
                 </Button>
               </TableHead>
-              <TableHead className='text-right min-w-[120px]'>
+              <TableHead className='min-w-[120px] text-right'>
                 <Button
                   variant='ghost'
                   size='sm'
@@ -444,40 +435,33 @@ export function DisputesTable({
           <TableBody>
             {processedData.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={6} className='text-center py-8 text-muted-foreground'>
-                  {searchTerm || statusFilter !== 'all' 
-                    ? 'Nenhuma disputa encontrada' 
-                    : 'Nenhum dado disponível'
-                  }
+                <TableCell colSpan={6} className='text-muted-foreground py-8 text-center'>
+                  {searchTerm || statusFilter !== 'all'
+                    ? 'Nenhuma disputa encontrada'
+                    : 'Nenhum dado disponível'}
                 </TableCell>
               </TableRow>
             ) : (
-              processedData.map((dispute) => (
+              processedData.map(dispute => (
                 <TableRow key={dispute.id} className='hover:bg-muted/50'>
                   <TableCell className='font-mono text-sm'>
                     <div>
                       <div className='font-semibold'>{dispute.gateway_dispute_id}</div>
                       {dispute.type && (
-                        <div className='text-xs text-muted-foreground mt-1'>
-                          {dispute.type}
-                        </div>
+                        <div className='text-muted-foreground mt-1 text-xs'>{dispute.type}</div>
                       )}
                       {dispute.reason_code && (
-                        <div className='text-xs text-muted-foreground mt-1'>
+                        <div className='text-muted-foreground mt-1 text-xs'>
                           {dispute.reason_code}
                         </div>
                       )}
                     </div>
                   </TableCell>
-                  <TableCell>
-                    {getGatewayBadge(dispute.gateway)}
-                  </TableCell>
+                  <TableCell>{getGatewayBadge(dispute.gateway)}</TableCell>
                   <TableCell>
                     {getStatusBadge(dispute.status)}
                     {dispute.outcome && (
-                      <div className='text-xs text-muted-foreground mt-1'>
-                        {dispute.outcome}
-                      </div>
+                      <div className='text-muted-foreground mt-1 text-xs'>{dispute.outcome}</div>
                     )}
                   </TableCell>
                   <TableCell className='text-right font-medium'>
@@ -496,12 +480,13 @@ export function DisputesTable({
                     <div className='text-sm'>
                       {formatDateWithTimezone(dispute.opened_at, timezone, locale, 'dd/MM/yyyy')}
                     </div>
-                    <div className='text-xs text-muted-foreground'>
+                    <div className='text-muted-foreground text-xs'>
                       {formatDateWithTimezone(dispute.opened_at, timezone, locale, 'HH:mm')}
                     </div>
                     {dispute.resolved_at && (
-                      <div className='text-xs text-green-600 dark:text-green-400 mt-1'>
-                        Resolvida: {formatDateWithTimezone(dispute.resolved_at, timezone, locale, 'dd/MM')}
+                      <div className='mt-1 text-xs text-green-600 dark:text-green-400'>
+                        Resolvida:{' '}
+                        {formatDateWithTimezone(dispute.resolved_at, timezone, locale, 'dd/MM')}
                       </div>
                     )}
                   </TableCell>
@@ -514,11 +499,10 @@ export function DisputesTable({
 
       {/* Footer Summary */}
       {processedData.length > 0 && (
-        <div className='text-xs text-muted-foreground border-t pt-2'>
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+        <div className='text-muted-foreground border-t pt-2 text-xs'>
+          <div className='grid grid-cols-1 gap-4 md:grid-cols-3'>
             <div>
-              <span className='font-medium'>Total de Disputas:</span>{' '}
-              {processedData.length}
+              <span className='font-medium'>Total de Disputas:</span> {processedData.length}
             </div>
             <div>
               <span className='font-medium'>Valor Total Disputado:</span>{' '}
@@ -531,7 +515,10 @@ export function DisputesTable({
               <span className='font-medium'>Perdas Líquidas:</span>{' '}
               <span className='text-red-600 dark:text-red-400'>
                 {formatBRL(
-                  processedData.reduce((sum, item) => sum + parseFloat(item.net_loss_brl || '0'), 0),
+                  processedData.reduce(
+                    (sum, item) => sum + parseFloat(item.net_loss_brl || '0'),
+                    0
+                  ),
                   { locale }
                 )}
               </span>

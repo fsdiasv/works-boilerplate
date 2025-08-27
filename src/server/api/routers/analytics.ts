@@ -1,13 +1,13 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { Prisma } from '@prisma/client'
-import { 
-  calculateNetRevenue, 
-  calculateAOV, 
-  calculateRate, 
+import {
+  calculateNetRevenue,
+  calculateAOV,
+  calculateRate,
   isSuccessfulPayment,
   validateDateRange,
-  adjustTimezone
+  adjustTimezone,
 } from '@/lib/analytics-utils'
 import { createTRPCRouter, publicProcedure } from '@/server/api/trpc'
 
@@ -27,7 +27,7 @@ const productsLimitSchema = z.number().min(1).max(50).default(10)
 // Output type definitions
 const kpisOutputSchema = z.object({
   pedidos: z.number(),
-  pagamentos: z.number(), 
+  pagamentos: z.number(),
   receita_bruta_brl: z.string(),
   impostos_brl: z.string(),
   receita_liquida_brl: z.string(),
@@ -38,6 +38,17 @@ const kpisOutputSchema = z.object({
   cb_rate: z.string(),
   assinaturas_ativas: z.number(),
   mrr_realizado_brl: z.string(),
+  // Multi-currency breakdown
+  receita_por_moeda: z.object({
+    BRL: z.string(),
+    USD: z.string(),
+    EUR: z.string(),
+  }),
+  impostos_por_moeda: z.object({
+    BRL: z.string(),
+    USD: z.string(),
+    EUR: z.string(),
+  }),
 })
 
 const timeseriesPointSchema = z.object({
@@ -85,6 +96,30 @@ const recentPaymentSchema = z.object({
   country: z.string().nullable(),
 })
 
+const salesByProductSchema = z.object({
+  product_code: z.string(),
+  quantity: z.number(),
+  percentage: z.number(),
+})
+
+const revenueByProductSchema = z.object({
+  product_code: z.string(),
+  revenue_brl: z.string(),
+  percentage: z.number(),
+})
+
+const salesByDayOfWeekSchema = z.object({
+  day_of_week: z.string(),
+  sales: z.number(),
+  percentage: z.number(),
+})
+
+const salesByHourSchema = z.object({
+  hour: z.number(),
+  sales: z.number(),
+  percentage: z.number(),
+})
+
 export const analyticsRouter = createTRPCRouter({
   /**
    * Get comprehensive KPIs for the dashboard
@@ -94,12 +129,12 @@ export const analyticsRouter = createTRPCRouter({
     .output(kpisOutputSchema)
     .query(async ({ ctx, input }) => {
       const { from, to, tz, product, gateway, country } = input
-      
+
       // Validate date range
       const fromDate = new Date(from)
       const toDate = new Date(to)
       const validation = validateDateRange(fromDate, toDate)
-      
+
       if (!validation.valid) {
         throw new TRPCError({
           code: 'BAD_REQUEST',
@@ -153,7 +188,7 @@ export const analyticsRouter = createTRPCRouter({
         })
 
         // Flatten order items from completed orders
-        const orderItems = completedOrders.flatMap(order => 
+        const orderItems = completedOrders.flatMap(order =>
           order.orderItems.map(item => ({
             ...item,
             order: {
@@ -220,9 +255,9 @@ export const analyticsRouter = createTRPCRouter({
           where: {
             OR: [
               { status: { in: ['active', 'trialing'] } },
-              { 
+              {
                 canceledAt: null,
-                startDate: { lt: toAdjusted }
+                startDate: { lt: toAdjusted },
               },
             ],
             ...(product && {
@@ -243,14 +278,34 @@ export const analyticsRouter = createTRPCRouter({
         // Helper function to convert currency to BRL (simplified rates)
         const convertToBRL = (amount: number, currency: string): number => {
           const rates: Record<string, number> = {
-            'USD': 5.50, // Example rate
-            'EUR': 6.00, // Example rate
-            'BRL': 1.00,
+            USD: 5.5, // Example rate
+            EUR: 6.0, // Example rate
+            BRL: 1.0,
           }
-          return amount * (rates[currency] || rates['USD'] || 1.00)
+          return amount * (rates[currency] || rates['USD'] || 1.0)
         }
 
-        // Calculate metrics using order_items.price with currency conversion
+        // Calculate metrics using order_items.price with currency conversion and breakdown
+        const receitaPorMoeda = orderItems.reduce(
+          (acc, item) => {
+            if (!item.price || !item.order?.currency) return acc
+            const amount = Number(item.price)
+            if (isNaN(amount)) return acc
+            const currency = item.order.currency
+
+            if (currency === 'BRL') {
+              acc.BRL += amount
+            } else if (currency === 'USD') {
+              acc.USD += amount
+            } else if (currency === 'EUR') {
+              acc.EUR += amount
+            }
+
+            return acc
+          },
+          { BRL: 0, USD: 0, EUR: 0 }
+        )
+
         const receita_bruta = orderItems.reduce((sum, item) => {
           if (!item.price || !item.order?.currency) return sum
           const amount = Number(item.price)
@@ -258,34 +313,44 @@ export const analyticsRouter = createTRPCRouter({
           const currency = item.order.currency
           return sum + convertToBRL(amount, currency)
         }, 0)
-        
-        // For now, we don't have tax data in order_items, so setting to 0
-        const impostos = 0
-        
+
+        // Calculate taxes as 2.5% of gross revenue (per currency)
+        const impostos = receita_bruta * 0.025
+        const impostosPorMoeda = {
+          BRL: receitaPorMoeda.BRL * 0.025,
+          USD: receitaPorMoeda.USD * 0.025,
+          EUR: receitaPorMoeda.EUR * 0.025,
+        }
+
         const refunds_total = refunds.reduce((sum, r) => {
           const amount = r.amountBrl ? Number(r.amountBrl) : 0
           return sum + (isNaN(amount) ? 0 : amount)
         }, 0)
-        
+
         const cb_losses = disputes.reduce((sum, d) => {
           const loss = d.netLossBrl ? Number(d.netLossBrl) : 0
           return sum + (isNaN(loss) ? 0 : loss)
         }, 0)
-        
-        const receita_liquida = calculateNetRevenue(receita_bruta, impostos, refunds_total, cb_losses)
-        
+
+        const receita_liquida = calculateNetRevenue(
+          receita_bruta,
+          impostos,
+          refunds_total,
+          cb_losses
+        )
+
         // Get unique orders count
         const uniqueOrderIds = new Set(completedOrders.map(o => o.id))
         const pedidos = uniqueOrderIds.size
         const pagamentos = orderItems.length // Total order items as "pagamentos"
-        
+
         const ticket_medio = calculateAOV(receita_bruta, pedidos)
         const refund_rate = calculateRate(refunds_total, receita_bruta)
         const cb_rate = calculateRate(cb_losses, receita_bruta)
 
         // Calculate MRR from subscription order items
-        const subscriptionOrderItems = orderItems.filter(oi => 
-          oi.pricingType === 'subscription' && oi.subscriptions && oi.subscriptions.length > 0
+        const subscriptionOrderItems = orderItems.filter(
+          oi => oi.pricingType === 'subscription' && oi.subscriptions && oi.subscriptions.length > 0
         )
         const mrr_realizado = subscriptionOrderItems.reduce((sum, oi) => {
           if (!oi.price || !oi.order?.currency) return sum
@@ -308,6 +373,16 @@ export const analyticsRouter = createTRPCRouter({
           cb_rate: (cb_rate * 100).toFixed(2),
           assinaturas_ativas: activeSubscriptions.length,
           mrr_realizado_brl: mrr_realizado.toFixed(2),
+          receita_por_moeda: {
+            BRL: receitaPorMoeda.BRL.toFixed(2),
+            USD: receitaPorMoeda.USD.toFixed(2),
+            EUR: receitaPorMoeda.EUR.toFixed(2),
+          },
+          impostos_por_moeda: {
+            BRL: impostosPorMoeda.BRL.toFixed(2),
+            USD: impostosPorMoeda.USD.toFixed(2),
+            EUR: impostosPorMoeda.EUR.toFixed(2),
+          },
         }
       } catch (error) {
         console.error('Error calculating KPIs:', error)
@@ -326,7 +401,7 @@ export const analyticsRouter = createTRPCRouter({
     .output(z.array(timeseriesPointSchema))
     .query(async ({ ctx, input }) => {
       const { from, to, tz, product, gateway, country } = input
-      
+
       const fromDate = adjustTimezone(new Date(from), tz)
       const toDate = adjustTimezone(new Date(to), tz)
 
@@ -385,7 +460,7 @@ export const analyticsRouter = createTRPCRouter({
     .output(z.array(ordersTimeseriesPointSchema))
     .query(async ({ ctx, input }) => {
       const { from, to, tz, product, gateway, country } = input
-      
+
       const fromDate = adjustTimezone(new Date(from), tz)
       const toDate = adjustTimezone(new Date(to), tz)
 
@@ -401,20 +476,28 @@ export const analyticsRouter = createTRPCRouter({
               AND o.created_at <= ${toDate}
               AND o.status = 'COMPLETED'
               ${gateway ? Prisma.sql`AND o.gateway = ${gateway}` : Prisma.sql``}
-              ${product ? Prisma.sql`
+              ${
+                product
+                  ? Prisma.sql`
                 AND EXISTS (
                   SELECT 1 FROM order_items oi 
                   LEFT JOIN product_language_versions plv ON oi.product_version_id = plv.id 
                   WHERE oi.order_id = o.id AND plv.product_code = ${product}
                 )
-              ` : Prisma.sql``}
-              ${country ? Prisma.sql`
+              `
+                  : Prisma.sql``
+              }
+              ${
+                country
+                  ? Prisma.sql`
                 AND EXISTS (
                   SELECT 1 FROM order_items oi 
                   LEFT JOIN users u ON oi.user_id = u.id 
                   WHERE oi.order_id = o.id AND u.country = ${country}
                 )
-              ` : Prisma.sql``}
+              `
+                  : Prisma.sql``
+              }
           )
           SELECT 
             order_day::text as day,
@@ -442,7 +525,7 @@ export const analyticsRouter = createTRPCRouter({
     .output(z.array(productSchema))
     .query(async ({ ctx, input }) => {
       const { from, to, tz, limit, gateway, country } = input
-      
+
       const fromDate = adjustTimezone(new Date(from), tz)
       const toDate = adjustTimezone(new Date(to), tz)
 
@@ -453,9 +536,9 @@ export const analyticsRouter = createTRPCRouter({
           Prisma.sql`o.created_at <= ${toDate}`,
           Prisma.sql`o.status = 'COMPLETED'`,
           Prisma.sql`plv.product_code IS NOT NULL`,
-          Prisma.sql`oi.price IS NOT NULL`
+          Prisma.sql`oi.price IS NOT NULL`,
         ]
-        
+
         if (gateway) {
           whereConditions.push(Prisma.sql`o.gateway = ${gateway}`)
         }
@@ -463,12 +546,14 @@ export const analyticsRouter = createTRPCRouter({
           whereConditions.push(Prisma.sql`u.country = ${country}`)
         }
 
-        const results = await ctx.db.$queryRaw<Array<{
-          product_code: string
-          pedidos: number
-          receita_brl: string
-          refunds_brl: string
-        }>>`
+        const results = await ctx.db.$queryRaw<
+          Array<{
+            product_code: string
+            pedidos: number
+            receita_brl: string
+            refunds_brl: string
+          }>
+        >`
           SELECT 
             plv.product_code,
             COUNT(DISTINCT o.id)::int as pedidos,
@@ -501,7 +586,7 @@ export const analyticsRouter = createTRPCRouter({
           const receita = Number(row.receita_brl)
           const refunds = Number(row.refunds_brl)
           const pedidos = row.pedidos
-          
+
           return {
             product_code: row.product_code,
             pedidos,
@@ -527,7 +612,7 @@ export const analyticsRouter = createTRPCRouter({
     .output(subscriptionsSummarySchema)
     .query(async ({ ctx, input }) => {
       const { from, to, tz, product, country } = input
-      
+
       const fromDate = adjustTimezone(new Date(from), tz)
       const toDate = adjustTimezone(new Date(to), tz)
 
@@ -537,9 +622,9 @@ export const analyticsRouter = createTRPCRouter({
           where: {
             OR: [
               { status: { in: ['active', 'trialing'] } },
-              { 
+              {
                 canceledAt: null,
-                startDate: { lt: toDate }
+                startDate: { lt: toDate },
               },
             ],
             ...(product && {
@@ -657,7 +742,7 @@ export const analyticsRouter = createTRPCRouter({
     .output(disputesSummarySchema)
     .query(async ({ ctx, input }) => {
       const { from, to } = input
-      
+
       const fromDate = new Date(from)
       const toDate = new Date(to)
 
@@ -706,7 +791,7 @@ export const analyticsRouter = createTRPCRouter({
 
       try {
         console.log(`[paymentsRecent] Fetching ${limit} recent payments`)
-        
+
         const payments = await ctx.db.payment.findMany({
           where: {
             status: {
@@ -754,7 +839,7 @@ export const analyticsRouter = createTRPCRouter({
                 hasOrderItem: !!payment.orderItem,
                 hasProductVersion: !!payment.orderItem?.productVersion,
                 hasUser: !!payment.orderItem?.user,
-              }
+              },
             })
             throw mappingError
           }
@@ -768,6 +853,279 @@ export const analyticsRouter = createTRPCRouter({
         throw new TRPCError({
           code: 'INTERNAL_SERVER_ERROR',
           message: 'Failed to fetch recent payments',
+        })
+      }
+    }),
+
+  /**
+   * Get sales by product with quantities and percentages
+   */
+  salesByProduct: publicProcedure
+    .input(analyticsFiltersSchema)
+    .output(z.array(salesByProductSchema))
+    .query(async ({ ctx, input }) => {
+      const { from, to, tz, product, gateway, country } = input
+      const fromDate = adjustTimezone(new Date(from), tz)
+      const toDate = adjustTimezone(new Date(to), tz)
+
+      try {
+        // Build WHERE conditions dynamically - using orders/order_items structure
+        const whereConditions = [
+          Prisma.sql`o.created_at >= ${fromDate}`,
+          Prisma.sql`o.created_at <= ${toDate}`,
+          Prisma.sql`o.status = 'COMPLETED'`,
+          Prisma.sql`plv.product_code IS NOT NULL`,
+        ]
+
+        if (gateway) whereConditions.push(Prisma.sql`o.gateway = ${gateway}`)
+        if (product) whereConditions.push(Prisma.sql`plv.product_code = ${product}`)
+        if (country) whereConditions.push(Prisma.sql`u.country = ${country}`)
+
+        const whereClause = Prisma.join(whereConditions, ' AND ')
+
+        const results = await ctx.db.$queryRaw<Array<{ product_code: string; quantity: bigint }>>(
+          Prisma.sql`
+            WITH product_sales AS (
+              SELECT 
+                plv.product_code,
+                COUNT(DISTINCT o.id) as quantity
+              FROM orders o
+              LEFT JOIN order_items oi ON o.id = oi.order_id
+              LEFT JOIN product_language_versions plv ON oi.product_version_id = plv.id
+              LEFT JOIN users u ON oi.user_id = u.id
+              WHERE ${whereClause}
+              GROUP BY plv.product_code
+            )
+            SELECT 
+              product_code,
+              quantity
+            FROM product_sales
+            ORDER BY quantity DESC
+          `
+        )
+
+        const totalSales = results.reduce((sum, row) => sum + Number(row.quantity), 0)
+
+        return results.map(row => ({
+          product_code: row.product_code,
+          quantity: Number(row.quantity),
+          percentage: totalSales > 0 ? (Number(row.quantity) / totalSales) * 100 : 0,
+        }))
+      } catch (error) {
+        console.error('Error fetching sales by product:', error)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to fetch sales by product',
+        })
+      }
+    }),
+
+  /**
+   * Get revenue by product with amounts and percentages
+   */
+  revenueByProduct: publicProcedure
+    .input(analyticsFiltersSchema)
+    .output(z.array(revenueByProductSchema))
+    .query(async ({ ctx, input }) => {
+      const { from, to, tz, product, gateway, country } = input
+      const fromDate = adjustTimezone(new Date(from), tz)
+      const toDate = adjustTimezone(new Date(to), tz)
+
+      try {
+        // Build WHERE conditions dynamically - using orders/order_items structure
+        const whereConditions = [
+          Prisma.sql`o.created_at >= ${fromDate}`,
+          Prisma.sql`o.created_at <= ${toDate}`,
+          Prisma.sql`o.status = 'COMPLETED'`,
+          Prisma.sql`plv.product_code IS NOT NULL`,
+          Prisma.sql`oi.price IS NOT NULL`,
+        ]
+
+        if (gateway) whereConditions.push(Prisma.sql`o.gateway = ${gateway}`)
+        if (product) whereConditions.push(Prisma.sql`plv.product_code = ${product}`)
+        if (country) whereConditions.push(Prisma.sql`u.country = ${country}`)
+
+        const whereClause = Prisma.join(whereConditions, ' AND ')
+
+        const results = await ctx.db.$queryRaw<
+          Array<{ product_code: string; revenue_brl: string }>
+        >(
+          Prisma.sql`
+            WITH product_revenue AS (
+              SELECT 
+                plv.product_code,
+                SUM(
+                  CASE 
+                    WHEN o.currency = 'USD' THEN COALESCE(oi.price, 0) * 5.50
+                    WHEN o.currency = 'EUR' THEN COALESCE(oi.price, 0) * 6.00
+                    ELSE COALESCE(oi.price, 0)
+                  END
+                ) as revenue_brl
+              FROM orders o
+              LEFT JOIN order_items oi ON o.id = oi.order_id
+              LEFT JOIN product_language_versions plv ON oi.product_version_id = plv.id
+              LEFT JOIN users u ON oi.user_id = u.id
+              WHERE ${whereClause}
+              GROUP BY plv.product_code
+            )
+            SELECT 
+              product_code,
+              revenue_brl::text
+            FROM product_revenue
+            ORDER BY revenue_brl DESC
+          `
+        )
+
+        const totalRevenue = results.reduce((sum, row) => sum + parseFloat(row.revenue_brl), 0)
+
+        return results.map(row => {
+          const revenue = parseFloat(row.revenue_brl)
+          return {
+            product_code: row.product_code,
+            revenue_brl: revenue.toFixed(2),
+            percentage: totalRevenue > 0 ? (revenue / totalRevenue) * 100 : 0,
+          }
+        })
+      } catch (error) {
+        console.error('Error fetching revenue by product:', error)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to fetch revenue by product',
+        })
+      }
+    }),
+
+  /**
+   * Get sales distribution by day of week
+   */
+  salesByDayOfWeek: publicProcedure
+    .input(analyticsFiltersSchema)
+    .output(z.array(salesByDayOfWeekSchema))
+    .query(async ({ ctx, input }) => {
+      const { from, to, tz, product, gateway, country } = input
+      const fromDate = adjustTimezone(new Date(from), tz)
+      const toDate = adjustTimezone(new Date(to), tz)
+
+      try {
+        // Build WHERE conditions dynamically - using orders/order_items structure
+        const whereConditions = [
+          Prisma.sql`o.created_at >= ${fromDate}`,
+          Prisma.sql`o.created_at <= ${toDate}`,
+          Prisma.sql`o.status = 'COMPLETED'`,
+        ]
+
+        if (gateway) whereConditions.push(Prisma.sql`o.gateway = ${gateway}`)
+        if (product) whereConditions.push(Prisma.sql`plv.product_code = ${product}`)
+        if (country) whereConditions.push(Prisma.sql`u.country = ${country}`)
+
+        const whereClause = Prisma.join(whereConditions, ' AND ')
+
+        const results = await ctx.db.$queryRaw<Array<{ day_name: string; sales: bigint }>>(
+          Prisma.sql`
+            WITH daily_sales AS (
+              SELECT 
+                EXTRACT(DOW FROM o.created_at AT TIME ZONE 'UTC' AT TIME ZONE ${tz}) as day_of_week,
+                COUNT(DISTINCT o.id) as sales
+              FROM orders o
+              LEFT JOIN order_items oi ON o.id = oi.order_id
+              LEFT JOIN product_language_versions plv ON oi.product_version_id = plv.id
+              LEFT JOIN users u ON oi.user_id = u.id
+              WHERE ${whereClause}
+              GROUP BY 1
+            )
+            SELECT 
+              CASE day_of_week
+                WHEN 0 THEN 'Dom'
+                WHEN 1 THEN 'Seg'
+                WHEN 2 THEN 'Ter'
+                WHEN 3 THEN 'Qua'
+                WHEN 4 THEN 'Qui'
+                WHEN 5 THEN 'Sex'
+                WHEN 6 THEN 'Sab'
+              END as day_name,
+              sales
+            FROM daily_sales
+            ORDER BY day_of_week
+          `
+        )
+
+        const totalSales = results.reduce((sum, row) => sum + Number(row.sales), 0)
+
+        return results.map(row => ({
+          day_of_week: row.day_name,
+          sales: Number(row.sales),
+          percentage: totalSales > 0 ? (Number(row.sales) / totalSales) * 100 : 0,
+        }))
+      } catch (error) {
+        console.error('Error fetching sales by day of week:', error)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to fetch sales by day of week',
+        })
+      }
+    }),
+
+  /**
+   * Get sales distribution by hour of day
+   */
+  salesByHour: publicProcedure
+    .input(analyticsFiltersSchema)
+    .output(z.array(salesByHourSchema))
+    .query(async ({ ctx, input }) => {
+      const { from, to, tz, product, gateway, country } = input
+      const fromDate = adjustTimezone(new Date(from), tz)
+      const toDate = adjustTimezone(new Date(to), tz)
+
+      try {
+        // Build WHERE conditions dynamically - using orders/order_items structure
+        const whereConditions = [
+          Prisma.sql`o.created_at >= ${fromDate}`,
+          Prisma.sql`o.created_at <= ${toDate}`,
+          Prisma.sql`o.status = 'COMPLETED'`,
+        ]
+
+        if (gateway) whereConditions.push(Prisma.sql`o.gateway = ${gateway}`)
+        if (product) whereConditions.push(Prisma.sql`plv.product_code = ${product}`)
+        if (country) whereConditions.push(Prisma.sql`u.country = ${country}`)
+
+        const whereClause = Prisma.join(whereConditions, ' AND ')
+
+        const results = await ctx.db.$queryRaw<Array<{ hour: number; sales: bigint }>>(
+          Prisma.sql`
+            WITH hourly_sales AS (
+              SELECT 
+                EXTRACT(HOUR FROM o.created_at AT TIME ZONE 'UTC' AT TIME ZONE ${tz}) as hour,
+                COUNT(DISTINCT o.id) as sales
+              FROM orders o
+              LEFT JOIN order_items oi ON o.id = oi.order_id
+              LEFT JOIN product_language_versions plv ON oi.product_version_id = plv.id
+              LEFT JOIN users u ON oi.user_id = u.id
+              WHERE ${whereClause}
+              GROUP BY 1
+            )
+            SELECT 
+              hour::integer,
+              sales
+            FROM hourly_sales
+            ORDER BY hour
+          `
+        )
+
+        const totalSales = results.reduce((sum, row) => sum + Number(row.sales), 0)
+
+        return results.map(row => {
+          const sales = Number(row.sales)
+          return {
+            hour: row.hour,
+            sales,
+            percentage: totalSales > 0 ? (sales / totalSales) * 100 : 0,
+          }
+        })
+      } catch (error) {
+        console.error('Error fetching sales by hour:', error)
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: 'Failed to fetch sales by hour',
         })
       }
     }),

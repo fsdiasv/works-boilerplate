@@ -69,10 +69,7 @@ export function calculateNetRevenue(
  * @param orders - Number of orders
  * @returns AOV value
  */
-export function calculateAOV(
-  revenue: Decimal | string | number,
-  orders: number
-): number {
+export function calculateAOV(revenue: Decimal | string | number, orders: number): number {
   const revenueNum = toNumber(revenue)
   return orders > 0 ? revenueNum / orders : 0
 }
@@ -98,10 +95,7 @@ export function calculateRate(
  * @param decimals - Number of decimal places
  * @returns Formatted percentage string
  */
-export function formatPercentage(
-  rate: number,
-  decimals: number = 2
-): string {
+export function formatPercentage(rate: number, decimals: number = 2): string {
   return `${(rate * 100).toFixed(decimals)}%`
 }
 
@@ -132,7 +126,7 @@ export function formatDateWithTimezone(
 ): string {
   const adjustedDate = adjustTimezone(date, timezone)
   const localeObj = locale === 'pt-BR' ? ptBR : enUS
-  
+
   return format(adjustedDate, formatString, { locale: localeObj })
 }
 
@@ -179,21 +173,26 @@ const PAYMENT_STATUS_MAP: Record<string, Record<string, string>> = {
  * @param gateway - Payment gateway identifier
  * @returns Normalized status ('succeeded', 'pending', 'failed', 'refunded')
  */
-export function normalizePaymentStatus(
-  status: string,
-  gateway: string
-): string {
+export function normalizePaymentStatus(status: string, gateway: string): string {
   const gatewayMap = PAYMENT_STATUS_MAP[gateway.toLowerCase()]
   if (!gatewayMap) {
     // Fallback for unknown gateways - try to map common statuses
     const normalizedStatus = status.toLowerCase()
-    if (['succeeded', 'paid', 'captured', 'completed', 'approved', 'success'].includes(normalizedStatus)) {
+    if (
+      ['succeeded', 'paid', 'captured', 'completed', 'approved', 'success'].includes(
+        normalizedStatus
+      )
+    ) {
       return 'succeeded'
     }
     if (['pending', 'processing', 'requires_action', 'in_process'].includes(normalizedStatus)) {
       return 'pending'
     }
-    if (['failed', 'declined', 'rejected', 'cancelled', 'canceled', 'expired'].includes(normalizedStatus)) {
+    if (
+      ['failed', 'declined', 'rejected', 'cancelled', 'canceled', 'expired'].includes(
+        normalizedStatus
+      )
+    ) {
       return 'failed'
     }
     if (['refunded'].includes(normalizedStatus)) {
@@ -201,7 +200,7 @@ export function normalizePaymentStatus(
     }
     return 'unknown'
   }
-  
+
   return gatewayMap[status.toLowerCase()] || 'unknown'
 }
 
@@ -221,30 +220,29 @@ export function isSuccessfulPayment(status: string, gateway: string): boolean {
  * @param filename - Name of the file (without extension)
  * @returns CSV content as string
  */
-export function exportToCSV(
-  data: Record<string, unknown>[],
-  filename: string = 'export'
-): string {
+export function exportToCSV(data: Record<string, unknown>[], filename: string = 'export'): string {
   if (!data.length) return ''
 
   // Get headers from first object
   const headers = Object.keys(data[0])
-  
+
   // Create CSV content
   const csvContent = [
     // Header row
     headers.join(','),
     // Data rows
     ...data.map(row =>
-      headers.map(header => {
-        const value = row[header]
-        // Handle values that might contain commas or quotes
-        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
-          return `"${value.replace(/"/g, '""')}"`
-        }
-        return value?.toString() || ''
-      }).join(',')
-    )
+      headers
+        .map(header => {
+          const value = row[header]
+          // Handle values that might contain commas or quotes
+          if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+            return `"${value.replace(/"/g, '""')}"`
+          }
+          return value?.toString() || ''
+        })
+        .join(',')
+    ),
   ].join('\n')
 
   return csvContent
@@ -264,7 +262,7 @@ export function downloadCSV(csvContent: string, filename: string): void {
 
   const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
   const link = document.createElement('a')
-  
+
   if (link.download !== undefined) {
     const url = URL.createObjectURL(blob)
     link.setAttribute('href', url)
@@ -291,48 +289,48 @@ export function getDateRange(
 ): { from: Date; to: Date } {
   const now = adjustTimezone(new Date(), timezone)
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
-  
+
   switch (period) {
     case 'today':
       return {
         from: today,
-        to: new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1) // End of today
+        to: new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1), // End of today
       }
-    
+
     case '7d':
       return {
         from: new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000), // 7 days ago
-        to: new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1)
+        to: new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1),
       }
-    
+
     case '30d':
       return {
         from: new Date(today.getTime() - 29 * 24 * 60 * 60 * 1000), // 30 days ago
-        to: new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1)
+        to: new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1),
       }
-    
+
     case '90d':
       return {
         from: new Date(today.getTime() - 89 * 24 * 60 * 60 * 1000), // 90 days ago
-        to: new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1)
+        to: new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1),
       }
-    
+
     case 'mtd': // Month to date
       return {
         from: new Date(now.getFullYear(), now.getMonth(), 1), // First day of current month
-        to: new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1)
+        to: new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1),
       }
-    
+
     case 'custom':
       return {
         from: customFrom || today,
-        to: customTo || new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1)
+        to: customTo || new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1),
       }
-    
+
     default:
       return {
         from: new Date(today.getTime() - 29 * 24 * 60 * 60 * 1000),
-        to: new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1)
+        to: new Date(today.getTime() + 24 * 60 * 60 * 1000 - 1),
       }
   }
 }
@@ -352,12 +350,12 @@ export function validateDateRange(
   if (from >= to) {
     return { valid: false, error: 'Start date must be before end date' }
   }
-  
+
   const daysDiff = Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24))
   if (daysDiff > maxDays) {
     return { valid: false, error: `Date range cannot exceed ${maxDays} days` }
   }
-  
+
   return { valid: true }
 }
 
@@ -367,12 +365,9 @@ export function validateDateRange(
  * @param decimals - Number of decimal places
  * @returns Formatted string
  */
-export function formatLargeNumber(
-  value: Decimal | string | number,
-  decimals: number = 1
-): string {
+export function formatLargeNumber(value: Decimal | string | number, decimals: number = 1): string {
   const num = toNumber(value)
-  
+
   if (num >= 1000000000) {
     return `${(num / 1000000000).toFixed(decimals)}B`
   }
@@ -382,6 +377,6 @@ export function formatLargeNumber(
   if (num >= 1000) {
     return `${(num / 1000).toFixed(decimals)}K`
   }
-  
+
   return num.toFixed(0)
 }

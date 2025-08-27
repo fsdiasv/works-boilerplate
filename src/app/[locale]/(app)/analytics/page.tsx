@@ -2,22 +2,22 @@
 
 import dynamic from 'next/dynamic'
 import { useSearchParams, usePathname, useRouter } from 'next/navigation'
-import React, { useState, useCallback, useEffect } from 'react'
+import { useTranslations } from 'next-intl'
+import React, { useState, useCallback } from 'react'
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { 
-  RevenueCard, 
-  OrdersCard, 
-  AOVCard, 
-  RefundRateCard, 
-  SubscriptionsCard, 
+import {
+  RevenueCard,
+  OrdersCard,
+  AOVCard,
+  RefundRateCard,
+  SubscriptionsCard,
   MRRCard,
-  SalesMetricCard
+  SalesMetricCard,
 } from '@/components/dashboard/SalesMetricCard'
 import { ProductsTable } from '@/components/dashboard/ProductsTable'
-import { DisputesTable } from '@/components/dashboard/DisputesTable'
 import { getDateRange } from '@/lib/analytics-utils'
 import { api } from '@/trpc/react'
 
@@ -31,7 +31,10 @@ const RevenueChart = dynamic(
 )
 
 const DualAxisRevenueChart = dynamic(
-  () => import('@/components/dashboard/RevenueChart').then(mod => ({ default: mod.DualAxisRevenueChart })),
+  () =>
+    import('@/components/dashboard/RevenueChart').then(mod => ({
+      default: mod.DualAxisRevenueChart,
+    })),
   {
     ssr: false,
     loading: () => <ChartSkeleton />,
@@ -46,8 +49,44 @@ const OrdersChart = dynamic(
   }
 )
 
-const SubscriptionsChart = dynamic(
-  () => import('@/components/dashboard/OrdersChart').then(mod => ({ default: mod.SubscriptionsChart })),
+const ProductSalesChart = dynamic(
+  () =>
+    import('@/components/dashboard/ProductSalesChart').then(mod => ({
+      default: mod.ProductSalesChart,
+    })),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton />,
+  }
+)
+
+const ProductRevenueChart = dynamic(
+  () =>
+    import('@/components/dashboard/ProductRevenueChart').then(mod => ({
+      default: mod.ProductRevenueChart,
+    })),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton />,
+  }
+)
+
+const SalesByDayOfWeekChart = dynamic(
+  () =>
+    import('@/components/dashboard/SalesByDayOfWeekChart').then(mod => ({
+      default: mod.SalesByDayOfWeekChart,
+    })),
+  {
+    ssr: false,
+    loading: () => <ChartSkeleton />,
+  }
+)
+
+const SalesByHourChart = dynamic(
+  () =>
+    import('@/components/dashboard/SalesByHourChart').then(mod => ({
+      default: mod.SalesByHourChart,
+    })),
   {
     ssr: false,
     loading: () => <ChartSkeleton />,
@@ -69,8 +108,8 @@ function ChartSkeleton() {
   return (
     <div className='h-[400px] w-full'>
       <div className='flex h-full items-center justify-center'>
-        <div className='space-y-4 w-full p-6'>
-          <Skeleton className='h-4 w-48 mx-auto' />
+        <div className='w-full space-y-4 p-6'>
+          <Skeleton className='mx-auto h-4 w-48' />
           <Skeleton className='h-64 w-full' />
           <div className='flex justify-center space-x-4'>
             <Skeleton className='h-4 w-20' />
@@ -89,6 +128,7 @@ interface GlobalFiltersProps {
 }
 
 function GlobalFilters({ filters, onFiltersChange }: GlobalFiltersProps) {
+  const t = useTranslations('Analytics')
   const handlePeriodChange = (period: AnalyticsFilters['period']) => {
     const dateRange = getDateRange(period, filters.timezone)
     onFiltersChange({
@@ -117,27 +157,28 @@ function GlobalFilters({ filters, onFiltersChange }: GlobalFiltersProps) {
   return (
     <Card className='mb-6'>
       <CardHeader>
-        <CardTitle className='text-lg'>Filtros</CardTitle>
-        <CardDescription>
-          Ajuste os filtros para personalizar a visualização dos dados
-        </CardDescription>
+        <CardTitle className='text-lg'>{t('filters.title')}</CardTitle>
+        <CardDescription>{t('filters.subtitle')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
           {/* Period Selector */}
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>Período</label>
+            <label htmlFor='period-select' className='text-sm font-medium'>
+              {t('filters.period')}
+            </label>
             <select
+              id='period-select'
               value={filters.period}
-              onChange={(e) => handlePeriodChange(e.target.value as AnalyticsFilters['period'])}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handlePeriodChange(e.target.value as AnalyticsFilters['period'])}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             >
-              <option value='today'>Hoje</option>
-              <option value='7d'>Últimos 7 dias</option>
-              <option value='30d'>Últimos 30 dias</option>
-              <option value='90d'>Últimos 90 dias</option>
-              <option value='mtd'>Mês atual</option>
-              <option value='custom'>Personalizado</option>
+              <option value='today'>{t('filters.periods.today')}</option>
+              <option value='7d'>{t('filters.periods.7d')}</option>
+              <option value='30d'>{t('filters.periods.30d')}</option>
+              <option value='90d'>{t('filters.periods.90d')}</option>
+              <option value='mtd'>{t('filters.periods.mtd')}</option>
+              <option value='custom'>{t('filters.periods.custom')}</option>
             </select>
           </div>
 
@@ -145,21 +186,27 @@ function GlobalFilters({ filters, onFiltersChange }: GlobalFiltersProps) {
           {filters.period === 'custom' && (
             <>
               <div className='space-y-2'>
-                <label className='text-sm font-medium'>Data Inicial</label>
+                <label htmlFor='date-from' className='text-sm font-medium'>
+                  {t('filters.from')}
+                </label>
                 <input
+                  id='date-from'
                   type='date'
                   value={filters.from.split('T')[0]}
-                  onChange={(e) => handleDateChange('from', e.target.value)}
-                  className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+                  onChange={e => handleDateChange('from', e.target.value)}
+                  className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
                 />
               </div>
               <div className='space-y-2'>
-                <label className='text-sm font-medium'>Data Final</label>
+                <label htmlFor='date-to' className='text-sm font-medium'>
+                  {t('filters.to')}
+                </label>
                 <input
+                  id='date-to'
                   type='date'
                   value={filters.to.split('T')[0]}
-                  onChange={(e) => handleDateChange('to', e.target.value)}
-                  className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+                  onChange={e => handleDateChange('to', e.target.value)}
+                  className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
                 />
               </div>
             </>
@@ -167,11 +214,14 @@ function GlobalFilters({ filters, onFiltersChange }: GlobalFiltersProps) {
 
           {/* Timezone */}
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>Fuso Horário</label>
+            <label htmlFor='timezone-select' className='text-sm font-medium'>
+              {t('filters.timezone')}
+            </label>
             <select
+              id='timezone-select'
               value={filters.timezone}
-              onChange={(e) => handleFilterChange('timezone', e.target.value)}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handleFilterChange('timezone', e.target.value)}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             >
               <option value='America/Sao_Paulo'>São Paulo (BRT)</option>
               <option value='UTC'>UTC</option>
@@ -182,25 +232,31 @@ function GlobalFilters({ filters, onFiltersChange }: GlobalFiltersProps) {
 
           {/* Product Filter */}
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>Produto</label>
+            <label htmlFor='product-filter' className='text-sm font-medium'>
+              {t('filters.product')}
+            </label>
             <input
+              id='product-filter'
               type='text'
-              placeholder='Código do produto'
+              placeholder={t('filters.productPlaceholder')}
               value={filters.product || ''}
-              onChange={(e) => handleFilterChange('product', e.target.value)}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handleFilterChange('product', e.target.value)}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             />
           </div>
 
           {/* Gateway Filter */}
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>Gateway</label>
+            <label htmlFor='gateway-filter' className='text-sm font-medium'>
+              {t('filters.gateway')}
+            </label>
             <select
+              id='gateway-filter'
               value={filters.gateway || ''}
-              onChange={(e) => handleFilterChange('gateway', e.target.value)}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handleFilterChange('gateway', e.target.value)}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             >
-              <option value=''>Todos</option>
+              <option value=''>{t('filters.gateways.all')}</option>
               <option value='stripe'>Stripe</option>
               <option value='paypal'>PayPal</option>
               <option value='mercadopago'>Mercado Pago</option>
@@ -210,18 +266,21 @@ function GlobalFilters({ filters, onFiltersChange }: GlobalFiltersProps) {
 
           {/* Country Filter */}
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>País</label>
+            <label htmlFor='country-filter' className='text-sm font-medium'>
+              {t('filters.country')}
+            </label>
             <select
+              id='country-filter'
               value={filters.country || ''}
-              onChange={(e) => handleFilterChange('country', e.target.value)}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handleFilterChange('country', e.target.value)}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             >
-              <option value=''>Todos</option>
-              <option value='BR'>Brasil</option>
-              <option value='US'>Estados Unidos</option>
-              <option value='AR'>Argentina</option>
-              <option value='MX'>México</option>
-              <option value='PT'>Portugal</option>
+              <option value=''>{t('filters.gateways.all')}</option>
+              <option value='BR'>{t('filters.countries.BR')}</option>
+              <option value='US'>{t('filters.countries.US')}</option>
+              <option value='AR'>{t('filters.countries.AR')}</option>
+              <option value='MX'>{t('filters.countries.MX')}</option>
+              <option value='PT'>{t('filters.countries.PT')}</option>
             </select>
           </div>
         </div>
@@ -231,6 +290,7 @@ function GlobalFilters({ filters, onFiltersChange }: GlobalFiltersProps) {
 }
 
 export default function AnalyticsPage() {
+  const t = useTranslations('Analytics')
   const searchParams = useSearchParams()
   const pathname = usePathname()
   const router = useRouter()
@@ -240,41 +300,55 @@ export default function AnalyticsPage() {
     const period = (searchParams.get('period') as AnalyticsFilters['period']) || '30d'
     const timezone = searchParams.get('timezone') || 'America/Sao_Paulo'
     const dateRange = getDateRange(period, timezone)
-    
+
+    const productParam = searchParams.get('product')
+    const gatewayParam = searchParams.get('gateway')
+    const countryParam = searchParams.get('country')
+
     return {
       period,
       from: searchParams.get('from') || dateRange.from.toISOString(),
       to: searchParams.get('to') || dateRange.to.toISOString(),
       timezone,
-      product: searchParams.get('product') || undefined,
-      gateway: searchParams.get('gateway') || undefined,
-      country: searchParams.get('country') || undefined,
+      ...(productParam && { product: productParam }),
+      ...(gatewayParam && { gateway: gatewayParam }),
+      ...(countryParam && { country: countryParam }),
     }
   })
 
   // Update URL when filters change
-  const updateURL = useCallback((newFilters: AnalyticsFilters) => {
-    const params = new URLSearchParams()
-    
-    params.set('period', newFilters.period)
-    params.set('from', newFilters.from)
-    params.set('to', newFilters.to)
-    params.set('timezone', newFilters.timezone)
-    
-    if (newFilters.product) params.set('product', newFilters.product)
-    if (newFilters.gateway) params.set('gateway', newFilters.gateway)
-    if (newFilters.country) params.set('country', newFilters.country)
-    
-    router.replace(`${pathname}?${params.toString()}`)
-  }, [pathname, router])
+  const updateURL = useCallback(
+    (newFilters: AnalyticsFilters) => {
+      const params = new URLSearchParams()
 
-  const handleFiltersChange = useCallback((newFilters: AnalyticsFilters) => {
-    setFilters(newFilters)
-    updateURL(newFilters)
-  }, [updateURL])
+      params.set('period', newFilters.period)
+      params.set('from', newFilters.from)
+      params.set('to', newFilters.to)
+      params.set('timezone', newFilters.timezone)
+
+      if (newFilters.product) params.set('product', newFilters.product)
+      if (newFilters.gateway) params.set('gateway', newFilters.gateway)
+      if (newFilters.country) params.set('country', newFilters.country)
+
+      router.replace(`${pathname}?${params.toString()}`)
+    },
+    [pathname, router]
+  )
+
+  const handleFiltersChange = useCallback(
+    (newFilters: AnalyticsFilters) => {
+      setFilters(newFilters)
+      updateURL(newFilters)
+    },
+    [updateURL]
+  )
 
   // API queries
-  const { data: kpis, isLoading: kpisLoading, error: kpisError } = api.analytics.kpis.useQuery({
+  const {
+    data: kpis,
+    isLoading: kpisLoading,
+    error: kpisError,
+  } = api.analytics.kpis.useQuery({
     from: filters.from,
     to: filters.to,
     tz: filters.timezone,
@@ -283,14 +357,16 @@ export default function AnalyticsPage() {
     country: filters.country,
   })
 
-  const { data: revenueData, isLoading: revenueLoading } = api.analytics.revenueTimeseries.useQuery({
-    from: filters.from,
-    to: filters.to,
-    tz: filters.timezone,
-    product: filters.product,
-    gateway: filters.gateway,
-    country: filters.country,
-  })
+  const { data: revenueData, isLoading: revenueLoading } = api.analytics.revenueTimeseries.useQuery(
+    {
+      from: filters.from,
+      to: filters.to,
+      tz: filters.timezone,
+      product: filters.product,
+      gateway: filters.gateway,
+      country: filters.country,
+    }
+  )
 
   const { data: ordersData, isLoading: ordersLoading } = api.analytics.ordersTimeseries.useQuery({
     from: filters.from,
@@ -310,22 +386,66 @@ export default function AnalyticsPage() {
     country: filters.country,
   })
 
-  const { data: subscriptionsData, isLoading: subscriptionsLoading } = api.analytics.subscriptionsSummary.useQuery({
-    from: filters.from,
-    to: filters.to,
-    tz: filters.timezone,
-    product: filters.product,
-    country: filters.country,
-  })
+  const { data: subscriptionsData, isLoading: subscriptionsLoading } =
+    api.analytics.subscriptionsSummary.useQuery({
+      from: filters.from,
+      to: filters.to,
+      tz: filters.timezone,
+      product: filters.product,
+      country: filters.country,
+    })
 
-  const { data: disputesData, isLoading: disputesLoading } = api.analytics.disputesSummary.useQuery({
-    from: filters.from,
-    to: filters.to,
-  })
+  const { data: disputesData, isLoading: disputesLoading } = api.analytics.disputesSummary.useQuery(
+    {
+      from: filters.from,
+      to: filters.to,
+    }
+  )
 
-  const { data: recentPayments, isLoading: recentPaymentsLoading } = api.analytics.paymentsRecent.useQuery({
-    limit: 50,
-  })
+  const { data: recentPayments, isLoading: recentPaymentsLoading } =
+    api.analytics.paymentsRecent.useQuery({
+      limit: 50,
+    })
+
+  const { data: salesByProductData, isLoading: salesByProductLoading } =
+    api.analytics.salesByProduct.useQuery({
+      from: filters.from,
+      to: filters.to,
+      tz: filters.timezone,
+      product: filters.product,
+      gateway: filters.gateway,
+      country: filters.country,
+    })
+
+  const { data: revenueByProductData, isLoading: revenueByProductLoading } =
+    api.analytics.revenueByProduct.useQuery({
+      from: filters.from,
+      to: filters.to,
+      tz: filters.timezone,
+      product: filters.product,
+      gateway: filters.gateway,
+      country: filters.country,
+    })
+
+  const { data: salesByDayOfWeekData, isLoading: salesByDayOfWeekLoading } =
+    api.analytics.salesByDayOfWeek.useQuery({
+      from: filters.from,
+      to: filters.to,
+      tz: filters.timezone,
+      product: filters.product,
+      gateway: filters.gateway,
+      country: filters.country,
+    })
+
+  const { data: salesByHourData, isLoading: salesByHourLoading } =
+    api.analytics.salesByHour.useQuery({
+      from: filters.from,
+      to: filters.to,
+      tz: filters.timezone,
+      product: filters.product,
+      gateway: filters.gateway,
+      country: filters.country,
+    })
 
   return (
     <div className='flex-1 space-y-6 p-4 pt-6 md:p-8'>
@@ -333,41 +453,39 @@ export default function AnalyticsPage() {
       <div className='flex items-center justify-between space-y-2'>
         <div>
           <h2 className='text-3xl font-bold tracking-tight'>Analytics</h2>
-          <p className='text-muted-foreground'>
-            Dashboard de vendas e assinaturas
-          </p>
+          <p className='text-muted-foreground'>Dashboard de vendas e assinaturas</p>
         </div>
       </div>
 
       {/* Global Filters */}
-      <GlobalFilters 
-        filters={filters} 
-        onFiltersChange={handleFiltersChange} 
-      />
+      <GlobalFilters filters={filters} onFiltersChange={handleFiltersChange} />
 
       {/* KPI Cards Grid */}
       <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
-        <RevenueCard
+        <SalesMetricCard
+          title='Receita Bruta'
           value={kpis?.receita_bruta_brl || '0'}
+          type='currency'
+          description='Total de vendas antes de impostos e reembolsos'
           loading={kpisLoading}
-          error={kpisError?.message}
-          type='gross'
+          currencyBreakdown={kpis?.receita_por_moeda || undefined}
+          {...(kpisError?.message && { error: kpisError.message })}
         />
         <RevenueCard
           value={kpis?.receita_liquida_brl || '0'}
           loading={kpisLoading}
-          error={kpisError?.message}
+          {...(kpisError?.message && { error: kpisError.message })}
           type='net'
         />
         <OrdersCard
           value={kpis?.pedidos || 0}
           loading={kpisLoading}
-          error={kpisError?.message}
+          {...(kpisError?.message && { error: kpisError.message })}
         />
         <AOVCard
           value={kpis?.ticket_medio_brl || '0'}
           loading={kpisLoading}
-          error={kpisError?.message}
+          {...(kpisError?.message && { error: kpisError.message })}
         />
       </div>
 
@@ -377,14 +495,15 @@ export default function AnalyticsPage() {
           title='Impostos'
           value={kpis?.impostos_brl || '0'}
           type='currency'
-          description='Total de impostos no período'
+          description='Total de impostos no período (2.5%)'
           loading={kpisLoading}
-          error={kpisError?.message}
+          currencyBreakdown={kpis?.impostos_por_moeda || undefined}
+          {...(kpisError?.message && { error: kpisError.message })}
         />
         <RefundRateCard
           value={parseFloat(kpis?.refund_rate || '0')}
           loading={kpisLoading}
-          error={kpisError?.message}
+          {...(kpisError?.message && { error: kpisError.message })}
         />
         <SalesMetricCard
           title='Taxa de Chargeback'
@@ -392,7 +511,7 @@ export default function AnalyticsPage() {
           type='percentage'
           description='Percentual de chargebacks sobre receita bruta'
           loading={kpisLoading}
-          error={kpisError?.message}
+          {...(kpisError?.message && { error: kpisError.message })}
         />
         <SalesMetricCard
           title='Pagamentos'
@@ -400,7 +519,7 @@ export default function AnalyticsPage() {
           type='count'
           description='Total de pagamentos aprovados'
           loading={kpisLoading}
-          error={kpisError?.message}
+          {...(kpisError?.message && { error: kpisError.message })}
         />
       </div>
 
@@ -429,9 +548,7 @@ export default function AnalyticsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Receita Diária</CardTitle>
-            <CardDescription>
-              Evolução da receita por dia no período selecionado
-            </CardDescription>
+            <CardDescription>Evolução da receita por dia no período selecionado</CardDescription>
           </CardHeader>
           <CardContent className='p-0'>
             <RevenueChart
@@ -448,9 +565,7 @@ export default function AnalyticsPage() {
         <Card>
           <CardHeader>
             <CardTitle>Pedidos Diários</CardTitle>
-            <CardDescription>
-              Número de pedidos por dia
-            </CardDescription>
+            <CardDescription>Número de pedidos por dia</CardDescription>
           </CardHeader>
           <CardContent className='p-0'>
             <OrdersChart
@@ -468,10 +583,8 @@ export default function AnalyticsPage() {
       {/* Combined Revenue and Orders Chart */}
       <Card>
         <CardHeader>
-          <CardTitle>Receita e Pedidos</CardTitle>
-          <CardDescription>
-            Visão combinada de receita e volume de pedidos
-          </CardDescription>
+          <CardTitle>{t('charts.revenueAndOrders')}</CardTitle>
+          <CardDescription>{t('charts.revenueAndOrdersDescription')}</CardDescription>
         </CardHeader>
         <CardContent className='p-0'>
           <DualAxisRevenueChart
@@ -483,6 +596,76 @@ export default function AnalyticsPage() {
           />
         </CardContent>
       </Card>
+
+      {/* Product Analysis Charts */}
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+        {/* Sales by Product */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Vendas por Produto</CardTitle>
+            <CardDescription>Distribuição de vendas por produto no período</CardDescription>
+          </CardHeader>
+          <CardContent className='p-0'>
+            <ProductSalesChart
+              data={salesByProductData || []}
+              loading={salesByProductLoading}
+              height={400}
+              locale='pt-BR'
+            />
+          </CardContent>
+        </Card>
+
+        {/* Revenue by Product */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Faturamento por Produto</CardTitle>
+            <CardDescription>Distribuição de receita por produto no período</CardDescription>
+          </CardHeader>
+          <CardContent className='p-0'>
+            <ProductRevenueChart
+              data={revenueByProductData || []}
+              loading={revenueByProductLoading}
+              height={400}
+              locale='pt-BR'
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Time-Based Sales Charts */}
+      <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
+        {/* Sales by Day of Week */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Vendas por Dia da Semana</CardTitle>
+            <CardDescription>Distribuição de vendas por dia da semana</CardDescription>
+          </CardHeader>
+          <CardContent className='p-0'>
+            <SalesByDayOfWeekChart
+              data={salesByDayOfWeekData || []}
+              loading={salesByDayOfWeekLoading}
+              height={400}
+              locale='pt-BR'
+            />
+          </CardContent>
+        </Card>
+
+        {/* Sales by Hour */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Vendas por Horário</CardTitle>
+            <CardDescription>Distribuição de vendas por hora do dia</CardDescription>
+          </CardHeader>
+          <CardContent className='p-0'>
+            <SalesByHourChart
+              data={salesByHourData || []}
+              loading={salesByHourLoading}
+              height={400}
+              locale='pt-BR'
+            />
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Tables Section */}
       <Tabs defaultValue='products' className='space-y-4'>
@@ -496,9 +679,7 @@ export default function AnalyticsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Top Produtos por Receita</CardTitle>
-              <CardDescription>
-                Produtos com maior receita no período selecionado
-              </CardDescription>
+              <CardDescription>Produtos com maior receita no período selecionado</CardDescription>
             </CardHeader>
             <CardContent>
               <ProductsTable
@@ -516,12 +697,10 @@ export default function AnalyticsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Disputas e Chargebacks</CardTitle>
-              <CardDescription>
-                Resumo de disputas e chargebacks no período
-              </CardDescription>
+              <CardDescription>Resumo de disputas e chargebacks no período</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className='grid grid-cols-1 gap-4 md:grid-cols-3 mb-6'>
+              <div className='mb-6 grid grid-cols-1 gap-4 md:grid-cols-3'>
                 <SalesMetricCard
                   title='Total de Disputas'
                   value={disputesData?.total_disputas || 0}
@@ -536,17 +715,21 @@ export default function AnalyticsPage() {
                 />
                 <SalesMetricCard
                   title='Taxa de Vitória'
-                  value={disputesData ? 
-                    (disputesData.ganhas / (disputesData.ganhas + disputesData.perdidas) * 100) || 0 
-                    : 0
+                  value={
+                    disputesData
+                      ? (disputesData.ganhas / (disputesData.ganhas + disputesData.perdidas)) *
+                          100 || 0
+                      : 0
                   }
                   type='percentage'
                   loading={disputesLoading}
                 />
               </div>
               {/* Note: DisputesTable would need actual dispute data from a different endpoint */}
-              <div className='text-center py-8 text-muted-foreground'>
-                <p>Tabela de disputas detalhada estará disponível quando conectada à base de dados</p>
+              <div className='text-muted-foreground py-8 text-center'>
+                <p>
+                  Tabela de disputas detalhada estará disponível quando conectada à base de dados
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -556,13 +739,11 @@ export default function AnalyticsPage() {
           <Card>
             <CardHeader>
               <CardTitle>Vendas Recentes</CardTitle>
-              <CardDescription>
-                Últimos pagamentos aprovados
-              </CardDescription>
+              <CardDescription>Últimos pagamentos aprovados</CardDescription>
             </CardHeader>
             <CardContent>
               {/* Recent payments table would go here */}
-              <div className='text-center py-8 text-muted-foreground'>
+              <div className='text-muted-foreground py-8 text-center'>
                 <p>Tabela de vendas recentes estará disponível quando conectada à base de dados</p>
               </div>
             </CardContent>

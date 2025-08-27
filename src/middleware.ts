@@ -13,18 +13,10 @@ const intlMiddleware = createMiddleware({
 })
 
 // Define protected routes patterns
-const protectedRoutes = [
-  '/profile',
-  '/settings',
-  '/admin',
-  '/workspace',
-  '/faturamento',
-]
+const protectedRoutes = ['/profile', '/settings', '/admin', '/workspace', '/faturamento']
 
 // Define public routes that don't require authentication
-const publicRoutes = [
-  '/analytics',
-]
+const publicRoutes = ['/analytics']
 
 // Define auth routes (where authenticated users shouldn't be)
 const authRoutes = ['/login', '/signup', '/forgot-password']

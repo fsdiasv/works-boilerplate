@@ -4,7 +4,9 @@
 
 **THIS DOCUMENT CONTAINS LIFE-SAVING RULES FOR DATABASE OPERATIONS**
 
-A single wrong command can **DESTROY YEARS OF PRODUCTION DATA** in seconds. These rules exist because data loss has already occurred and must never happen again.
+A single wrong command can **DESTROY YEARS OF PRODUCTION DATA** in seconds.
+These rules exist because data loss has already occurred and must never happen
+again.
 
 ---
 
@@ -23,6 +25,7 @@ UPDATE table_name SET;               # ❌ WITHOUT WHERE CLAUSE = CORRUPTION
 ```
 
 ### 🚨 HIGH-RISK OPERATIONS:
+
 - Any SQL command without WHERE clause on production data
 - Database schema changes without migrations
 - Direct database manipulation without backup
@@ -54,19 +57,21 @@ pg_restore backup.sql                            # ✅ Restore from backup
 ### Before ANY Database Operation:
 
 1. **🛡️ BACKUP FIRST**
+
    ```bash
    # Create timestamped backup
    pg_dump $DATABASE_URL > "backup_$(date +%Y%m%d_%H%M%S).sql"
-   
+
    # Verify backup was created
    ls -la backup_*.sql
    ```
 
 2. **🔍 VERIFY ENVIRONMENT**
+
    ```bash
    # Check which database you're connected to
    echo $DATABASE_URL
-   
+
    # Confirm this is the correct environment
    psql $DATABASE_URL -c "SELECT current_database();"
    ```
@@ -122,12 +127,14 @@ Before executing ANY database command, verify:
 ## 🚨 ESCALATION PROCEDURES
 
 ### When in Doubt:
+
 1. **ASK FIRST** - Never guess with database operations
 2. **BACKUP FIRST** - Always create backup before changes
 3. **TEST FIRST** - Use development database for testing
 4. **DOCUMENT FIRST** - Write down what you're doing and why
 
 ### Emergency Contacts:
+
 - Database Administrator: [Add contact info]
 - DevOps Team: [Add contact info]
 - Technical Lead: [Add contact info]
@@ -137,6 +144,7 @@ Before executing ANY database command, verify:
 ## 📚 EDUCATIONAL RESOURCES
 
 ### Learn Safe Database Practices:
+
 - [Prisma Migration Guide](https://www.prisma.io/docs/concepts/components/prisma-migrate)
 - [PostgreSQL Backup Best Practices](https://www.postgresql.org/docs/current/backup.html)
 - [Database Schema Versioning](https://docs.microsoft.com/en-us/ef/core/managing-schemas/migrations/)
@@ -146,17 +154,13 @@ Before executing ANY database command, verify:
 ## 🎯 REMEMBER
 
 > **"Data is irreplaceable. Code is not."**
-> 
-> You can rewrite code in hours. 
-> You cannot recreate lost production data.
-> 
-> When in doubt, ask. When uncertain, backup.
-> When risky, test elsewhere first.
+>
+> You can rewrite code in hours. You cannot recreate lost production data.
+>
+> When in doubt, ask. When uncertain, backup. When risky, test elsewhere first.
 
 **These rules save careers, projects, and businesses.**
 
 ---
 
-*Last updated: $(date)*
-*Next review: Monthly*
-*Severity: CRITICAL*
+_Last updated: $(date)_ _Next review: Monthly_ _Severity: CRITICAL_

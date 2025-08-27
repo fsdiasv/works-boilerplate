@@ -71,9 +71,10 @@ export function ProductsTable({
 
     // Apply search filter
     if (searchTerm) {
-      filtered = filtered.filter(item =>
-        item.product_code.toLowerCase().includes(lowerSearchTerm) ||
-        item.nome_produto?.toLowerCase().includes(lowerSearchTerm)
+      filtered = filtered.filter(
+        item =>
+          item.product_code.toLowerCase().includes(lowerSearchTerm) ||
+          item.nome_produto?.toLowerCase().includes(lowerSearchTerm)
       )
     }
 
@@ -83,7 +84,11 @@ export function ProductsTable({
       let bValue: number | string = b[sortField] ?? ''
 
       // Convert string numbers to numbers for proper sorting
-      if (sortField === 'receita_brl' || sortField === 'ticket_medio_brl' || sortField === 'refund_rate') {
+      if (
+        sortField === 'receita_brl' ||
+        sortField === 'ticket_medio_brl' ||
+        sortField === 'refund_rate'
+      ) {
         aValue = parseFloat(aValue as string) || 0
         bValue = parseFloat(bValue as string) || 0
       }
@@ -95,7 +100,7 @@ export function ProductsTable({
       // String comparison
       const aStr = String(aValue).toLowerCase()
       const bStr = String(bValue).toLowerCase()
-      
+
       if (sortDirection === 'asc') {
         return aStr.localeCompare(bStr)
       } else {
@@ -125,12 +130,12 @@ export function ProductsTable({
     const exportData = processedData.map(item => ({
       'Código do Produto': item.product_code,
       'Nome do Produto': item.nome_produto || '',
-      'Pedidos': item.pedidos,
+      Pedidos: item.pedidos,
       'Receita (R$)': item.receita_brl,
       'Ticket Médio (R$)': item.ticket_medio_brl,
       'Taxa de Reembolso (%)': item.refund_rate,
-      'Categoria': item.categoria || '',
-      'Status': item.status || '',
+      Categoria: item.categoria || '',
+      Status: item.status || '',
     }))
 
     const csvContent = exportToCSV(exportData, 'produtos_top')
@@ -139,15 +144,15 @@ export function ProductsTable({
 
   const getSortIcon = (field: SortField) => {
     if (sortField !== field) {
-      return <ArrowUpDown className='h-4 w-4 text-muted-foreground' />
+      return <ArrowUpDown className='text-muted-foreground h-4 w-4' />
     }
-    
+
     return (
-      <ArrowUpDown 
+      <ArrowUpDown
         className={cn(
           'h-4 w-4',
-          sortDirection === 'asc' ? 'text-blue-500 rotate-180' : 'text-blue-500'
-        )} 
+          sortDirection === 'asc' ? 'rotate-180 text-blue-500' : 'text-blue-500'
+        )}
       />
     )
   }
@@ -168,10 +173,14 @@ export function ProductsTable({
 
   const getStatusBadge = (status?: string) => {
     if (!status) return null
-    
+
     switch (status) {
       case 'active':
-        return <Badge variant='default' className='bg-green-100 text-green-800'>{t('status.active')}</Badge>
+        return (
+          <Badge variant='default' className='bg-green-100 text-green-800'>
+            {t('status.active')}
+          </Badge>
+        )
       case 'inactive':
         return <Badge variant='secondary'>{t('status.inactive')}</Badge>
       case 'discontinued':
@@ -194,21 +203,41 @@ export function ProductsTable({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead><Skeleton className='h-4 w-24' /></TableHead>
-                <TableHead><Skeleton className='h-4 w-16' /></TableHead>
-                <TableHead><Skeleton className='h-4 w-20' /></TableHead>
-                <TableHead><Skeleton className='h-4 w-24' /></TableHead>
-                <TableHead><Skeleton className='h-4 w-20' /></TableHead>
+                <TableHead>
+                  <Skeleton className='h-4 w-24' />
+                </TableHead>
+                <TableHead>
+                  <Skeleton className='h-4 w-16' />
+                </TableHead>
+                <TableHead>
+                  <Skeleton className='h-4 w-20' />
+                </TableHead>
+                <TableHead>
+                  <Skeleton className='h-4 w-24' />
+                </TableHead>
+                <TableHead>
+                  <Skeleton className='h-4 w-20' />
+                </TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {Array.from({ length: 5 }).map((_, index) => (
                 <TableRow key={index}>
-                  <TableCell><Skeleton className='h-4 w-32' /></TableCell>
-                  <TableCell><Skeleton className='h-4 w-12' /></TableCell>
-                  <TableCell><Skeleton className='h-4 w-20' /></TableCell>
-                  <TableCell><Skeleton className='h-4 w-20' /></TableCell>
-                  <TableCell><Skeleton className='h-4 w-16' /></TableCell>
+                  <TableCell>
+                    <Skeleton className='h-4 w-32' />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className='h-4 w-12' />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className='h-4 w-20' />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className='h-4 w-20' />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className='h-4 w-16' />
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -220,13 +249,14 @@ export function ProductsTable({
 
   if (error) {
     return (
-      <div className={cn('rounded-md border border-red-200 bg-red-50 p-8 text-center dark:border-red-800 dark:bg-red-950', className)}>
-        <div className='text-red-700 dark:text-red-300 font-medium mb-2'>
-          {t('error.loading')}
-        </div>
-        <div className='text-red-600 dark:text-red-400 text-sm'>
-          {error}
-        </div>
+      <div
+        className={cn(
+          'rounded-md border border-red-200 bg-red-50 p-8 text-center dark:border-red-800 dark:bg-red-950',
+          className
+        )}
+      >
+        <div className='mb-2 font-medium text-red-700 dark:text-red-300'>{t('error.loading')}</div>
+        <div className='text-sm text-red-600 dark:text-red-400'>{error}</div>
       </div>
     )
   }
@@ -236,12 +266,12 @@ export function ProductsTable({
       {/* Search and Export Header */}
       {showSearch && (
         <div className='flex items-center justify-between gap-4'>
-          <div className='relative flex-1 max-w-sm'>
-            <Search className='absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground' />
+          <div className='relative max-w-sm flex-1'>
+            <Search className='text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2' />
             <Input
               placeholder={t('search.placeholder')}
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={e => setSearchTerm(e.target.value)}
               className='pl-9'
             />
           </div>
@@ -258,7 +288,7 @@ export function ProductsTable({
       )}
 
       {/* Results Summary */}
-      <div className='text-sm text-muted-foreground'>
+      <div className='text-muted-foreground text-sm'>
         {searchTerm ? (
           <>
             {t('summary.showing', { count: processedData.length, total: data.length })}
@@ -274,12 +304,9 @@ export function ProductsTable({
       </div>
 
       {/* Table */}
-      <div 
-        className='rounded-md border overflow-auto'
-        style={{ maxHeight }}
-      >
+      <div className='overflow-auto rounded-md border' style={{ maxHeight }}>
         <Table>
-          <TableHeader className='sticky top-0 bg-background z-10'>
+          <TableHeader className='bg-background sticky top-0 z-10'>
             <TableRow>
               <TableHead className='min-w-[120px]'>
                 <Button
@@ -292,7 +319,7 @@ export function ProductsTable({
                   {getSortIcon('product_code')}
                 </Button>
               </TableHead>
-              <TableHead className='text-right min-w-[80px]'>
+              <TableHead className='min-w-[80px] text-right'>
                 <Button
                   variant='ghost'
                   size='sm'
@@ -303,7 +330,7 @@ export function ProductsTable({
                   {getSortIcon('pedidos')}
                 </Button>
               </TableHead>
-              <TableHead className='text-right min-w-[120px]'>
+              <TableHead className='min-w-[120px] text-right'>
                 <Button
                   variant='ghost'
                   size='sm'
@@ -314,7 +341,7 @@ export function ProductsTable({
                   {getSortIcon('receita_brl')}
                 </Button>
               </TableHead>
-              <TableHead className='text-right min-w-[120px]'>
+              <TableHead className='min-w-[120px] text-right'>
                 <Button
                   variant='ghost'
                   size='sm'
@@ -325,7 +352,7 @@ export function ProductsTable({
                   {getSortIcon('ticket_medio_brl')}
                 </Button>
               </TableHead>
-              <TableHead className='text-right min-w-[100px]'>
+              <TableHead className='min-w-[100px] text-right'>
                 <Button
                   variant='ghost'
                   size='sm'
@@ -344,9 +371,9 @@ export function ProductsTable({
           <TableBody>
             {processedData.length === 0 ? (
               <TableRow>
-                <TableCell 
+                <TableCell
                   colSpan={data.some(item => item.status) ? 6 : 5}
-                  className='text-center py-8 text-muted-foreground'
+                  className='text-muted-foreground py-8 text-center'
                 >
                   {searchTerm ? t('empty.noProducts') : t('empty.noData')}
                 </TableCell>
@@ -358,12 +385,12 @@ export function ProductsTable({
                     <div>
                       <div className='font-semibold'>{product.product_code}</div>
                       {product.nome_produto && (
-                        <div className='text-xs text-muted-foreground mt-1'>
+                        <div className='text-muted-foreground mt-1 text-xs'>
                           {product.nome_produto}
                         </div>
                       )}
                       {product.categoria && (
-                        <div className='text-xs text-blue-600 dark:text-blue-400 mt-1'>
+                        <div className='mt-1 text-xs text-blue-600 dark:text-blue-400'>
                           {product.categoria}
                         </div>
                       )}
@@ -381,17 +408,11 @@ export function ProductsTable({
                   <TableCell className='text-right'>
                     {(() => {
                       const { display, value } = formatRefundRate(product.refund_rate)
-                      return (
-                        <span className={getRefundRateColor(value)}>
-                          {display}
-                        </span>
-                      )
+                      return <span className={getRefundRateColor(value)}>{display}</span>
                     })()}
                   </TableCell>
                   {data.some(item => item.status) && (
-                    <TableCell>
-                      {getStatusBadge(product.status)}
-                    </TableCell>
+                    <TableCell>{getStatusBadge(product.status)}</TableCell>
                   )}
                 </TableRow>
               ))
@@ -402,8 +423,8 @@ export function ProductsTable({
 
       {/* Footer Summary */}
       {processedData.length > 0 && (
-        <div className='text-xs text-muted-foreground border-t pt-2'>
-          <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+        <div className='text-muted-foreground border-t pt-2 text-xs'>
+          <div className='grid grid-cols-2 gap-4 md:grid-cols-4'>
             <div>
               <span className='font-medium'>{t('footer.totalOrders')}</span>{' '}
               {processedData.reduce((sum, item) => sum + item.pedidos, 0).toLocaleString(locale)}
@@ -419,7 +440,10 @@ export function ProductsTable({
               <span className='font-medium'>{t('footer.averageTicketGeneral')}</span>{' '}
               {(() => {
                 const totalPedidos = processedData.reduce((sum, item) => sum + item.pedidos, 0)
-                const totalReceita = processedData.reduce((sum, item) => sum + parseFloat(item.receita_brl), 0)
+                const totalReceita = processedData.reduce(
+                  (sum, item) => sum + parseFloat(item.receita_brl),
+                  0
+                )
                 if (totalPedidos === 0) {
                   return 'N/A'
                 }

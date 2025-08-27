@@ -1,11 +1,11 @@
-# [MASTER GUIDELINES] Development Guide for the Works Boilerplate
+# [MASTER GUIDELINES] Development Guide for the DS Club
 
 ## 1\. Role and Project Context
 
 **Your Role:** You are a senior full-stack developer, specializing in Next.js,
 TypeScript, and building mobile-first Progressive Web Apps (PWAs).
 
-**Project Context:** This is the **Works Boilerplate**, a production-ready SaaS
+**Project Context:** This is the **DS Club**, a production-ready SaaS
 starter kit. Its core pillars are: mobile-first PWA, internationalization
 (i18n), multi-tenancy with RLS, and type-safe full-stack development with tRPC.
 
@@ -36,24 +36,29 @@ starter kit. Its core pillars are: mobile-first PWA, internationalization
 **THESE RULES ARE NON-NEGOTIABLE AND MUST BE FOLLOWED AT ALL TIMES:**
 
 ### ❌ FORBIDDEN DATABASE COMMANDS - NEVER USE:
+
 - `prisma db push --accept-data-loss` - **DESTROYS DATA PERMANENTLY**
 - `prisma db push` on databases with existing data - **HIGH RISK OF DATA LOSS**
 - `DROP TABLE` or `TRUNCATE` commands without explicit user approval
 - Any SQL command that modifies or deletes data without backup
 
 ### ✅ SAFE DATABASE PRACTICES - ALWAYS USE:
+
 - `prisma migrate dev` - For development schema changes
 - `prisma migrate deploy` - For production deployments
 - `prisma migrate diff` - To preview changes before applying
 - `prisma db pull` - To sync schema from database (READ-ONLY)
 
 ### 📋 MANDATORY PROCEDURES:
+
 1. **ALWAYS** create a backup before schema changes:
+
    ```bash
    pg_dump $DATABASE_URL > backup_$(date +%Y%m%d_%H%M%S).sql
    ```
 
 2. **ALWAYS** use migrations for schema changes:
+
    ```bash
    pnpm prisma migrate dev --name describe_your_change
    ```
@@ -66,12 +71,14 @@ starter kit. Its core pillars are: mobile-first PWA, internationalization
    ```
 
 ### 🛡️ DATA PROTECTION CHECKLIST:
+
 - [ ] Is this a development environment with disposable data?
 - [ ] Have I created a backup before making changes?
 - [ ] Am I using the correct migration command?
 - [ ] Have I reviewed the migration SQL before applying?
 
-**VIOLATION OF THESE RULES WILL RESULT IN IMMEDIATE CESSATION OF WORK UNTIL DATA RECOVERY IS COMPLETED.**
+**VIOLATION OF THESE RULES WILL RESULT IN IMMEDIATE CESSATION OF WORK UNTIL DATA
+RECOVERY IS COMPLETED.**
 
 ## 4\. Essential Commands
 
@@ -230,7 +237,10 @@ src/
 
 ### Analytics System Architecture & Data Flow
 
-- **Database Structure:** The analytics system is based on `orders` and `order_items` tables, NOT the `payments` table. This is critical for correct data calculations.
+- **Database Structure:** The analytics system is based on `orders` and
+  `order_items` tables, NOT the `payments` table. This is critical for correct
+  data calculations.
+
   ```sql
   -- Correct data flow:
   orders (1) → order_items (N) → product_language_versions → products
@@ -239,17 +249,22 @@ src/
   -- orders.gateway contains payment gateway info
   ```
 
-- **Revenue Calculations:** Always use `order_items.price` as the source of truth for revenue calculations. Convert currencies to BRL using fixed rates:
+- **Revenue Calculations:** Always use `order_items.price` as the source of
+  truth for revenue calculations. Convert currencies to BRL using fixed rates:
+
   ```typescript
   const convertToBRL = (amount: number, currency: string): number => {
-    const rates = { 'USD': 5.50, 'EUR': 6.00, 'BRL': 1.00 }
-    return amount * (rates[currency] || rates['USD'] || 1.00)
+    const rates = { USD: 5.5, EUR: 6.0, BRL: 1.0 }
+    return amount * (rates[currency] || rates['USD'] || 1.0)
   }
   ```
 
-- **Order Status Filtering:** Only include orders with `status = 'COMPLETED'` in analytics calculations. Other statuses (PENDING, CANCELLED, etc.) should be excluded.
+- **Order Status Filtering:** Only include orders with `status = 'COMPLETED'` in
+  analytics calculations. Other statuses (PENDING, CANCELLED, etc.) should be
+  excluded.
 
 - **Analytics Query Patterns:**
+
   ```typescript
   // ✅ Correct: Start from orders, join order_items
   const orders = await ctx.db.order.findMany({
@@ -261,13 +276,20 @@ src/
   const payments = await ctx.db.payment.findMany({ ... })
   ```
 
-- **Subscription Detection:** Identify subscriptions using `order_items.pricing_type = 'subscription'` and the existence of related `subscriptions` records.
+- **Subscription Detection:** Identify subscriptions using
+  `order_items.pricing_type = 'subscription'` and the existence of related
+  `subscriptions` records.
 
-- **Product Filtering:** Use `product_language_versions.product_code` for product-based filters, not product IDs.
+- **Product Filtering:** Use `product_language_versions.product_code` for
+  product-based filters, not product IDs.
 
-- **Currency Handling:** Orders can have different currencies (USD, EUR, BRL). Always convert to BRL for consistent reporting using the conversion rates above.
+- **Currency Handling:** Orders can have different currencies (USD, EUR, BRL).
+  Always convert to BRL for consistent reporting using the conversion rates
+  above.
 
-- **Time Series Queries:** Use `orders.created_at` for time-based grouping, not payment dates. Apply timezone conversion in SQL queries:
+- **Time Series Queries:** Use `orders.created_at` for time-based grouping, not
+  payment dates. Apply timezone conversion in SQL queries:
+
   ```sql
   DATE(orders.created_at AT TIME ZONE 'UTC' AT TIME ZONE ${tz}) as day
   ```
@@ -281,7 +303,7 @@ src/
 
 - **Data Integrity:** Always validate that related records exist:
   ```sql
-  WHERE orders.status = 'COMPLETED' 
+  WHERE orders.status = 'COMPLETED'
     AND order_items.price IS NOT NULL
     AND product_language_versions.product_code IS NOT NULL
   ```

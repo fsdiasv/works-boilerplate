@@ -3,7 +3,7 @@
 ## Overview
 
 This document describes the enhanced OAuth callback security measures
-implemented in the Works Boilerplate application to protect against common OAuth
+implemented in the DS Club application to protect against common OAuth
 attacks.
 
 ## Security Measures Implemented

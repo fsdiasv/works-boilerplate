@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
 import { Button } from '@/components/ui/button'
@@ -11,12 +12,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ProductsTable } from '@/components/dashboard/ProductsTable'
-import { 
+import {
   SalesMetricCard,
   RevenueCard,
   OrdersCard,
   AOVCard,
-  RefundRateCard
+  RefundRateCard,
 } from '@/components/dashboard/SalesMetricCard'
 import { getDateRange } from '@/lib/analytics-utils'
 import { api } from '@/trpc/react'
@@ -60,13 +61,14 @@ interface ProductFilters {
   limit: number
 }
 
-function ProductFilters({ 
-  filters, 
-  onFiltersChange 
-}: { 
+function ProductFilters({
+  filters,
+  onFiltersChange,
+}: {
   filters: ProductFilters
-  onFiltersChange: (filters: ProductFilters) => void 
+  onFiltersChange: (filters: ProductFilters) => void
 }) {
+  const t = useTranslations('Analytics')
   const handlePeriodChange = (period: ProductFilters['period']) => {
     const dateRange = getDateRange(period, filters.timezone)
     onFiltersChange({
@@ -87,37 +89,41 @@ function ProductFilters({
   return (
     <Card className='mb-6'>
       <CardHeader>
-        <CardTitle className='text-lg'>Filtros de Produtos</CardTitle>
-        <CardDescription>
-          Ajuste os filtros para personalizar a análise de produtos
-        </CardDescription>
+        <CardTitle className='text-lg'>{t('products.filters.title')}</CardTitle>
+        <CardDescription>{t('products.filters.subtitle')}</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4'>
+        <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5'>
           {/* Period Selector */}
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>Período</label>
+            <label htmlFor='product-period-select' className='text-sm font-medium'>
+              {t('filters.period')}
+            </label>
             <select
+              id='product-period-select'
               value={filters.period}
-              onChange={(e) => handlePeriodChange(e.target.value as ProductFilters['period'])}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handlePeriodChange(e.target.value as ProductFilters['period'])}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             >
-              <option value='today'>Hoje</option>
-              <option value='7d'>Últimos 7 dias</option>
-              <option value='30d'>Últimos 30 dias</option>
-              <option value='90d'>Últimos 90 dias</option>
-              <option value='mtd'>Mês atual</option>
-              <option value='custom'>Personalizado</option>
+              <option value='today'>{t('filters.periods.today')}</option>
+              <option value='7d'>{t('filters.periods.7d')}</option>
+              <option value='30d'>{t('filters.periods.30d')}</option>
+              <option value='90d'>{t('filters.periods.90d')}</option>
+              <option value='mtd'>{t('filters.periods.mtd')}</option>
+              <option value='custom'>{t('filters.periods.custom')}</option>
             </select>
           </div>
 
           {/* Timezone */}
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>Fuso Horário</label>
+            <label htmlFor='product-timezone-select' className='text-sm font-medium'>
+              {t('filters.timezone')}
+            </label>
             <select
+              id='product-timezone-select'
               value={filters.timezone}
-              onChange={(e) => handleFilterChange('timezone', e.target.value)}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handleFilterChange('timezone', e.target.value)}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             >
               <option value='America/Sao_Paulo'>São Paulo (BRT)</option>
               <option value='UTC'>UTC</option>
@@ -128,23 +134,29 @@ function ProductFilters({
 
           {/* Product Code Filter */}
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>Produto Específico</label>
+            <label htmlFor='product-code-filter' className='text-sm font-medium'>
+              {t('products.filters.specificProduct')}
+            </label>
             <input
+              id='product-code-filter'
               type='text'
-              placeholder='Código do produto'
+              placeholder={t('filters.productPlaceholder')}
               value={filters.productCode || ''}
-              onChange={(e) => handleFilterChange('productCode', e.target.value)}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handleFilterChange('productCode', e.target.value)}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             />
           </div>
 
           {/* Gateway Filter */}
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>Gateway</label>
+            <label htmlFor='product-gateway-filter' className='text-sm font-medium'>
+              {t('filters.gateway')}
+            </label>
             <select
+              id='product-gateway-filter'
               value={filters.gateway || ''}
-              onChange={(e) => handleFilterChange('gateway', e.target.value)}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handleFilterChange('gateway', e.target.value)}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             >
               <option value=''>Todos</option>
               <option value='stripe'>Stripe</option>
@@ -156,15 +168,18 @@ function ProductFilters({
 
           {/* Results Limit */}
           <div className='space-y-2'>
-            <label className='text-sm font-medium'>Resultados</label>
+            <label htmlFor='results-limit-select' className='text-sm font-medium'>
+              {t('products.filters.results')}
+            </label>
             <select
+              id='results-limit-select'
               value={filters.limit}
-              onChange={(e) => handleFilterChange('limit', parseInt(e.target.value))}
-              className='w-full px-3 py-2 text-sm border border-input bg-background rounded-md focus:outline-none focus:ring-2 focus:ring-ring'
+              onChange={e => handleFilterChange('limit', parseInt(e.target.value))}
+              className='border-input bg-background focus:ring-ring w-full rounded-md border px-3 py-2 text-sm focus:ring-2 focus:outline-none'
             >
-              <option value={10}>Top 10</option>
-              <option value={25}>Top 25</option>
-              <option value={50}>Top 50</option>
+              <option value={10}>{t('products.filters.top10')}</option>
+              <option value={25}>{t('products.filters.top25')}</option>
+              <option value={50}>{t('products.filters.top50')}</option>
             </select>
           </div>
         </div>
@@ -174,28 +189,37 @@ function ProductFilters({
 }
 
 export default function ProductsAnalyticsPage() {
+  const t = useTranslations('Analytics')
   const searchParams = useSearchParams()
-  
+
   // Initialize filters
   const [filters, setFilters] = useState<ProductFilters>(() => {
     const period = (searchParams.get('period') as ProductFilters['period']) || '30d'
     const timezone = searchParams.get('timezone') || 'America/Sao_Paulo'
     const dateRange = getDateRange(period, timezone)
-    
+
+    const gatewayParam = searchParams.get('gateway')
+    const countryParam = searchParams.get('country')
+    const productCodeParam = searchParams.get('productCode')
+
     return {
       period,
       from: searchParams.get('from') || dateRange.from.toISOString(),
       to: searchParams.get('to') || dateRange.to.toISOString(),
       timezone,
-      gateway: searchParams.get('gateway') || undefined,
-      country: searchParams.get('country') || undefined,
-      productCode: searchParams.get('productCode') || undefined,
+      ...(gatewayParam && { gateway: gatewayParam }),
+      ...(countryParam && { country: countryParam }),
+      ...(productCodeParam && { productCode: productCodeParam }),
       limit: parseInt(searchParams.get('limit') || '25'),
     }
   })
 
   // API queries
-  const { data: productsData, isLoading: productsLoading, error: productsError } = api.analytics.productsTop.useQuery({
+  const {
+    data: productsData,
+    isLoading: productsLoading,
+    error: productsError,
+  } = api.analytics.productsTop.useQuery({
     from: filters.from,
     to: filters.to,
     tz: filters.timezone,
@@ -206,42 +230,53 @@ export default function ProductsAnalyticsPage() {
   })
 
   // If a specific product is selected, get its detailed metrics
-  const { data: productKpis, isLoading: productKpisLoading } = api.analytics.kpis.useQuery({
-    from: filters.from,
-    to: filters.to,
-    tz: filters.timezone,
-    product: filters.productCode,
-    gateway: filters.gateway,
-    country: filters.country,
-  }, {
-    enabled: !!filters.productCode, // Only run when a specific product is selected
-  })
+  const { data: productKpis, isLoading: productKpisLoading } = api.analytics.kpis.useQuery(
+    {
+      from: filters.from,
+      to: filters.to,
+      tz: filters.timezone,
+      product: filters.productCode,
+      gateway: filters.gateway,
+      country: filters.country,
+    },
+    {
+      enabled: !!filters.productCode, // Only run when a specific product is selected
+    }
+  )
 
-  const { data: productRevenueData, isLoading: productRevenueLoading } = api.analytics.revenueTimeseries.useQuery({
-    from: filters.from,
-    to: filters.to,
-    tz: filters.timezone,
-    product: filters.productCode,
-    gateway: filters.gateway,
-    country: filters.country,
-  }, {
-    enabled: !!filters.productCode,
-  })
+  const { data: productRevenueData, isLoading: productRevenueLoading } =
+    api.analytics.revenueTimeseries.useQuery(
+      {
+        from: filters.from,
+        to: filters.to,
+        tz: filters.timezone,
+        product: filters.productCode,
+        gateway: filters.gateway,
+        country: filters.country,
+      },
+      {
+        enabled: !!filters.productCode,
+      }
+    )
 
-  const { data: productOrdersData, isLoading: productOrdersLoading } = api.analytics.ordersTimeseries.useQuery({
-    from: filters.from,
-    to: filters.to,
-    tz: filters.timezone,
-    product: filters.productCode,
-    gateway: filters.gateway,
-    country: filters.country,
-  }, {
-    enabled: !!filters.productCode,
-  })
+  const { data: productOrdersData, isLoading: productOrdersLoading } =
+    api.analytics.ordersTimeseries.useQuery(
+      {
+        from: filters.from,
+        to: filters.to,
+        tz: filters.timezone,
+        product: filters.productCode,
+        gateway: filters.gateway,
+        country: filters.country,
+      },
+      {
+        enabled: !!filters.productCode,
+      }
+    )
 
-  const selectedProduct = filters.productCode ? 
-    productsData?.find(p => p.product_code === filters.productCode) :
-    null
+  const selectedProduct = filters.productCode
+    ? productsData?.find(p => p.product_code === filters.productCode)
+    : null
 
   return (
     <div className='flex-1 space-y-6 p-4 pt-6 md:p-8'>
@@ -251,28 +286,22 @@ export default function ProductsAnalyticsPage() {
           <Link href='/analytics'>
             <Button variant='ghost' size='sm'>
               <ArrowLeft className='mr-2 h-4 w-4' />
-              Voltar ao Dashboard
+              {t('products.backToDashboard')}
             </Button>
           </Link>
           <div>
-            <h2 className='text-3xl font-bold tracking-tight'>
-              Análise de Produtos
-            </h2>
+            <h2 className='text-3xl font-bold tracking-tight'>{t('products.title')}</h2>
             <p className='text-muted-foreground'>
-              {filters.productCode 
-                ? `Análise detalhada do produto: ${filters.productCode}`
-                : 'Análise detalhada de performance por produto'
-              }
+              {filters.productCode
+                ? `${t('products.detailedAnalysis')} ${filters.productCode}`
+                : t('products.generalAnalysis')}
             </p>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <ProductFilters 
-        filters={filters} 
-        onFiltersChange={setFilters} 
-      />
+      <ProductFilters filters={filters} onFiltersChange={setFilters} />
 
       {/* Conditional rendering based on whether a specific product is selected */}
       {filters.productCode && selectedProduct ? (
@@ -282,14 +311,12 @@ export default function ProductsAnalyticsPage() {
           <Card>
             <CardHeader>
               <CardTitle className='flex items-center gap-2'>
-                Produto: {filters.productCode}
-                <span className='text-sm font-normal text-muted-foreground'>
-                  (Análise Detalhada)
+                {t('filters.product')}: {filters.productCode}
+                <span className='text-muted-foreground text-sm font-normal'>
+                  ({t('products.singleProduct.overview')})
                 </span>
               </CardTitle>
-              <CardDescription>
-                Performance detalhada do produto no período selecionado
-              </CardDescription>
+              <CardDescription>{t('products.singleProduct.description')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
@@ -318,9 +345,11 @@ export default function ProductsAnalyticsPage() {
           <div className='grid grid-cols-1 gap-6 lg:grid-cols-2'>
             <Card>
               <CardHeader>
-                <CardTitle>Receita Diária - {filters.productCode}</CardTitle>
+                <CardTitle>
+                  {t('products.singleProduct.dailyRevenue')} - {filters.productCode}
+                </CardTitle>
                 <CardDescription>
-                  Evolução da receita do produto por dia
+                  {t('products.singleProduct.dailyRevenueDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent className='p-0'>
@@ -336,9 +365,11 @@ export default function ProductsAnalyticsPage() {
 
             <Card>
               <CardHeader>
-                <CardTitle>Pedidos Diários - {filters.productCode}</CardTitle>
+                <CardTitle>
+                  {t('products.singleProduct.dailyOrders')} - {filters.productCode}
+                </CardTitle>
                 <CardDescription>
-                  Volume de pedidos do produto por dia
+                  {t('products.singleProduct.dailyOrdersDescription')}
                 </CardDescription>
               </CardHeader>
               <CardContent className='p-0'>
@@ -356,16 +387,14 @@ export default function ProductsAnalyticsPage() {
           {/* Product Comparison with Others */}
           <Card>
             <CardHeader>
-              <CardTitle>Comparação com Outros Produtos</CardTitle>
-              <CardDescription>
-                Como este produto se compara com os demais
-              </CardDescription>
+              <CardTitle>{t('products.singleProduct.comparison')}</CardTitle>
+              <CardDescription>{t('products.singleProduct.comparisonDescription')}</CardDescription>
             </CardHeader>
             <CardContent>
               <ProductsTable
                 data={productsData || []}
                 loading={productsLoading}
-                error={productsError?.message}
+                {...(productsError?.message && { error: productsError.message })}
                 locale='pt-BR'
                 showSearch={true}
                 maxHeight='400px'
@@ -379,35 +408,36 @@ export default function ProductsAnalyticsPage() {
           {/* Summary Statistics */}
           <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
             <SalesMetricCard
-              title='Total de Produtos'
+              title={t('products.multiProduct.totalProducts')}
               value={productsData?.length || 0}
               type='count'
-              description='Produtos com vendas no período'
+              description={t('products.multiProduct.totalProductsDescription')}
               loading={productsLoading}
             />
             <SalesMetricCard
-              title='Receita Total'
+              title={t('products.multiProduct.totalRevenue')}
               value={productsData?.reduce((sum, p) => sum + parseFloat(p.receita_brl), 0) || 0}
               type='currency'
-              description='Soma da receita de todos os produtos'
+              description={t('products.multiProduct.totalRevenueDescription')}
               loading={productsLoading}
             />
             <SalesMetricCard
-              title='Pedidos Total'
+              title={t('products.multiProduct.totalOrders')}
               value={productsData?.reduce((sum, p) => sum + p.pedidos, 0) || 0}
               type='count'
-              description='Total de pedidos de todos os produtos'
+              description={t('products.multiProduct.totalOrdersDescription')}
               loading={productsLoading}
             />
             <SalesMetricCard
-              title='Ticket Médio Geral'
+              title={t('products.multiProduct.generalAov')}
               value={
-                productsData && productsData.length > 0 ?
-                (productsData.reduce((sum, p) => sum + parseFloat(p.receita_brl), 0) /
-                 productsData.reduce((sum, p) => sum + p.pedidos, 0)) : 0
+                productsData && productsData.length > 0
+                  ? productsData.reduce((sum, p) => sum + parseFloat(p.receita_brl), 0) /
+                    productsData.reduce((sum, p) => sum + p.pedidos, 0)
+                  : 0
               }
               type='aov'
-              description='Ticket médio considerando todos os produtos'
+              description={t('products.multiProduct.generalAovDescription')}
               loading={productsLoading}
             />
           </div>
@@ -423,16 +453,14 @@ export default function ProductsAnalyticsPage() {
             <TabsContent value='table' className='space-y-4'>
               <Card>
                 <CardHeader>
-                  <CardTitle>Ranking de Produtos por Performance</CardTitle>
-                  <CardDescription>
-                    Produtos ordenados por receita no período selecionado
-                  </CardDescription>
+                  <CardTitle>{t('products.multiProduct.ranking')}</CardTitle>
+                  <CardDescription>{t('products.multiProduct.rankingDescription')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <ProductsTable
                     data={productsData || []}
                     loading={productsLoading}
-                    error={productsError?.message}
+                    {...(productsError?.message && { error: productsError.message })}
                     locale='pt-BR'
                     showSearch={true}
                     maxHeight='600px'
@@ -447,9 +475,7 @@ export default function ProductsAnalyticsPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Top 3 Produtos</CardTitle>
-                    <CardDescription>
-                      Melhores produtos por receita
-                    </CardDescription>
+                    <CardDescription>Melhores produtos por receita</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {productsLoading ? (
@@ -461,26 +487,29 @@ export default function ProductsAnalyticsPage() {
                     ) : (
                       <div className='space-y-3'>
                         {(productsData || []).slice(0, 3).map((product, index) => (
-                          <div 
+                          <div
                             key={product.product_code}
-                            className='flex items-center justify-between p-3 border rounded-lg'
+                            className='flex items-center justify-between rounded-lg border p-3'
                           >
                             <div className='flex items-center gap-3'>
-                              <div className='flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-bold'>
+                              <div className='bg-primary text-primary-foreground flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold'>
                                 {index + 1}
                               </div>
                               <div>
                                 <div className='font-medium'>{product.product_code}</div>
-                                <div className='text-sm text-muted-foreground'>
+                                <div className='text-muted-foreground text-sm'>
                                   {product.pedidos} pedidos
                                 </div>
                               </div>
                             </div>
                             <div className='text-right'>
-                              <div className='font-bold text-lg'>
-                                R$ {parseFloat(product.receita_brl).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                              <div className='text-lg font-bold'>
+                                R${' '}
+                                {parseFloat(product.receita_brl).toLocaleString('pt-BR', {
+                                  minimumFractionDigits: 2,
+                                })}
                               </div>
-                              <div className='text-sm text-muted-foreground'>
+                              <div className='text-muted-foreground text-sm'>
                                 {product.refund_rate}% reembolso
                               </div>
                             </div>
@@ -495,9 +524,7 @@ export default function ProductsAnalyticsPage() {
                 <Card>
                   <CardHeader>
                     <CardTitle>Insights de Performance</CardTitle>
-                    <CardDescription>
-                      Análise automática dos dados
-                    </CardDescription>
+                    <CardDescription>Análise automática dos dados</CardDescription>
                   </CardHeader>
                   <CardContent>
                     {productsLoading ? (
@@ -508,40 +535,57 @@ export default function ProductsAnalyticsPage() {
                       </div>
                     ) : productsData && productsData.length > 0 ? (
                       <div className='space-y-3 text-sm'>
-                        <div className='p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg'>
-                          <strong>Produto com melhor AOV:</strong> {
-                            productsData.reduce((best, current) => 
-                              parseFloat(current.ticket_medio_brl) > parseFloat(best.ticket_medio_brl) ? current : best
+                        <div className='rounded-lg border border-green-200 bg-green-50 p-3 dark:border-green-800 dark:bg-green-950'>
+                          <strong>Produto com melhor AOV:</strong>{' '}
+                          {
+                            productsData.reduce((best, current) =>
+                              parseFloat(current.ticket_medio_brl) >
+                              parseFloat(best.ticket_medio_brl)
+                                ? current
+                                : best
                             ).product_code
-                          } - R$ {
-                            Math.max(...productsData.map(p => parseFloat(p.ticket_medio_brl))).toLocaleString('pt-BR', { minimumFractionDigits: 2 })
-                          }
+                          }{' '}
+                          - R${' '}
+                          {Math.max(
+                            ...productsData.map(p => parseFloat(p.ticket_medio_brl))
+                          ).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
                         </div>
-                        
-                        <div className='p-3 bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg'>
-                          <strong>Produto com mais pedidos:</strong> {
-                            productsData.reduce((best, current) => 
+
+                        <div className='rounded-lg border border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950'>
+                          <strong>Produto com mais pedidos:</strong>{' '}
+                          {
+                            productsData.reduce((best, current) =>
                               current.pedidos > best.pedidos ? current : best
                             ).product_code
-                          } - {Math.max(...productsData.map(p => p.pedidos)).toLocaleString('pt-BR')} pedidos
+                          }{' '}
+                          - {Math.max(...productsData.map(p => p.pedidos)).toLocaleString('pt-BR')}{' '}
+                          pedidos
                         </div>
-                        
-                        <div className='p-3 bg-yellow-50 dark:bg-yellow-950 border border-yellow-200 dark:border-yellow-800 rounded-lg'>
-                          <strong>Produto com menor taxa de reembolso:</strong> {
-                            productsData.reduce((best, current) => 
-                              parseFloat(current.refund_rate) < parseFloat(best.refund_rate) ? current : best
+
+                        <div className='rounded-lg border border-yellow-200 bg-yellow-50 p-3 dark:border-yellow-800 dark:bg-yellow-950'>
+                          <strong>Produto com menor taxa de reembolso:</strong>{' '}
+                          {
+                            productsData.reduce((best, current) =>
+                              parseFloat(current.refund_rate) < parseFloat(best.refund_rate)
+                                ? current
+                                : best
                             ).product_code
-                          } - {
-                            Math.min(...productsData.map(p => parseFloat(p.refund_rate))).toFixed(2)
-                          }%
+                          }{' '}
+                          -{' '}
+                          {Math.min(...productsData.map(p => parseFloat(p.refund_rate))).toFixed(2)}
+                          %
                         </div>
-                        
-                        <div className='p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg'>
+
+                        <div className='rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-800 dark:bg-gray-900'>
                           <strong>Concentração:</strong> Os top 3 produtos representam{' '}
                           {(
-                            (productsData.slice(0, 3).reduce((sum, p) => sum + parseFloat(p.receita_brl), 0) /
-                             productsData.reduce((sum, p) => sum + parseFloat(p.receita_brl), 0)) * 100
-                          ).toFixed(1)}% da receita total
+                            (productsData
+                              .slice(0, 3)
+                              .reduce((sum, p) => sum + parseFloat(p.receita_brl), 0) /
+                              productsData.reduce((sum, p) => sum + parseFloat(p.receita_brl), 0)) *
+                            100
+                          ).toFixed(1)}
+                          % da receita total
                         </div>
                       </div>
                     ) : (
@@ -556,9 +600,7 @@ export default function ProductsAnalyticsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Exportar Dados de Produtos</CardTitle>
-                  <CardDescription>
-                    Download dos dados em diferentes formatos
-                  </CardDescription>
+                  <CardDescription>Download dos dados em diferentes formatos</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className='space-y-4'>
@@ -572,15 +614,18 @@ export default function ProductsAnalyticsPage() {
                       >
                         Exportar como CSV
                       </Button>
-                      
+
                       <Button variant='outline' disabled>
                         Exportar como Excel
-                        <span className='ml-2 text-xs text-muted-foreground'>(Em breve)</span>
+                        <span className='text-muted-foreground ml-2 text-xs'>(Em breve)</span>
                       </Button>
                     </div>
-                    
-                    <div className='text-sm text-muted-foreground'>
-                      <p>O arquivo CSV incluirá todos os produtos mostrados na tabela com as seguintes colunas:</p>
+
+                    <div className='text-muted-foreground text-sm'>
+                      <p>
+                        O arquivo CSV incluirá todos os produtos mostrados na tabela com as
+                        seguintes colunas:
+                      </p>
                       <ul className='mt-2 ml-4 list-disc space-y-1'>
                         <li>Código do Produto</li>
                         <li>Número de Pedidos</li>
