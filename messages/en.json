@@ -12,6 +12,9 @@
       "home": "Home",
       "mainMenu": "Main Menu",
       "billing": "Billing",
+      "contentRadar": "Content Radar",
+      "createPost": "Create Post",
+      "calendar": "Calendar",
       "socialAccounts": "Social Accounts",
       "apiKeys": "API Keys",
       "pricing": "Pricing",
@@ -561,6 +564,7 @@
     "email": "Enter a valid email",
     "min": "Minimum {min} characters",
     "max": "Maximum {max} characters",
+    "nameMinLength": "Name must be at least 2 characters",
     "passwordMatch": "Passwords do not match",
     "itemCount": "{count, plural, =0 {No items} =1 {1 item} other {# items}}",
     "passwordMinLength": "Password must be at least 8 characters",
@@ -635,89 +639,6 @@
       "analytics": {
         "title": "Integrated Analytics",
         "description": "Ready-to-use metrics and dashboards to track your business growth."
-      }
-    },
-    "Analytics": {
-      "title": "Analytics",
-      "subtitle": "Sales and subscriptions dashboard",
-      "filters": {
-        "title": "Filters",
-        "subtitle": "Adjust filters to customize data visualization",
-        "period": "Period",
-        "from": "Start Date",
-        "to": "End Date",
-        "timezone": "Timezone",
-        "product": "Product",
-        "productPlaceholder": "Product code",
-        "gateway": "Gateway",
-        "country": "Country",
-        "periods": {
-          "today": "Today",
-          "7d": "Last 7 days",
-          "30d": "Last 30 days",
-          "90d": "Last 90 days",
-          "mtd": "Month to date",
-          "custom": "Custom"
-        },
-        "gateways": {
-          "all": "All",
-          "stripe": "Stripe",
-          "paypal": "PayPal",
-          "mercadopago": "Mercado Pago",
-          "pagseguro": "PagSeguro"
-        },
-        "countries": {
-          "all": "All",
-          "BR": "Brazil",
-          "US": "United States",
-          "AR": "Argentina",
-          "MX": "Mexico",
-          "PT": "Portugal"
-        }
-      },
-      "metrics": {
-        "grossRevenue": "Gross Revenue",
-        "netRevenue": "Net Revenue",
-        "orders": "Orders",
-        "aov": "Average Order Value",
-        "taxes": "Taxes",
-        "taxesDescription": "Total taxes in the period",
-        "refundRate": "Refund Rate",
-        "refundRateDescription": "Percentage of refunds over sales",
-        "chargebackRate": "Chargeback Rate",
-        "chargebackRateDescription": "Percentage of chargebacks over gross revenue",
-        "payments": "Payments",
-        "paymentsDescription": "Total approved payments",
-        "subscriptions": "Active Subscriptions",
-        "mrr": "Realized MRR",
-        "newSubscriptions": "New Subscriptions",
-        "newSubscriptionsDescription": "Subscriptions created in the period"
-      },
-      "charts": {
-        "dailyRevenue": "Daily Revenue",
-        "dailyRevenueDescription": "Revenue evolution per day in the selected period",
-        "dailyOrders": "Daily Orders",
-        "dailyOrdersDescription": "Number of orders per day",
-        "revenueAndOrders": "Revenue and Orders",
-        "revenueAndOrdersDescription": "Combined view of revenue and order volume"
-      },
-      "tables": {
-        "topProducts": "Top Products",
-        "topProductsByRevenue": "Top Products by Revenue",
-        "topProductsDescription": "Products with highest revenue in the selected period",
-        "disputes": "Disputes",
-        "disputesAndChargebacks": "Disputes and Chargebacks",
-        "disputesDescription": "Summary of disputes and chargebacks in the period",
-        "recentSales": "Recent Sales",
-        "recentPayments": "Recent Sales",
-        "recentPaymentsDescription": "Latest approved payments",
-        "noDataMessage": "Detailed disputes table will be available when connected to the database",
-        "noSalesDataMessage": "Recent sales table will be available when connected to the database"
-      },
-      "disputes": {
-        "totalDisputes": "Total Disputes",
-        "netLosses": "Net Losses",
-        "winRate": "Win Rate"
       }
     },
     "pricing": {
@@ -907,6 +828,89 @@
       "active": "Active",
       "inactive": "Inactive",
       "discontinued": "Discontinued"
+    }
+  },
+  "Analytics": {
+    "title": "Analytics",
+    "subtitle": "Sales and subscriptions dashboard",
+    "filters": {
+      "title": "Filters",
+      "subtitle": "Adjust filters to customize data visualization",
+      "period": "Period",
+      "from": "Start Date",
+      "to": "End Date",
+      "timezone": "Timezone",
+      "product": "Product",
+      "productPlaceholder": "Product code",
+      "gateway": "Gateway",
+      "country": "Country",
+      "periods": {
+        "today": "Today",
+        "7d": "Last 7 days",
+        "30d": "Last 30 days",
+        "90d": "Last 90 days",
+        "mtd": "Month to date",
+        "custom": "Custom"
+      },
+      "gateways": {
+        "all": "All",
+        "stripe": "Stripe",
+        "paypal": "PayPal",
+        "mercadopago": "Mercado Pago",
+        "pagseguro": "PagSeguro"
+      },
+      "countries": {
+        "all": "All",
+        "BR": "Brazil",
+        "US": "United States",
+        "AR": "Argentina",
+        "MX": "Mexico",
+        "PT": "Portugal"
+      }
+    },
+    "metrics": {
+      "grossRevenue": "Gross Revenue",
+      "netRevenue": "Net Revenue",
+      "orders": "Orders",
+      "aov": "Average Order Value",
+      "taxes": "Taxes",
+      "taxesDescription": "Total taxes in the period",
+      "refundRate": "Refund Rate",
+      "refundRateDescription": "Percentage of refunds over sales",
+      "chargebackRate": "Chargeback Rate",
+      "chargebackRateDescription": "Percentage of chargebacks over gross revenue",
+      "payments": "Payments",
+      "paymentsDescription": "Total approved payments",
+      "subscriptions": "Active Subscriptions",
+      "mrr": "Realized MRR",
+      "newSubscriptions": "New Subscriptions",
+      "newSubscriptionsDescription": "Subscriptions created in the period"
+    },
+    "charts": {
+      "dailyRevenue": "Daily Revenue",
+      "dailyRevenueDescription": "Revenue evolution per day in the selected period",
+      "dailyOrders": "Daily Orders",
+      "dailyOrdersDescription": "Number of orders per day",
+      "revenueAndOrders": "Revenue and Orders",
+      "revenueAndOrdersDescription": "Combined view of revenue and order volume"
+    },
+    "tables": {
+      "topProducts": "Top Products",
+      "topProductsByRevenue": "Top Products by Revenue",
+      "topProductsDescription": "Products with highest revenue in the selected period",
+      "disputes": "Disputes",
+      "disputesAndChargebacks": "Disputes and Chargebacks",
+      "disputesDescription": "Summary of disputes and chargebacks in the period",
+      "recentSales": "Recent Sales",
+      "recentPayments": "Recent Sales",
+      "recentPaymentsDescription": "Latest approved payments",
+      "noDataMessage": "Detailed disputes table will be available when connected to the database",
+      "noSalesDataMessage": "Recent sales table will be available when connected to the database"
+    },
+    "disputes": {
+      "totalDisputes": "Total Disputes",
+      "netLosses": "Net Losses",
+      "winRate": "Win Rate"
     }
   },
   "RevenueChart": {
