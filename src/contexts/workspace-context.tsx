@@ -22,7 +22,12 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     enabled: Boolean(user?.id),
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     refetchOnWindowFocus: false,
-    retry: false, // Don't retry on failure for analytics pages
+    // Skip retries for auth/permission errors; retry once for transient failures
+    retry: (failureCount, error) => {
+      const message = (error as any)?.message ?? ''
+      if (/401|403|unauthor/i.test(message)) return false
+      return failureCount < 1
+    },
   })
 
   const value: WorkspaceContextValue = {

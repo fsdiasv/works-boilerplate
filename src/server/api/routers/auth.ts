@@ -187,7 +187,7 @@ export const authRouter = createTRPCRouter({
           : `${normalizedEmail.split('@')[0]}'s Workspace`
 
       const workspaceSlug = `workspace-${user.id.slice(0, 8)}`
-      
+
       // Generate IDs for related entities
       const profileId = crypto.randomUUID()
       const workspaceId = crypto.randomUUID()

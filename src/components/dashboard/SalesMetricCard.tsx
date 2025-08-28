@@ -12,21 +12,21 @@ export interface SalesMetricCardProps {
   title: string
   value: string | number
   type: 'currency' | 'count' | 'percentage' | 'aov'
-  change?: number // Percentage change from previous period
-  changeDirection?: 'up' | 'down' | 'neutral'
-  description?: string
-  loading?: boolean
-  error?: string
-  className?: string
+  change?: number | undefined // Percentage change from previous period
+  changeDirection?: 'up' | 'down' | 'neutral' | undefined
+  description?: string | undefined
+  loading?: boolean | undefined
+  error?: string | undefined
+  className?: string | undefined
   // Additional props for specific metric types
-  showTrend?: boolean
-  locale?: string
+  showTrend?: boolean | undefined
+  locale?: string | undefined
   // Multi-currency support
   currencyBreakdown?: {
     BRL?: string
     USD?: string
     EUR?: string
-  }
+  } | undefined
 }
 
 /**

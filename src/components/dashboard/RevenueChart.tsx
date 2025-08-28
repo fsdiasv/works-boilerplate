@@ -148,7 +148,7 @@ export function RevenueChart({
             )}
 
             <Tooltip
-              content={({ active, payload, label }) => {
+              content={({ active, payload }) => {
                 if (active && payload && payload.length > 0) {
                   const data = payload[0]?.payload
                   return (
@@ -380,7 +380,7 @@ export function DualAxisRevenueChart({
           />
 
           <Tooltip
-            content={({ active, payload, label }) => {
+            content={({ active, payload }) => {
               if (active && payload && payload.length > 0) {
                 const data = payload[0]?.payload
                 return (

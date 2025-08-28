@@ -39,9 +39,9 @@ cp .env.mcp.example .env.mcp
 
 See [MCP Setup Guide](docs/MCP_SETUP.md) for detailed instructions.
 
-## 🚨 CRITICAL DATABASE SECURITY
+## 🚨 CRITICAL DATABASE SAFETY
 
-**⚠️ READ THIS BEFORE ANY DATABASE OPERATIONS ⚠️**
+### ⚠️ Read this before any database operations
 
 ### 🛡️ Protect Your Data
 
@@ -145,7 +145,8 @@ the safety protocols religiously.
 - [ ] Copied `.env.example` to `.env.local`
 - [ ] Added all required environment variables
 - [ ] Ran `pnpm install` successfully
-- [ ] Ran `pnpm db:push` without errors
+- [ ] Ran `pnpm db:migrate` (recommended), or if using an empty DB: created a
+      backup then ran `pnpm db:push`
 - [ ] Started dev server with `pnpm dev`
 - [ ] Can access http://localhost:3000
 

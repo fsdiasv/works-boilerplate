@@ -3,8 +3,7 @@
 ## Overview
 
 This document describes the enhanced OAuth callback security measures
-implemented in the DS Club application to protect against common OAuth
-attacks.
+implemented in the DS Club application to protect against common OAuth attacks.
 
 ## Security Measures Implemented
 

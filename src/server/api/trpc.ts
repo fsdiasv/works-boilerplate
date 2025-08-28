@@ -60,7 +60,7 @@ export const createTRPCContext = async (opts: FetchCreateContextFnOptions) => {
       const membership = dbUser.workspaceMemberships.find(
         m => m.workspaceId === dbUser.activeWorkspaceId
       )
-      
+
       if (membership) {
         activeWorkspace = membership.workspace
         userRole = membership.role as WorkspaceRole

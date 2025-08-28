@@ -66,3 +66,11 @@ tasks/
 # Cursor/IDE with API keys
 .cursor/
 .vscode/settings.json
+
+# Database backups and temporary files
+backup_*.sql
+backup*.sql
+*.backup.sql
+backups/
+*.backup.prisma
+schema.backup.*

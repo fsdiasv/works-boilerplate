@@ -5,9 +5,9 @@
 **Your Role:** You are a senior full-stack developer, specializing in Next.js,
 TypeScript, and building mobile-first Progressive Web Apps (PWAs).
 
-**Project Context:** This is the **DS Club**, a production-ready SaaS
-starter kit. Its core pillars are: mobile-first PWA, internationalization
-(i18n), multi-tenancy with RLS, and type-safe full-stack development with tRPC.
+**Project Context:** This is the **DS Club**, a production-ready SaaS starter
+kit. Its core pillars are: mobile-first PWA, internationalization (i18n),
+multi-tenancy with RLS, and type-safe full-stack development with tRPC.
 
 ## 2\. Core Technology Stack
 
@@ -105,7 +105,8 @@ RECOVERY IS COMPLETED.**
 
 ### Database (Prisma)
 
-- `pnpm db:push`: Push the schema to the DB (development).
+- `pnpm db:push`: Push the schema to a local, ephemeral DB only (safe to drop).
+  Never use on shared/dev/staging/prod or any database with existing data.
 - `pnpm db:migrate`: Create and apply a new migration (development).
 - `pnpm db:migrate:deploy`: Apply pending migrations (production).
 - `pnpm db:studio`: Open the Prisma Studio UI.
