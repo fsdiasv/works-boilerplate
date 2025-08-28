@@ -76,8 +76,8 @@ export function SalesByDayOfWeekChart({
   }
 
   // Custom tooltip
-  const CustomTooltip = ({ active, payload, label }: any) => {
-    if (active && payload && payload.length) {
+  function CustomTooltip({ active, payload, label }: any) {
+    if (active && payload?.length) {
       const data = payload[0].payload
       return (
         <div className='bg-background rounded-lg border p-3 shadow-lg'>

@@ -1,6 +1,7 @@
+import { Prisma } from '@prisma/client'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { Prisma } from '@prisma/client'
+
 import {
   calculateNetRevenue,
   calculateAOV,
@@ -8,19 +9,93 @@ import {
   isSuccessfulPayment,
   validateDateRange,
   adjustTimezone,
+  convertToBRL,
+  getCurrencyConversionSQL,
 } from '@/lib/analytics-utils'
 import { env } from '@/lib/env'
 import { createTRPCRouter, workspaceAdminProcedure } from '@/server/api/trpc'
 
-// Input validation schemas
-const analyticsFiltersSchema = z.object({
-  from: z.string().datetime(),
-  to: z.string().datetime(),
-  tz: z.string().default('America/Sao_Paulo'),
-  product: z.string().optional(),
-  gateway: z.string().optional(),
-  country: z.string().optional(),
-})
+// Input validation schemas with comprehensive security checks
+const analyticsFiltersSchema = z
+  .object({
+    from: z
+      .string()
+      .datetime()
+      .refine(
+        date => {
+          const d = new Date(date)
+          const now = new Date()
+          const maxPast = new Date()
+          maxPast.setFullYear(maxPast.getFullYear() - 2) // Max 2 years in the past
+          return d >= maxPast && d <= now
+        },
+        { message: 'Date must be within the last 2 years and not in the future' }
+      ),
+    to: z
+      .string()
+      .datetime()
+      .refine(
+        date => {
+          const d = new Date(date)
+          const now = new Date()
+          const maxFuture = new Date()
+          maxFuture.setDate(maxFuture.getDate() + 1) // Allow up to tomorrow for timezone differences
+          return d <= maxFuture
+        },
+        { message: 'End date cannot be more than 1 day in the future' }
+      ),
+    tz: z
+      .string()
+      .regex(/^[A-Za-z_]+\/[A-Za-z_]+$/, 'Invalid timezone format')
+      .default('America/Sao_Paulo')
+      .refine(
+        tz => {
+          // Validate against a whitelist of common timezones
+          const validTimezones = [
+            'America/New_York',
+            'America/Chicago',
+            'America/Los_Angeles',
+            'America/Sao_Paulo',
+            'America/Argentina/Buenos_Aires',
+            'Europe/London',
+            'Europe/Paris',
+            'Europe/Berlin',
+            'Asia/Tokyo',
+            'Asia/Shanghai',
+            'Asia/Dubai',
+            'Australia/Sydney',
+            'UTC',
+          ]
+          return validTimezones.includes(tz)
+        },
+        { message: 'Unsupported timezone' }
+      ),
+    product: z
+      .string()
+      .max(100, 'Product code too long')
+      .regex(/^[a-zA-Z0-9_-]+$/, 'Invalid product code format')
+      .optional(),
+    gateway: z
+      .string()
+      .max(50, 'Gateway name too long')
+      .regex(/^[a-zA-Z0-9_-]+$/, 'Invalid gateway format')
+      .optional(),
+    country: z
+      .string()
+      .length(2, 'Country code must be 2 characters')
+      .regex(/^[A-Z]{2}$/, 'Invalid country code format')
+      .optional(),
+  })
+  .refine(
+    data => {
+      const from = new Date(data.from)
+      const to = new Date(data.to)
+      const maxDays = 370 // Maximum date range
+      const daysDiff = Math.ceil((to.getTime() - from.getTime()) / (1000 * 60 * 60 * 24))
+      return daysDiff <= maxDays && daysDiff >= 0
+    },
+    { message: 'Date range cannot exceed 370 days and from must be before to' }
+  )
 
 const limitSchema = z.number().min(1).max(200).default(50)
 const productsLimitSchema = z.number().min(1).max(50).default(10)
@@ -136,7 +211,7 @@ export const analyticsRouter = createTRPCRouter({
       // Validate date range
       const fromDate = new Date(from)
       const toDate = new Date(to)
-      
+
       // Enhanced date validation (incorporating security feedback)
       if (fromDate >= toDate) {
         throw new TRPCError({
@@ -144,7 +219,7 @@ export const analyticsRouter = createTRPCRouter({
           message: 'From date must be before to date',
         })
       }
-      
+
       const validation = validateDateRange(fromDate, toDate)
 
       if (!validation.valid) {
@@ -181,7 +256,7 @@ export const analyticsRouter = createTRPCRouter({
                   },
                 }),
                 ...(country && {
-                  user: {
+                  customer: {
                     country,
                   },
                 }),
@@ -192,7 +267,7 @@ export const analyticsRouter = createTRPCRouter({
                     product: true,
                   },
                 },
-                user: true,
+                customer: true,
                 subscriptions: true,
               },
             },
@@ -231,7 +306,7 @@ export const analyticsRouter = createTRPCRouter({
             }),
             ...(country && {
               orderItem: {
-                user: {
+                customer: {
                   country,
                 },
               },
@@ -255,7 +330,7 @@ export const analyticsRouter = createTRPCRouter({
               },
             }),
             ...(country && {
-              user: {
+              customer: {
                 country,
               },
             }),
@@ -280,22 +355,14 @@ export const analyticsRouter = createTRPCRouter({
               },
             }),
             ...(country && {
-              user: {
+              customer: {
                 country,
               },
             }),
           },
         })
 
-        // Helper function to convert currency to BRL (simplified rates)
-        const convertToBRL = (amount: number, currency: string): number => {
-          const rates: Record<string, number> = {
-            USD: 5.5, // Example rate
-            EUR: 6.0, // Example rate
-            BRL: 1.0,
-          }
-          return amount * (rates[currency] || rates['USD'] || 1.0)
-        }
+        // Currency conversion is now handled by the utility function
 
         // Calculate metrics using order_items.price with currency conversion and breakdown
         const receitaPorMoeda = orderItems.reduce(
@@ -420,6 +487,7 @@ export const analyticsRouter = createTRPCRouter({
 
       try {
         // Use CTE with orders and order_items (no payments table)
+        const conversionSQL = getCurrencyConversionSQL()
         const results = await ctx.db.$queryRaw<Array<{ day: string; receita_brl: string }>>`
           WITH daily_revenue AS (
             SELECT 
@@ -429,24 +497,18 @@ export const analyticsRouter = createTRPCRouter({
             FROM orders o
             LEFT JOIN order_items oi ON o.id = oi.order_id
             LEFT JOIN product_language_versions plv ON oi.product_version_id = plv.id
-            LEFT JOIN users u ON oi.user_id = u.id
+            LEFT JOIN customers c ON oi.customer_id = c.id
             WHERE o.created_at >= ${fromDate}
               AND o.created_at <= ${toDate}
               AND o.status = 'COMPLETED'
               ${gateway ? Prisma.sql`AND o.gateway = ${gateway}` : Prisma.sql``}
               ${product ? Prisma.sql`AND plv.product_code = ${product}` : Prisma.sql``}
-              ${country ? Prisma.sql`AND u.country = ${country}` : Prisma.sql``}
+              ${country ? Prisma.sql`AND c.country = ${country}` : Prisma.sql``}
               AND oi.price IS NOT NULL
           )
           SELECT 
             order_day::text as day,
-            SUM(
-              CASE 
-                WHEN currency = 'USD' THEN COALESCE(price, 0) * 5.50
-                WHEN currency = 'EUR' THEN COALESCE(price, 0) * 6.00
-                ELSE COALESCE(price, 0)
-              END
-            )::text as receita_brl
+            SUM(${Prisma.raw(conversionSQL)})::text as receita_brl
           FROM daily_revenue
           GROUP BY order_day
           ORDER BY order_day ASC
@@ -505,8 +567,8 @@ export const analyticsRouter = createTRPCRouter({
                   ? Prisma.sql`
                 AND EXISTS (
                   SELECT 1 FROM order_items oi 
-                  LEFT JOIN users u ON oi.user_id = u.id 
-                  WHERE oi.order_id = o.id AND u.country = ${country}
+                  LEFT JOIN customers c ON oi.customer_id = c.id 
+                  WHERE oi.order_id = o.id AND c.country = ${country}
                 )
               `
                   : Prisma.sql``
@@ -534,7 +596,17 @@ export const analyticsRouter = createTRPCRouter({
    * Get top products by revenue
    */
   productsTop: workspaceAdminProcedure
-    .input(analyticsFiltersSchema.extend({ limit: productsLimitSchema }))
+    .input(
+      z.object({
+        from: z.string().datetime(),
+        to: z.string().datetime(),
+        tz: z.string().default('America/Sao_Paulo'),
+        product: z.string().optional(),
+        gateway: z.string().optional(),
+        country: z.string().optional(),
+        limit: productsLimitSchema,
+      })
+    )
     .output(z.array(productSchema))
     .query(async ({ ctx, input }) => {
       const { from, to, tz, limit, gateway, country } = input
@@ -556,8 +628,13 @@ export const analyticsRouter = createTRPCRouter({
           whereConditions.push(Prisma.sql`o.gateway = ${gateway}`)
         }
         if (country) {
-          whereConditions.push(Prisma.sql`u.country = ${country}`)
+          whereConditions.push(Prisma.sql`c.country = ${country}`)
         }
+
+        // Get dynamic conversion SQL for use in query
+        const conversionSQL = getCurrencyConversionSQL()
+          .replace(/price/g, 'oi.price')
+          .replace(/currency/g, 'o.currency')
 
         const results = await ctx.db.$queryRaw<
           Array<{
@@ -570,28 +647,16 @@ export const analyticsRouter = createTRPCRouter({
           SELECT 
             plv.product_code,
             COUNT(DISTINCT o.id)::int as pedidos,
-            SUM(
-              CASE 
-                WHEN o.currency = 'USD' THEN COALESCE(oi.price, 0) * 5.50
-                WHEN o.currency = 'EUR' THEN COALESCE(oi.price, 0) * 6.00
-                ELSE COALESCE(oi.price, 0)
-              END
-            )::text as receita_brl,
+            SUM(${Prisma.raw(conversionSQL)})::text as receita_brl,
             COALESCE(SUM(r.amount_brl), 0)::text as refunds_brl
           FROM orders o
           LEFT JOIN order_items oi ON o.id = oi.order_id
           LEFT JOIN product_language_versions plv ON oi.product_version_id = plv.id
-          LEFT JOIN users u ON oi.user_id = u.id
+          LEFT JOIN customers c ON oi.customer_id = c.id
           LEFT JOIN refunds r ON oi.id = r.order_item_id AND r.created_at >= ${fromDate} AND r.created_at <= ${toDate}
           WHERE ${Prisma.join(whereConditions, ' AND ')}
           GROUP BY plv.product_code
-          ORDER BY SUM(
-            CASE 
-              WHEN o.currency = 'USD' THEN COALESCE(oi.price, 0) * 5.50
-              WHEN o.currency = 'EUR' THEN COALESCE(oi.price, 0) * 6.00
-              ELSE COALESCE(oi.price, 0)
-            END
-          ) DESC
+          ORDER BY SUM(${Prisma.raw(conversionSQL)}) DESC
           LIMIT ${limit}
         `
 
@@ -648,7 +713,7 @@ export const analyticsRouter = createTRPCRouter({
               },
             }),
             ...(country && {
-              user: {
+              customer: {
                 country,
               },
             }),
@@ -670,7 +735,7 @@ export const analyticsRouter = createTRPCRouter({
               },
             }),
             ...(country && {
-              user: {
+              customer: {
                 country,
               },
             }),
@@ -692,7 +757,7 @@ export const analyticsRouter = createTRPCRouter({
               },
             }),
             ...(country && {
-              user: {
+              customer: {
                 country,
               },
             }),
@@ -719,7 +784,7 @@ export const analyticsRouter = createTRPCRouter({
                 },
               }),
               ...(country && {
-                user: {
+                customer: {
                   country,
                 },
               }),
@@ -816,7 +881,7 @@ export const analyticsRouter = createTRPCRouter({
               include: {
                 order: true,
                 productVersion: true,
-                user: true,
+                customer: true,
               },
             },
           },
@@ -832,7 +897,7 @@ export const analyticsRouter = createTRPCRouter({
           try {
             const orderItem = payment.orderItem
             const productVersion = orderItem?.productVersion
-            const user = orderItem?.user
+            const customer = orderItem?.customer
 
             return {
               payment_id: payment.id.toString(),
@@ -842,7 +907,7 @@ export const analyticsRouter = createTRPCRouter({
               amount_brl: payment.amountBrl ? Number(payment.amountBrl).toFixed(2) : '0.00',
               gateway: payment.gateway || null,
               payment_method: payment.paymentMethod || null,
-              country: user?.country || null,
+              country: customer?.country || null,
             }
           } catch (mappingError) {
             console.error(`[paymentsRecent] Error mapping payment ${index}:`, {
@@ -851,7 +916,7 @@ export const analyticsRouter = createTRPCRouter({
               paymentData: {
                 hasOrderItem: !!payment.orderItem,
                 hasProductVersion: !!payment.orderItem?.productVersion,
-                hasUser: !!payment.orderItem?.user,
+                hasCustomer: !!payment.orderItem?.customer,
               },
             })
             throw mappingError
@@ -892,7 +957,7 @@ export const analyticsRouter = createTRPCRouter({
 
         if (gateway) whereConditions.push(Prisma.sql`o.gateway = ${gateway}`)
         if (product) whereConditions.push(Prisma.sql`plv.product_code = ${product}`)
-        if (country) whereConditions.push(Prisma.sql`u.country = ${country}`)
+        if (country) whereConditions.push(Prisma.sql`c.country = ${country}`)
 
         const whereClause = Prisma.join(whereConditions, ' AND ')
 
@@ -905,7 +970,7 @@ export const analyticsRouter = createTRPCRouter({
               FROM orders o
               LEFT JOIN order_items oi ON o.id = oi.order_id
               LEFT JOIN product_language_versions plv ON oi.product_version_id = plv.id
-              LEFT JOIN users u ON oi.user_id = u.id
+              LEFT JOIN customers c ON oi.customer_id = c.id
               WHERE ${whereClause}
               GROUP BY plv.product_code
             )
@@ -956,9 +1021,14 @@ export const analyticsRouter = createTRPCRouter({
 
         if (gateway) whereConditions.push(Prisma.sql`o.gateway = ${gateway}`)
         if (product) whereConditions.push(Prisma.sql`plv.product_code = ${product}`)
-        if (country) whereConditions.push(Prisma.sql`u.country = ${country}`)
+        if (country) whereConditions.push(Prisma.sql`c.country = ${country}`)
 
         const whereClause = Prisma.join(whereConditions, ' AND ')
+
+        // Get dynamic conversion SQL for use in query
+        const conversionSQL = getCurrencyConversionSQL()
+          .replace(/price/g, 'oi.price')
+          .replace(/currency/g, 'o.currency')
 
         const results = await ctx.db.$queryRaw<
           Array<{ product_code: string; revenue_brl: string }>
@@ -967,17 +1037,11 @@ export const analyticsRouter = createTRPCRouter({
             WITH product_revenue AS (
               SELECT 
                 plv.product_code,
-                SUM(
-                  CASE 
-                    WHEN o.currency = 'USD' THEN COALESCE(oi.price, 0) * 5.50
-                    WHEN o.currency = 'EUR' THEN COALESCE(oi.price, 0) * 6.00
-                    ELSE COALESCE(oi.price, 0)
-                  END
-                ) as revenue_brl
+                SUM(${Prisma.raw(conversionSQL)}) as revenue_brl
               FROM orders o
               LEFT JOIN order_items oi ON o.id = oi.order_id
               LEFT JOIN product_language_versions plv ON oi.product_version_id = plv.id
-              LEFT JOIN users u ON oi.user_id = u.id
+              LEFT JOIN customers c ON oi.customer_id = c.id
               WHERE ${whereClause}
               GROUP BY plv.product_code
             )
@@ -1029,7 +1093,7 @@ export const analyticsRouter = createTRPCRouter({
 
         if (gateway) whereConditions.push(Prisma.sql`o.gateway = ${gateway}`)
         if (product) whereConditions.push(Prisma.sql`plv.product_code = ${product}`)
-        if (country) whereConditions.push(Prisma.sql`u.country = ${country}`)
+        if (country) whereConditions.push(Prisma.sql`c.country = ${country}`)
 
         const whereClause = Prisma.join(whereConditions, ' AND ')
 
@@ -1042,7 +1106,7 @@ export const analyticsRouter = createTRPCRouter({
               FROM orders o
               LEFT JOIN order_items oi ON o.id = oi.order_id
               LEFT JOIN product_language_versions plv ON oi.product_version_id = plv.id
-              LEFT JOIN users u ON oi.user_id = u.id
+              LEFT JOIN customers c ON oi.customer_id = c.id
               WHERE ${whereClause}
               GROUP BY 1
             )
@@ -1099,7 +1163,7 @@ export const analyticsRouter = createTRPCRouter({
 
         if (gateway) whereConditions.push(Prisma.sql`o.gateway = ${gateway}`)
         if (product) whereConditions.push(Prisma.sql`plv.product_code = ${product}`)
-        if (country) whereConditions.push(Prisma.sql`u.country = ${country}`)
+        if (country) whereConditions.push(Prisma.sql`c.country = ${country}`)
 
         const whereClause = Prisma.join(whereConditions, ' AND ')
 
@@ -1112,7 +1176,7 @@ export const analyticsRouter = createTRPCRouter({
               FROM orders o
               LEFT JOIN order_items oi ON o.id = oi.order_id
               LEFT JOIN product_language_versions plv ON oi.product_version_id = plv.id
-              LEFT JOIN users u ON oi.user_id = u.id
+              LEFT JOIN customers c ON oi.customer_id = c.id
               WHERE ${whereClause}
               GROUP BY 1
             )

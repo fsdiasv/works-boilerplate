@@ -7,10 +7,6 @@ import { useSearchParams } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import React, { useState } from 'react'
 
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { ProductsTable } from '@/components/dashboard/ProductsTable'
 import {
   SalesMetricCard,
@@ -19,6 +15,10 @@ import {
   AOVCard,
   RefundRateCard,
 } from '@/components/dashboard/SalesMetricCard'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getDateRange } from '@/lib/analytics-utils'
 import { api } from '@/trpc/react'
 

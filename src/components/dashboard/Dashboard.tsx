@@ -19,18 +19,9 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { DocumentsTable } from './DocumentsTable'
 import { MetricCard } from './MetricCard'
 
-// Dynamically import the chart component to reduce initial bundle size
-const VisitorsChart = dynamic(
-  () => import('./VisitorsChart').then(mod => ({ default: mod.VisitorsChart })),
-  {
-    ssr: false,
-    loading: () => (
-      <div className='flex h-full items-center justify-center'>
-        <div className='text-muted-foreground'>Loading chart...</div>
-      </div>
-    ),
-  }
-)
+// Import the chart directly without dynamic loading for now
+// This ensures the component is available immediately
+import { VisitorsChart } from './VisitorsChart'
 
 export function Dashboard() {
   const metrics = [

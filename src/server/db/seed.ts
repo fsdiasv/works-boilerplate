@@ -34,7 +34,7 @@ async function main() {
       // Delete workspaces where this user is the only member
       const workspacesToDelete = await db.workspace.findMany({
         where: {
-          members: {
+          workspaceMembers: {
             every: { userId: existingUser.id },
           },
         },
@@ -65,6 +65,7 @@ async function main() {
 
     const testUser = await db.user.create({
       data: {
+        id: crypto.randomUUID(),
         email: 'test@example.com',
         fullName: 'Test User',
         emailVerified: true,

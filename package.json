@@ -166,6 +166,7 @@
     "prisma": "6.13.0",
     "shadcn": "2.10.0",
     "sharp": "^0.34.3",
+    "supabase": "^2.39.2",
     "tailwindcss": "^4.1.11",
     "tsx": "^4.20.3",
     "typescript": "5.9.2",

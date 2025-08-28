@@ -6,11 +6,11 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import React, { useState } from 'react'
 
+import { SalesMetricCard, SubscriptionsCard, MRRCard } from '@/components/dashboard/SalesMetricCard'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { SalesMetricCard, SubscriptionsCard, MRRCard } from '@/components/dashboard/SalesMetricCard'
 import { getDateRange, formatBRL } from '@/lib/analytics-utils'
 import { api } from '@/trpc/react'
 

@@ -47,19 +47,24 @@ export const createTRPCContext = async (opts: FetchCreateContextFnOptions) => {
     const dbUser = await db.user.findUnique({
       where: { id: user.id },
       include: {
-        activeWorkspace: true,
-        workspaceMemberships: true,
+        workspaceMemberships: {
+          include: {
+            workspace: true,
+          },
+        },
       },
     })
 
-    if (dbUser && dbUser.activeWorkspaceId !== null && dbUser.activeWorkspace !== null) {
-      activeWorkspace = dbUser.activeWorkspace
-
-      // Get user's role in the active workspace
+    if (dbUser && dbUser.activeWorkspaceId !== null) {
+      // Find the workspace and user role
       const membership = dbUser.workspaceMemberships.find(
         m => m.workspaceId === dbUser.activeWorkspaceId
       )
-      userRole = membership?.role ?? null
+      
+      if (membership) {
+        activeWorkspace = membership.workspace
+        userRole = membership.role as WorkspaceRole
+      }
     }
   }
 

@@ -5,9 +5,7 @@ import { useSearchParams, usePathname, useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import React, { useState, useCallback } from 'react'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Skeleton } from '@/components/ui/skeleton'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { ProductsTable } from '@/components/dashboard/ProductsTable'
 import {
   RevenueCard,
   OrdersCard,
@@ -17,7 +15,9 @@ import {
   MRRCard,
   SalesMetricCard,
 } from '@/components/dashboard/SalesMetricCard'
-import { ProductsTable } from '@/components/dashboard/ProductsTable'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { getDateRange } from '@/lib/analytics-utils'
 import { api } from '@/trpc/react'
 

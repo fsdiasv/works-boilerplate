@@ -1,6 +1,5 @@
 generator client {
-  provider        = "prisma-client-js"
-  previewFeatures = ["multiSchema"]
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -8,72 +7,95 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ===== ESTRUTURA REAL DO BANCO =====
-// Baseado na estrutura real fornecida pelo usuário
+model Customer {
+  id               BigInt                @id @default(autoincrement())
+  createdAt        DateTime              @default(now()) @map("created_at") @db.Timestamptz(6)
+  email            String                @unique
+  name             String
+  systemeContactId BigInt?               @map("systeme_contact_id")
+  country          String?
+  language         String?
+  updatedAt        DateTime?             @default(now()) @map("updated_at") @db.Timestamptz(6)
+  disputes         Dispute[]
+  orderItems       OrderItem[]
+  orders           Order[]
+  subscriptions    Subscription[]
+  userMappings     UserCustomerMapping[]
+
+  @@map("customers")
+}
 
 model User {
-  // Campos que existem na estrutura real
-  id                 BigInt   @id @default(autoincrement())
-  createdAt          DateTime @default(now()) @map("created_at")
-  email              String   @unique
-  name               String   // nome real da coluna
-  systemeContactId   BigInt?  @map("systeme_contact_id")
-  country            String?
-  language           String?  // não "locale"
-  updatedAt          DateTime @default(now()) @map("updated_at")
-  
-  // Relations baseadas na estrutura real
-  orders             Order[]
-  orderItems         OrderItem[]
-  subscriptions      Subscription[]
-  disputes           Dispute[]
-  
-  // Relations do workspace
-  profiles           Profile[]
-  sessions           Session[]
+  id                String                @id @db.Uuid
+  email             String                @unique
+  fullName          String?               @map("full_name")
+  avatarUrl         String?               @map("avatar_url")
+  emailVerified     Boolean?              @default(false) @map("email_verified")
+  phone             String?
+  locale            String?               @default("pt-BR")
+  timezone          String?               @default("America/Sao_Paulo")
+  metadata          Json?
+  activeWorkspaceId String?               @map("active_workspace_id") @db.Uuid
+  activeWorkspace   Workspace?            @relation("UserActiveWorkspace", fields: [activeWorkspaceId], references: [id])
+  lastActiveAt      DateTime?             @default(now()) @map("last_active_at") @db.Timestamptz(6)
+  createdAt         DateTime?             @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime?             @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  customerMappings  UserCustomerMapping[]
+  invitations       Invitation[]
+  profile           Profile?
+  sessions          Session[]
   workspaceMemberships WorkspaceMember[]
-  invitations        Invitation[]
-  activeWorkspace    Workspace[]     @relation("UserActiveWorkspace")
 
+  @@index([activeWorkspaceId], map: "idx_users_active_workspace_id")
+  @@index([email], map: "idx_users_email")
   @@map("users")
 }
 
+model UserCustomerMapping {
+  userId     String    @map("user_id") @db.Uuid
+  customerId BigInt    @map("customer_id")
+  createdAt  DateTime? @default(now()) @map("created_at") @db.Timestamptz(6)
+  customer   Customer  @relation(fields: [customerId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([userId, customerId])
+  @@index([customerId], map: "idx_user_customer_mappings_customer_id")
+  @@map("user_customer_mappings")
+}
+
 model Product {
-  id                BigInt    @id @default(autoincrement())
-  createdAt         DateTime  @default(now()) @map("created_at")
-  productCode       String    @unique @map("product_code")
-  baseName          String?   @map("base_name")
+  id                BigInt                   @id @default(autoincrement())
+  createdAt         DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
+  productCode       String                   @unique @map("product_code")
+  baseName          String?                  @map("base_name")
   niche             String?
   gender            String?
   description       String?
-  updatedAt         DateTime  @default(now()) @map("updated_at")
-  marketingBriefing Json?     @map("marketing_briefing")
-  
-  // Relations
+  updatedAt         DateTime?                @default(now()) @map("updated_at") @db.Timestamptz(6)
+  marketingBriefing Json?                    @map("marketing_briefing")
   languageVersions  ProductLanguageVersion[]
 
   @@map("products")
 }
 
 model ProductLanguageVersion {
-  id                BigInt   @id @default(autoincrement())
-  createdAt         DateTime @default(now()) @map("created_at")
-  productId         BigInt   @map("product_id")
-  languageCode      String   @map("language_code")
-  translatedTitle   String?  @map("translated_title")
-  author            String?
-  salesPageUrl      String?  @map("sales_page_url")
-  publicContentUrl  String?  @map("public_content_url")
-  internalDriveUrl  String?  @map("internal_drive_url")
-  internalContentUrl String? @map("internal_content_url")
-  updatedAt         DateTime @default(now()) @map("updated_at")
-  productCode       String   @map("product_code")
-  
-  // Relations
-  product           Product    @relation(fields: [productId], references: [id])
-  orderItems        OrderItem[]
-  funnels           Funnel[]
+  id                 BigInt      @id @default(autoincrement())
+  createdAt          DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  productId          BigInt?     @map("product_id")
+  languageCode       String      @map("language_code")
+  translatedTitle    String?     @map("translated_title")
+  author             String?
+  salesPageUrl       String?     @map("sales_page_url")
+  publicContentUrl   String?     @map("public_content_url")
+  internalDriveUrl   String?     @map("internal_drive_url")
+  internalContentUrl String?     @map("internal_content_url")
+  updatedAt          DateTime?   @default(now()) @map("updated_at") @db.Timestamptz(6)
+  productCode        String      @map("product_code")
+  funnels            Funnel[]
+  orderItems         OrderItem[]
+  product            Product?    @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@index([productCode, languageCode], map: "idx_product_language_versions_code_lang")
   @@map("product_language_versions")
 }
 
@@ -81,115 +103,113 @@ model Funnel {
   id               BigInt                  @id @default(autoincrement())
   systemeFunnelId  BigInt                  @map("systeme_funnel_id")
   name             String?
-  productVersionId BigInt?                @map("product_version_id")
-  updatedAt        DateTime                @default(now()) @map("updated_at")
-  
-  // Relations
-  productVersion   ProductLanguageVersion? @relation(fields: [productVersionId], references: [id])
+  productVersionId BigInt?                 @map("product_version_id")
+  updatedAt        DateTime?               @default(now()) @map("updated_at") @db.Timestamptz(6)
+  productVersion   ProductLanguageVersion? @relation(fields: [productVersionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@map("funnels")
 }
 
 model Order {
-  id              BigInt   @id @default(autoincrement())
-  createdAt       DateTime @default(now()) @map("created_at")
-  userId          BigInt   @map("user_id")
-  systemeOrderId  BigInt?  @map("systeme_order_id")
+  id              BigInt      @id @default(autoincrement())
+  createdAt       DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  customerId      BigInt      @map("customer_id")
+  systemeOrderId  BigInt?     @map("systeme_order_id")
   currency        String?
-  trafficMetadata Json?    @map("traffic_metadata")
-  systemeFunnelId BigInt?  @map("systeme_funnel_id")
+  trafficMetadata Json?       @map("traffic_metadata")
+  systemeFunnelId BigInt?     @map("systeme_funnel_id")
   gateway         String?
   status          String?
-  updatedAt       DateTime @default(now()) @map("updated_at")
-  clientIp        String?  @map("client_ip")
-  
-  // Relations
-  user            User       @relation(fields: [userId], references: [id])
+  updatedAt       DateTime?   @default(now()) @map("updated_at") @db.Timestamptz(6)
+  clientIp        String?     @map("client_ip")
   orderItems      OrderItem[]
+  customer        Customer    @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@index([createdAt(sort: Desc)], map: "idx_orders_created_at")
+  @@index([customerId], map: "idx_orders_customer_id")
+  @@index([customerId], map: "idx_orders_user_id")
   @@map("orders")
 }
 
 model OrderItem {
   id                  BigInt                  @id @default(autoincrement())
-  createdAt           DateTime                @default(now()) @map("created_at")
+  createdAt           DateTime                @default(now()) @map("created_at") @db.Timestamptz(6)
   orderId             BigInt?                 @map("order_id")
   productVersionId    BigInt?                 @map("product_version_id")
   itemType            String?                 @map("item_type")
   pricingType         String?                 @map("pricing_type")
-  price               Decimal?                @db.Decimal(10, 2)
+  price               Decimal?                @db.Decimal
   systemeOrderItemId  BigInt?                 @map("systeme_order_item_id")
   systemeFunnelStepId BigInt?                 @map("systeme_funnel_step_id")
   description         String?
-  updatedAt           DateTime                @default(now()) @map("updated_at")
-  userId              BigInt?                 @map("user_id")
-  
-  // Relations
-  order               Order?                  @relation(fields: [orderId], references: [id])
-  productVersion      ProductLanguageVersion? @relation(fields: [productVersionId], references: [id])
-  user                User?                   @relation(fields: [userId], references: [id])
+  updatedAt           DateTime?               @default(now()) @map("updated_at") @db.Timestamptz(6)
+  customerId          BigInt?                 @map("customer_id")
+  has_payment         Boolean?                @default(false)
+  disputes            Dispute[]
+  customer            Customer?               @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  order               Order?                  @relation(fields: [orderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  productVersion      ProductLanguageVersion? @relation(fields: [productVersionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   payments            Payment[]
   refunds             Refund[]
   subscriptions       Subscription[]
-  disputes            Dispute[]
 
+  @@index([customerId], map: "idx_order_items_customer_id")
+  @@index([orderId], map: "idx_order_items_order_id")
+  @@index([orderId, productVersionId], map: "idx_order_items_order_product")
   @@map("order_items")
 }
 
 model Payment {
   id                   BigInt     @id @default(autoincrement())
-  createdAt            DateTime   @default(now()) @map("created_at")
+  createdAt            DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
   orderItemId          BigInt?    @map("order_item_id")
   gateway              String?
   gatewayTransactionId String?    @map("gateway_transaction_id")
-  amount               Decimal?   @db.Decimal(10, 2)
-  amountBrl            Decimal?   @map("amount_brl") @db.Decimal(10, 2)
-  taxBrl               Decimal?   @map("tax_brl") @db.Decimal(10, 2)
+  amount               Decimal?   @db.Decimal
+  amountBrl            Decimal?   @map("amount_brl") @db.Decimal
+  taxBrl               Decimal?   @map("tax_brl") @db.Decimal
   status               String?
   clientIp             String?    @map("client_ip")
   statementDescriptor  String?    @map("statement_descriptor")
-  updatedAt            DateTime   @default(now()) @map("updated_at")
+  updatedAt            DateTime?  @default(now()) @map("updated_at") @db.Timestamptz(6)
   paymentMethod        String?    @map("payment_method")
   cardLastFour         String?    @map("card_last_four")
   cardBrand            String?    @map("card_brand")
   currency             String?
-  
-  // Relations
-  orderItem            OrderItem? @relation(fields: [orderItemId], references: [id])
-  refunds              Refund[]
   disputes             Dispute[]
+  orderItem            OrderItem? @relation(fields: [orderItemId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  refunds              Refund[]
 
   @@map("payments")
 }
 
 model Refund {
-  id           BigInt    @id @default(autoincrement())
-  createdAt    DateTime  @default(now()) @map("created_at")
-  paymentId    BigInt?   @map("payment_id")
-  orderItemId  BigInt?   @map("order_item_id")
+  id           BigInt     @id @default(autoincrement())
+  createdAt    DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  paymentId    BigInt?    @map("payment_id")
+  orderItemId  BigInt?    @map("order_item_id")
   type         String?
   reason       String?
-  amount       Decimal?  @db.Decimal(10, 2)
-  amountBrl    Decimal?  @map("amount_brl") @db.Decimal(10, 2)
-  taxRefundBrl Decimal?  @map("tax_refund_brl") @db.Decimal(10, 2)
-  updatedAt    DateTime  @default(now()) @map("updated_at")
-  disputeId    BigInt?   @map("dispute_id")
-  
-  // Relations
-  payment      Payment?  @relation(fields: [paymentId], references: [id])
-  orderItem    OrderItem? @relation(fields: [orderItemId], references: [id])
-  dispute      Dispute?  @relation(fields: [disputeId], references: [id])
+  amount       Decimal?   @db.Decimal
+  amountBrl    Decimal?   @map("amount_brl") @db.Decimal
+  taxRefundBrl Decimal?   @map("tax_refund_brl") @db.Decimal
+  updatedAt    DateTime?  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  disputeId    BigInt?    @map("dispute_id")
+  dispute      Dispute?   @relation(fields: [disputeId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orderItem    OrderItem? @relation(fields: [orderItemId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payment      Payment?   @relation(fields: [paymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@index([createdAt], map: "idx_refunds_created_at")
   @@map("refunds")
 }
 
 model Dispute {
   id                BigInt     @id @default(autoincrement())
-  createdAt         DateTime   @default(now()) @map("created_at")
-  updatedAt         DateTime   @default(now()) @map("updated_at")
+  createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt         DateTime   @default(now()) @map("updated_at") @db.Timestamptz(6)
   paymentId         BigInt?    @map("payment_id")
   orderItemId       BigInt?    @map("order_item_id")
-  userId            BigInt     @map("user_id")
+  customerId        BigInt     @map("customer_id")
   gateway           String
   gatewayDisputeId  String     @unique @map("gateway_dispute_id")
   type              String
@@ -197,62 +217,62 @@ model Dispute {
   status            String
   reasonCode        String?    @map("reason_code")
   reasonDescription String?    @map("reason_description")
-  amount            Decimal    @db.Decimal(10, 2)
-  amountBrl         Decimal    @map("amount_brl") @db.Decimal(10, 2)
-  feeAmount         Decimal    @default(0) @map("fee_amount") @db.Decimal(10, 2)
-  feeAmountBrl      Decimal    @default(0) @map("fee_amount_brl") @db.Decimal(10, 2)
-  openedAt          DateTime   @map("opened_at")
-  escalatedAt       DateTime?  @map("escalated_at")
-  responseDueDate   DateTime?  @map("response_due_date")
-  resolvedAt        DateTime?  @map("resolved_at")
+  amount            Decimal    @db.Decimal
+  amountBrl         Decimal    @map("amount_brl") @db.Decimal
+  feeAmount         Decimal?   @default(0) @map("fee_amount") @db.Decimal
+  feeAmountBrl      Decimal?   @default(0) @map("fee_amount_brl") @db.Decimal
+  openedAt          DateTime   @map("opened_at") @db.Timestamptz(6)
+  escalatedAt       DateTime?  @map("escalated_at") @db.Timestamptz(6)
+  responseDueDate   DateTime?  @map("response_due_date") @db.Timestamptz(6)
+  resolvedAt        DateTime?  @map("resolved_at") @db.Timestamptz(6)
   outcome           String?
-  netLossBrl        Decimal?   @map("net_loss_brl") @db.Decimal(10, 2)
-  
-  // Relations
-  payment           Payment?   @relation(fields: [paymentId], references: [id])
-  orderItem         OrderItem? @relation(fields: [orderItemId], references: [id])
-  user              User       @relation(fields: [userId], references: [id])
+  netLossBrl        Decimal?   @map("net_loss_brl") @db.Decimal
+  customer          Customer   @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orderItem         OrderItem? @relation(fields: [orderItemId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payment           Payment?   @relation(fields: [paymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   refunds           Refund[]
 
+  @@index([customerId], map: "idx_disputes_customer_id")
+  @@index([openedAt, resolvedAt], map: "idx_disputes_dates")
   @@map("disputes")
 }
 
 model Subscription {
   id              BigInt     @id @default(autoincrement())
-  startDate       DateTime   @default(now()) @map("start_date")
-  canceledAt      DateTime?  @map("canceled_at") // NOTE: sem timezone na estrutura real
+  startDate       DateTime   @default(now()) @map("start_date") @db.Timestamptz(6)
+  canceledAt      DateTime?  @map("canceled_at") @db.Timestamp(6)
   orderItemId     BigInt?    @map("order_item_id")
-  userId          BigInt?    @map("user_id")
+  customerId      BigInt?    @map("customer_id")
   status          String?
   billingInterval String?    @map("billing_interval")
-  updatedAt       DateTime   @default(now()) @map("updated_at")
-  
-  // Relations
-  orderItem       OrderItem? @relation(fields: [orderItemId], references: [id])
-  user            User?      @relation(fields: [userId], references: [id])
+  updatedAt       DateTime?  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  customer        Customer?  @relation(fields: [customerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  orderItem       OrderItem? @relation(fields: [orderItemId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@index([customerId], map: "idx_subscriptions_customer_id")
+  @@index([startDate, canceledAt], map: "idx_subscriptions_dates")
   @@map("subscriptions")
 }
 
-// ===== MODELOS DO WORKSPACE (mantidos da estrutura original) =====
+model migration_audit {
+  id             Int       @id @default(autoincrement())
+  migration_name String
+  action         String
+  table_name     String?
+  record_count   Int?
+  details        Json?
+  executed_at    DateTime? @default(now()) @db.Timestamptz(6)
+}
 
-model Profile {
-  id        String   @id @default(uuid())
-  userId    BigInt   @unique @map("user_id")
-  bio       String?
-  website   String?
-  company   String?
-  jobTitle  String?  @map("job_title")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("profiles")
+enum WorkspaceRole {
+  owner
+  admin
+  member
 }
 
 model Session {
-  id           String   @id @default(uuid())
-  userId       BigInt   @map("user_id")
+  id           String   @id @default(uuid()) @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
   token        String   @unique
   expiresAt    DateTime @map("expires_at")
   ipAddress    String?  @map("ip_address")
@@ -262,30 +282,45 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId])
-  @@index([expiresAt])
+  @@index([token])
   @@map("sessions")
 }
 
+model Profile {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @unique @map("user_id") @db.Uuid
+  bio       String?
+  website   String?
+  company   String?
+  jobTitle  String?  @map("job_title")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @default(now()) @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("profiles")
+}
+
 model Workspace {
-  id          String            @id @default(uuid())
-  name        String
-  slug        String            @unique
-  logo        String?
-  settings    Json              @default("{}")
-  createdAt   DateTime          @default(now()) @map("created_at")
-  updatedAt   DateTime          @updatedAt @map("updated_at")
-  deletedAt   DateTime?         @map("deleted_at")
-  invitations Invitation[]
-  activeUsers User[]            @relation("UserActiveWorkspace")
-  members     WorkspaceMember[]
+  id              String            @id @default(uuid()) @db.Uuid
+  name            String
+  slug            String            @unique
+  logo            String?
+  settings        Json              @default("{}")
+  createdAt       DateTime          @default(now()) @map("created_at")
+  updatedAt       DateTime          @default(now()) @updatedAt @map("updated_at")
+  deletedAt       DateTime?         @map("deleted_at")
+  activeUsers     User[]            @relation("UserActiveWorkspace")
+  invitations     Invitation[]
+  workspaceMembers WorkspaceMember[]
 
   @@index([slug])
   @@map("workspaces")
 }
 
 model WorkspaceMember {
-  userId      BigInt        @map("user_id")
-  workspaceId String        @map("workspace_id")
+  userId      String        @map("user_id") @db.Uuid
+  workspaceId String        @map("workspace_id") @db.Uuid
   role        WorkspaceRole
   joinedAt    DateTime      @default(now()) @map("joined_at")
   user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -298,12 +333,12 @@ model WorkspaceMember {
 }
 
 model Invitation {
-  id          String        @id @default(uuid())
-  workspaceId String        @map("workspace_id")
+  id          String        @id @default(uuid()) @db.Uuid
+  workspaceId String        @map("workspace_id") @db.Uuid
   email       String
   role        WorkspaceRole
-  invitedById BigInt        @map("invited_by_id")
-  token       String        @unique @default(uuid())
+  invitedById String        @map("invited_by_id") @db.Uuid
+  token       String        @unique
   expiresAt   DateTime      @map("expires_at")
   acceptedAt  DateTime?     @map("accepted_at")
   createdAt   DateTime      @default(now()) @map("created_at")
@@ -314,10 +349,4 @@ model Invitation {
   @@index([email])
   @@index([workspaceId])
   @@map("invitations")
-}
-
-enum WorkspaceRole {
-  owner
-  admin
-  member
 }

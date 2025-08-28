@@ -1,8 +1,8 @@
 'use client'
 
 import { format, parseISO } from 'date-fns'
-import { formatInTimeZone } from 'date-fns-tz'
 import { ptBR, enUS } from 'date-fns/locale'
+import { formatInTimeZone } from 'date-fns-tz'
 import { useTheme } from 'next-themes'
 import React from 'react'
 import {

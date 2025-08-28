@@ -17,8 +17,16 @@ import {
   ReferenceLine,
 } from 'recharts'
 
-import { Skeleton } from '@/components/ui/skeleton'
 import { formatBRL } from '@/lib/analytics-utils'
+
+import {
+  BaseChartWrapper,
+  BaseChartProps,
+  useChartTheme,
+  CHART_COLORS,
+  CHART_MARGINS,
+  formatCurrencyTick,
+} from './BaseChart'
 
 interface RevenueDataPoint {
   day: string // 'YYYY-MM-DD'
@@ -28,16 +36,10 @@ interface RevenueDataPoint {
   aov?: number
 }
 
-interface RevenueChartProps {
+interface RevenueChartProps extends BaseChartProps {
   data: RevenueDataPoint[]
-  loading?: boolean
-  error?: string
-  height?: number
   showOrders?: boolean
   showAOV?: boolean
-  locale?: string
-  timezone?: string
-  className?: string
 }
 
 /**
@@ -56,8 +58,7 @@ export function RevenueChart({
   className,
 }: RevenueChartProps) {
   const t = useTranslations('RevenueChart')
-  const { theme } = useTheme()
-  const isDark = theme === 'dark'
+  const { isDark, gridColor, textColor, axisColor, tooltipStyle } = useChartTheme()
   const dateLocale = locale === 'pt-BR' ? ptBR : enUS
 
   // Transform data for chart
@@ -75,95 +76,40 @@ export function RevenueChart({
       ? chartData.reduce((sum, point) => sum + point.revenue, 0) / chartData.length
       : 0
 
-  if (loading) {
-    return (
-      <div className={`h-[${height}px] w-full ${className}`}>
-        <div className='flex h-full items-center justify-center'>
-          <div className='w-full space-y-4 p-6'>
-            <Skeleton className='h-4 w-48' />
-            <Skeleton className='h-64 w-full' />
-            <div className='flex justify-center space-x-4'>
-              <Skeleton className='h-4 w-20' />
-              <Skeleton className='h-4 w-20' />
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (error) {
-    return (
-      <div className={`h-[${height}px] w-full ${className}`}>
-        <div className='flex h-full items-center justify-center'>
-          <div className='space-y-2 text-center'>
-            <div className='text-sm font-medium text-red-500'>{t('error.loading')}</div>
-            <div className='text-muted-foreground text-xs'>{error}</div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
-  if (chartData.length === 0) {
-    return (
-      <div className={`h-[${height}px] w-full ${className}`}>
+  return (
+    <BaseChartWrapper
+      loading={loading}
+      error={error}
+      height={height}
+      className={className}
+      translationKey='RevenueChart'
+    >
+      {chartData.length === 0 ? (
         <div className='flex h-full items-center justify-center'>
           <div className='space-y-2 text-center'>
             <div className='text-muted-foreground text-sm'>{t('empty.noData')}</div>
             <div className='text-muted-foreground text-xs'>{t('empty.suggestion')}</div>
           </div>
         </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className={`h-[${height}px] w-full ${className}`}>
-      <ResponsiveContainer width='100%' height='100%'>
-        <LineChart
-          data={chartData}
-          margin={{
-            top: 20,
-            right: 30,
-            left: 20,
-            bottom: 20,
-          }}
-        >
-          <CartesianGrid
-            strokeDasharray='3 3'
-            stroke={isDark ? '#374151' : '#e5e7eb'}
-            vertical={false}
-          />
-
-          <XAxis
-            dataKey='date'
-            axisLine={false}
-            tickLine={false}
-            tick={{
-              fontSize: 12,
-              fill: isDark ? '#9ca3af' : '#6b7280',
+      ) : (
+        <ResponsiveContainer width='100%' height='100%'>
+          <LineChart
+            data={chartData}
+            margin={{
+              top: 20,
+              right: 30,
+              left: 20,
+              bottom: 20,
             }}
-            tickMargin={8}
-            interval='preserveStartEnd'
-          />
+          >
+            <CartesianGrid
+              strokeDasharray='3 3'
+              stroke={isDark ? '#374151' : '#e5e7eb'}
+              vertical={false}
+            />
 
-          <YAxis
-            yAxisId='left'
-            axisLine={false}
-            tickLine={false}
-            tick={{
-              fontSize: 12,
-              fill: isDark ? '#9ca3af' : '#6b7280',
-            }}
-            tickMargin={8}
-            tickFormatter={value => formatBRL(value, { locale, showSymbol: false })}
-          />
-
-          {showOrders && (
-            <YAxis
-              yAxisId='right'
-              orientation='right'
+            <XAxis
+              dataKey='date'
               axisLine={false}
               tickLine={false}
               tick={{
@@ -171,137 +117,164 @@ export function RevenueChart({
                 fill: isDark ? '#9ca3af' : '#6b7280',
               }}
               tickMargin={8}
-              tickFormatter={value => value.toLocaleString(locale)}
+              interval='preserveStartEnd'
             />
-          )}
 
-          <Tooltip
-            content={({ active, payload, label }) => {
-              if (active && payload && payload.length > 0) {
-                const data = payload[0]?.payload
-                return (
-                  <div className='rounded-lg border border-gray-200 bg-white p-3 shadow-lg dark:border-gray-700 dark:bg-gray-800'>
-                    <p className='text-sm font-medium text-gray-900 dark:text-gray-100'>
-                      {data?.fullDate}
-                    </p>
-                    <div className='mt-2 space-y-1'>
-                      <div className='flex items-center gap-2 text-sm'>
-                        <div
-                          className='h-3 w-3 rounded-full'
-                          style={{ backgroundColor: '#3b82f6' }}
-                        />
-                        <span className='text-gray-600 dark:text-gray-400'>
-                          {t('tooltip.revenue')}
-                        </span>
-                        <span className='font-medium text-gray-900 dark:text-gray-100'>
-                          {data?.formattedRevenue}
-                        </span>
-                      </div>
-
-                      {showOrders && data?.orders && (
-                        <div className='flex items-center gap-2 text-sm'>
-                          <div
-                            className='h-3 w-3 rounded-full'
-                            style={{ backgroundColor: '#10b981' }}
-                          />
-                          <span className='text-gray-600 dark:text-gray-400'>
-                            {t('tooltip.orders')}
-                          </span>
-                          <span className='font-medium text-gray-900 dark:text-gray-100'>
-                            {data.orders.toLocaleString(locale)}
-                          </span>
-                        </div>
-                      )}
-
-                      {showAOV && data?.aov && (
-                        <div className='flex items-center gap-2 text-sm'>
-                          <div
-                            className='h-3 w-3 rounded-full'
-                            style={{ backgroundColor: '#f59e0b' }}
-                          />
-                          <span className='text-gray-600 dark:text-gray-400'>
-                            {t('tooltip.averageTicket')}
-                          </span>
-                          <span className='font-medium text-gray-900 dark:text-gray-100'>
-                            {formatBRL(data.aov, { locale })}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )
-              }
-              return null
-            }}
-          />
-
-          {avgRevenue > 0 && (
-            <ReferenceLine
-              y={avgRevenue}
+            <YAxis
               yAxisId='left'
-              stroke={isDark ? '#6b7280' : '#9ca3af'}
-              strokeDasharray='5 5'
-              label={{
-                value: t('reference.average', {
-                  value: formatBRL(avgRevenue, { locale, showSymbol: false }),
-                }),
-                position: 'topRight',
-                style: {
-                  fontSize: '12px',
+              axisLine={false}
+              tickLine={false}
+              tick={{
+                fontSize: 12,
+                fill: isDark ? '#9ca3af' : '#6b7280',
+              }}
+              tickMargin={8}
+              tickFormatter={value => formatBRL(value, { locale, showSymbol: false })}
+            />
+
+            {showOrders && (
+              <YAxis
+                yAxisId='right'
+                orientation='right'
+                axisLine={false}
+                tickLine={false}
+                tick={{
+                  fontSize: 12,
                   fill: isDark ? '#9ca3af' : '#6b7280',
-                },
+                }}
+                tickMargin={8}
+                tickFormatter={value => value.toLocaleString(locale)}
+              />
+            )}
+
+            <Tooltip
+              content={({ active, payload, label }) => {
+                if (active && payload && payload.length > 0) {
+                  const data = payload[0]?.payload
+                  return (
+                    <div className='rounded-lg border border-gray-200 bg-white p-3 shadow-lg dark:border-gray-700 dark:bg-gray-800'>
+                      <p className='text-sm font-medium text-gray-900 dark:text-gray-100'>
+                        {data?.fullDate}
+                      </p>
+                      <div className='mt-2 space-y-1'>
+                        <div className='flex items-center gap-2 text-sm'>
+                          <div
+                            className='h-3 w-3 rounded-full'
+                            style={{ backgroundColor: '#3b82f6' }}
+                          />
+                          <span className='text-gray-600 dark:text-gray-400'>
+                            {t('tooltip.revenue')}
+                          </span>
+                          <span className='font-medium text-gray-900 dark:text-gray-100'>
+                            {data?.formattedRevenue}
+                          </span>
+                        </div>
+
+                        {showOrders && data?.orders && (
+                          <div className='flex items-center gap-2 text-sm'>
+                            <div
+                              className='h-3 w-3 rounded-full'
+                              style={{ backgroundColor: '#10b981' }}
+                            />
+                            <span className='text-gray-600 dark:text-gray-400'>
+                              {t('tooltip.orders')}
+                            </span>
+                            <span className='font-medium text-gray-900 dark:text-gray-100'>
+                              {data.orders.toLocaleString(locale)}
+                            </span>
+                          </div>
+                        )}
+
+                        {showAOV && data?.aov && (
+                          <div className='flex items-center gap-2 text-sm'>
+                            <div
+                              className='h-3 w-3 rounded-full'
+                              style={{ backgroundColor: '#f59e0b' }}
+                            />
+                            <span className='text-gray-600 dark:text-gray-400'>
+                              {t('tooltip.averageTicket')}
+                            </span>
+                            <span className='font-medium text-gray-900 dark:text-gray-100'>
+                              {formatBRL(data.aov, { locale })}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )
+                }
+                return null
               }}
             />
-          )}
 
-          <Line
-            yAxisId='left'
-            type='monotone'
-            dataKey='revenue'
-            stroke='#3b82f6'
-            strokeWidth={2}
-            dot={{
-              fill: '#3b82f6',
-              strokeWidth: 2,
-              r: 4,
-            }}
-            activeDot={{
-              r: 6,
-              stroke: '#3b82f6',
-              strokeWidth: 2,
-              fill: '#fff',
-            }}
-          />
+            {avgRevenue > 0 && (
+              <ReferenceLine
+                y={avgRevenue}
+                yAxisId='left'
+                stroke={isDark ? '#6b7280' : '#9ca3af'}
+                strokeDasharray='5 5'
+                label={{
+                  value: t('reference.average', {
+                    value: formatBRL(avgRevenue, { locale, showSymbol: false }),
+                  }),
+                  position: 'topRight',
+                  style: {
+                    fontSize: '12px',
+                    fill: isDark ? '#9ca3af' : '#6b7280',
+                  },
+                }}
+              />
+            )}
 
-          {showOrders && (
             <Line
+              yAxisId='left'
               type='monotone'
-              dataKey='orders'
-              stroke='#10b981'
+              dataKey='revenue'
+              stroke='#3b82f6'
               strokeWidth={2}
-              yAxisId='right'
               dot={{
-                fill: '#10b981',
+                fill: '#3b82f6',
                 strokeWidth: 2,
-                r: 3,
+                r: 4,
+              }}
+              activeDot={{
+                r: 6,
+                stroke: '#3b82f6',
+                strokeWidth: 2,
+                fill: '#fff',
               }}
             />
-          )}
 
-          {(showOrders || showAOV) && (
-            <Legend
-              verticalAlign='top'
-              height={36}
-              iconType='line'
-              wrapperStyle={{
-                fontSize: '12px',
-                color: isDark ? '#9ca3af' : '#6b7280',
-              }}
-            />
-          )}
-        </LineChart>
-      </ResponsiveContainer>
-    </div>
+            {showOrders && (
+              <Line
+                type='monotone'
+                dataKey='orders'
+                stroke='#10b981'
+                strokeWidth={2}
+                yAxisId='right'
+                dot={{
+                  fill: '#10b981',
+                  strokeWidth: 2,
+                  r: 3,
+                }}
+              />
+            )}
+
+            {(showOrders || showAOV) && (
+              <Legend
+                verticalAlign='top'
+                height={36}
+                iconType='line'
+                wrapperStyle={{
+                  fontSize: '12px',
+                  color: isDark ? '#9ca3af' : '#6b7280',
+                }}
+              />
+            )}
+          </LineChart>
+        </ResponsiveContainer>
+      )}
+    </BaseChartWrapper>
   )
 }
 
