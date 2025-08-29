@@ -220,7 +220,7 @@ export function isSuccessfulPayment(status: string, gateway: string): boolean {
  * @param filename - Name of the file (without extension)
  * @returns CSV content as string
  */
-export function exportToCSV(data: Record<string, unknown>[], _filename: string = 'export'): string {
+export function exportToCSV(data: Record<string, unknown>[], filename: string = 'export'): string {
   if (!data.length) return ''
 
   // Get headers from first object
@@ -379,4 +379,68 @@ export function formatLargeNumber(value: Decimal | string | number, decimals: nu
   }
 
   return num.toFixed(0)
+}
+
+/**
+ * Currency conversion rates interface
+ */
+interface CurrencyRates {
+  USD: number
+  EUR: number
+  BRL: number
+}
+
+/**
+ * Get current exchange rates from environment or fallback to defaults
+ * @returns Object with currency conversion rates
+ */
+export function getExchangeRates(): CurrencyRates {
+  // Try to use environment variables first
+  const usdRate = process.env.EXCHANGE_RATE_USD_TO_BRL
+  const eurRate = process.env.EXCHANGE_RATE_EUR_TO_BRL
+
+  return {
+    USD: usdRate ? parseFloat(usdRate) : 5.5, // Fallback rate
+    EUR: eurRate ? parseFloat(eurRate) : 6.0, // Fallback rate
+    BRL: 1.0, // Base currency
+  }
+}
+
+/**
+ * Convert amount from one currency to BRL
+ * @param amount - Amount to convert
+ * @param fromCurrency - Source currency (USD, EUR, BRL)
+ * @returns Amount in BRL
+ */
+export function convertToBRL(
+  amount: Decimal | string | number,
+  fromCurrency: string = 'BRL'
+): number {
+  const numAmount = toNumber(amount)
+  if (numAmount === 0) return 0
+
+  const rates = getExchangeRates()
+  const currency = fromCurrency.toUpperCase() as keyof CurrencyRates
+
+  // Use the rate if it exists, otherwise fallback to USD rate, then 1.0
+  const rate = rates[currency] ?? rates['USD'] ?? 1.0
+
+  return numAmount * rate
+}
+
+/**
+ * Get SQL expression for currency conversion to BRL
+ * This is used in raw SQL queries for optimal performance
+ * @returns SQL CASE expression for currency conversion
+ */
+export function getCurrencyConversionSQL(): string {
+  const rates = getExchangeRates()
+
+  return `
+    CASE 
+      WHEN currency = 'USD' THEN COALESCE(price, 0) * ${rates.USD}
+      WHEN currency = 'EUR' THEN COALESCE(price, 0) * ${rates.EUR}
+      ELSE COALESCE(price, 0)
+    END
+  `.trim()
 }

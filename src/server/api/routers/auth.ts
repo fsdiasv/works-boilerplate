@@ -2,6 +2,7 @@ import { TRPCError } from '@trpc/server'
 import { getTranslations } from 'next-intl/server'
 // import { hash, compare } from 'bcryptjs' // TODO: Remove if not needed
 import { z } from 'zod'
+import crypto from 'crypto'
 
 import {
   validatePasswordStrength,
@@ -187,6 +188,10 @@ export const authRouter = createTRPCRouter({
 
       const workspaceSlug = `workspace-${user.id.slice(0, 8)}`
 
+      // Generate IDs for related entities
+      const profileId = crypto.randomUUID()
+      const workspaceId = crypto.randomUUID()
+
       // Use a transaction to ensure atomicity with optimized structure
       const result = await ctx.db.$transaction(
         async tx => {
@@ -200,7 +205,8 @@ export const authRouter = createTRPCRouter({
               timezone: timezone ?? Intl.DateTimeFormat().resolvedOptions().timeZone,
               profile: {
                 create: {
-                  // Create profile in the same operation
+                  id: profileId,
+                  // Profile fields will use defaults from schema
                 },
               },
             },
@@ -212,9 +218,10 @@ export const authRouter = createTRPCRouter({
           // Create workspace with member in single operation
           const workspace = await tx.workspace.create({
             data: {
+              id: workspaceId,
               name: workspaceName,
               slug: workspaceSlug,
-              members: {
+              workspaceMembers: {
                 create: {
                   userId: dbUser.id,
                   role: 'owner',

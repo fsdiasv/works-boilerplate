@@ -19,9 +19,15 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
 
   // Only query when we have a user to avoid unnecessary calls
   const { data: session, isLoading } = api.auth.getSession.useQuery(undefined, {
-    enabled: !!user,
+    enabled: Boolean(user?.id),
     staleTime: 1000 * 60 * 5, // Cache for 5 minutes
     refetchOnWindowFocus: false,
+    // Skip retries for auth/permission errors; retry once for transient failures
+    retry: (failureCount, error) => {
+      const message = (error as any)?.message ?? ''
+      if (/401|403|unauthor/i.test(message)) return false
+      return failureCount < 1
+    },
   })
 
   const value: WorkspaceContextValue = {

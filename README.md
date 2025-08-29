@@ -1,4 +1,4 @@
-# Works Boilerplate
+# DS Club
 
 A mobile-first, production-ready SaaS starter kit built with Next.js 15, React
 19, and TypeScript.
@@ -38,6 +38,28 @@ cp .env.mcp.example .env.mcp
 ```
 
 See [MCP Setup Guide](docs/MCP_SETUP.md) for detailed instructions.
+
+## 🚨 CRITICAL DATABASE SAFETY
+
+### ⚠️ Read this before any database operations
+
+### 🛡️ Protect Your Data
+
+- **NEVER** use `pnpm db:push` on databases with existing data
+- **ALWAYS** create backups before schema changes: `pnpm db:backup`
+- **ALWAYS** use `pnpm db:migrate` for safe schema changes
+- **READ** the full safety guide:
+  [`docs/CRITICAL-DATABASE-SAFETY.md`](docs/CRITICAL-DATABASE-SAFETY.md)
+
+### 🔴 One Wrong Command = Data Loss
+
+Database operations can **permanently destroy** all your data in seconds. Follow
+the safety protocols religiously.
+
+📖 **Required Reading**:
+[`docs/CRITICAL-DATABASE-SAFETY.md`](docs/CRITICAL-DATABASE-SAFETY.md)
+
+---
 
 ### Standard Setup
 
@@ -94,8 +116,12 @@ See [MCP Setup Guide](docs/MCP_SETUP.md) for detailed instructions.
    # Generate Prisma client
    pnpm db:generate
 
-   # Push schema to database
-   pnpm db:push
+   # SAFE: Create initial migration (recommended)
+   pnpm db:migrate
+
+   # OR if using empty database: Create backup first, then push
+   pnpm db:backup  # Create backup (will fail on empty DB, that's OK)
+   pnpm db:push    # Only safe on empty databases!
 
    # (Optional) Seed with sample data
    pnpm db:seed
@@ -119,7 +145,8 @@ See [MCP Setup Guide](docs/MCP_SETUP.md) for detailed instructions.
 - [ ] Copied `.env.example` to `.env.local`
 - [ ] Added all required environment variables
 - [ ] Ran `pnpm install` successfully
-- [ ] Ran `pnpm db:push` without errors
+- [ ] Ran `pnpm db:migrate` (recommended), or if using an empty DB: created a
+      backup then ran `pnpm db:push`
 - [ ] Started dev server with `pnpm dev`
 - [ ] Can access http://localhost:3000
 

@@ -32,7 +32,7 @@ export const invitationRouter = createTRPCRouter({
               name: true,
               logo: true,
               _count: {
-                select: { members: true },
+                select: { workspaceMembers: true },
               },
             },
           },
@@ -253,7 +253,7 @@ export const invitationRouter = createTRPCRouter({
           workspace: {
             select: {
               id: true,
-              members: {
+              workspaceMembers: {
                 where: { userId: ctx.user.id },
                 select: { role: true },
               },
@@ -278,7 +278,7 @@ export const invitationRouter = createTRPCRouter({
       }
 
       // Verify user can cancel (inviter or workspace admin/owner)
-      const userMembership = invitation.workspace.members[0]
+      const userMembership = invitation.workspace.workspaceMembers[0]
       const canCancel =
         invitation.invitedById === ctx.user.id ||
         (userMembership !== undefined && ['owner', 'admin'].includes(userMembership.role))
@@ -314,7 +314,7 @@ export const invitationRouter = createTRPCRouter({
             select: {
               id: true,
               name: true,
-              members: {
+              workspaceMembers: {
                 where: { userId: ctx.user.id },
                 select: { role: true },
               },
@@ -347,7 +347,7 @@ export const invitationRouter = createTRPCRouter({
       }
 
       // Verify user can resend (workspace admin/owner)
-      const userMembership = invitation.workspace.members[0]
+      const userMembership = invitation.workspace.workspaceMembers[0]
       if (!userMembership || !['owner', 'admin'].includes(userMembership.role)) {
         throw new TRPCError({
           code: 'FORBIDDEN',

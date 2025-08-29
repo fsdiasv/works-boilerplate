@@ -59,18 +59,18 @@ export const workspaceRouter = createTRPCRouter({
     const workspace = await ctx.db.workspace.findFirst({
       where: {
         id: ctx.activeWorkspace.id,
-        members: {
+        workspaceMembers: {
           some: { userId: ctx.user!.id },
         },
         deletedAt: null,
       },
       include: {
-        members: {
+        workspaceMembers: {
           where: { userId: ctx.user!.id },
           select: { role: true },
         },
         _count: {
-          select: { members: true },
+          select: { workspaceMembers: true },
         },
       },
     })
@@ -82,18 +82,18 @@ export const workspaceRouter = createTRPCRouter({
   list: protectedProcedure.query(async ({ ctx }) => {
     return ctx.db.workspace.findMany({
       where: {
-        members: {
+        workspaceMembers: {
           some: { userId: ctx.user!.id },
         },
         deletedAt: null,
       },
       include: {
-        members: {
+        workspaceMembers: {
           where: { userId: ctx.user!.id },
           select: { role: true },
         },
         _count: {
-          select: { members: true },
+          select: { workspaceMembers: true },
         },
       },
       orderBy: { updatedAt: 'desc' },
@@ -111,18 +111,18 @@ export const workspaceRouter = createTRPCRouter({
       const workspace = await ctx.db.workspace.findFirst({
         where: {
           id: input.workspaceId,
-          members: {
+          workspaceMembers: {
             some: { userId: ctx.user!.id },
           },
           deletedAt: null,
         },
         include: {
-          members: {
+          workspaceMembers: {
             where: { userId: ctx.user!.id },
             select: { role: true },
           },
           _count: {
-            select: { members: true },
+            select: { workspaceMembers: true },
           },
         },
       })
@@ -180,7 +180,7 @@ export const workspaceRouter = createTRPCRouter({
         data: {
           name: sanitizedName,
           slug: sanitizedSlug,
-          members: {
+          workspaceMembers: {
             create: {
               userId: ctx.user!.id,
               role: 'owner',
@@ -188,7 +188,7 @@ export const workspaceRouter = createTRPCRouter({
           },
         },
         include: {
-          members: {
+          workspaceMembers: {
             where: { userId: ctx.user!.id },
             select: { role: true },
           },

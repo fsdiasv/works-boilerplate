@@ -3,6 +3,7 @@
 import { TRPCError } from '@trpc/server'
 import { getTranslations } from 'next-intl/server'
 import { z } from 'zod'
+import crypto from 'crypto'
 
 import {
   createTRPCRouter,
@@ -201,6 +202,7 @@ export const membersRouter = createTRPCRouter({
           email: validatedInput.email,
           role: validatedInput.role,
           invitedById: ctx.user!.id,
+          token: crypto.randomBytes(32).toString('hex'),
           expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
         },
       })

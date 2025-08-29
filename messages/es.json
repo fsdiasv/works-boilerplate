@@ -564,6 +564,7 @@
     "email": "Ingresa un correo electrónico válido",
     "min": "Mínimo {min} caracteres",
     "max": "Máximo {max} caracteres",
+    "nameMinLength": "El nombre debe tener al menos 2 caracteres",
     "passwordMatch": "Las contraseñas no coinciden",
     "itemCount": "{count, plural, =0 {Sin elementos} =1 {1 elemento} other {# elementos}}",
     "passwordMinLength": "La contraseña debe tener al menos 8 caracteres",
@@ -789,5 +790,148 @@
     },
     "signOut": "Cerrar Sesión",
     "signingOut": "Cerrando sesión..."
+  },
+  "RevenueChart": {
+    "error": {
+      "loading": "Error al cargar datos"
+    },
+    "empty": {
+      "noData": "No hay datos disponibles",
+      "suggestion": "Selecciona un período diferente o revisa los filtros"
+    },
+    "tooltip": {
+      "revenue": "Ingresos:",
+      "orders": "Pedidos:",
+      "averageTicket": "Ticket Promedio:"
+    },
+    "legend": {
+      "revenue": "Ingresos ($)",
+      "orders": "Pedidos"
+    },
+    "reference": {
+      "average": "Promedio: {value}"
+    }
+  },
+  "Analytics": {
+    "title": "Analytics",
+    "subtitle": "Panel de ventas y suscripciones",
+    "filters": {
+      "title": "Filtros",
+      "subtitle": "Ajusta los filtros para personalizar la visualización de datos",
+      "period": "Período",
+      "from": "Fecha de Inicio",
+      "to": "Fecha de Fin",
+      "timezone": "Zona Horaria",
+      "product": "Producto",
+      "productPlaceholder": "Código del producto",
+      "gateway": "Gateway",
+      "country": "País",
+      "periods": {
+        "today": "Hoy",
+        "7d": "Últimos 7 días",
+        "30d": "Últimos 30 días",
+        "90d": "Últimos 90 días",
+        "mtd": "Mes hasta la fecha",
+        "custom": "Personalizado"
+      },
+      "gateways": {
+        "all": "Todos",
+        "stripe": "Stripe",
+        "paypal": "PayPal",
+        "mercadopago": "Mercado Pago",
+        "pagseguro": "PagSeguro"
+      },
+      "countries": {
+        "all": "Todos",
+        "BR": "Brasil",
+        "US": "Estados Unidos",
+        "AR": "Argentina",
+        "MX": "México",
+        "PT": "Portugal"
+      }
+    },
+    "metrics": {
+      "grossRevenue": "Ingresos Brutos",
+      "netRevenue": "Ingresos Netos",
+      "orders": "Pedidos",
+      "aov": "Valor Promedio del Pedido",
+      "taxes": "Impuestos",
+      "taxesDescription": "Total de impuestos en el período",
+      "refundRate": "Tasa de Reembolso",
+      "refundRateDescription": "Porcentaje de reembolsos sobre ventas",
+      "chargebackRate": "Tasa de Contracargo",
+      "chargebackRateDescription": "Porcentaje de contracargos sobre ingresos brutos",
+      "payments": "Pagos",
+      "paymentsDescription": "Total de pagos aprobados",
+      "subscriptions": "Suscripciones Activas",
+      "mrr": "MRR Realizado",
+      "newSubscriptions": "Nuevas Suscripciones",
+      "newSubscriptionsDescription": "Suscripciones creadas en el período"
+    },
+    "charts": {
+      "dailyRevenue": "Ingresos Diarios",
+      "dailyRevenueDescription": "Evolución de ingresos por día en el período seleccionado",
+      "dailyOrders": "Pedidos Diarios",
+      "dailyOrdersDescription": "Número de pedidos por día",
+      "revenueAndOrders": "Ingresos y Pedidos",
+      "revenueAndOrdersDescription": "Vista combinada de ingresos y volumen de pedidos"
+    },
+    "tables": {
+      "topProducts": "Principales Productos",
+      "topProductsByRevenue": "Principales Productos por Ingresos",
+      "topProductsDescription": "Productos con mayores ingresos en el período seleccionado",
+      "disputes": "Disputas",
+      "disputesAndChargebacks": "Disputas y Contracargos",
+      "disputesDescription": "Resumen de disputas y contracargos en el período",
+      "recentSales": "Ventas Recientes",
+      "recentPayments": "Ventas Recientes",
+      "recentPaymentsDescription": "Últimos pagos aprobados",
+      "noDataMessage": "La tabla detallada de disputas estará disponible cuando esté conectada a la base de datos",
+      "noSalesDataMessage": "La tabla de ventas recientes estará disponible cuando esté conectada a la base de datos"
+    },
+    "disputes": {
+      "totalDisputes": "Total de Disputas",
+      "netLosses": "Pérdidas Netas",
+      "winRate": "Tasa de Victoria"
+    }
+  },
+  "ProductsTable": {
+    "search": {
+      "placeholder": "Buscar por código o nombre..."
+    },
+    "export": {
+      "csv": "Exportar CSV"
+    },
+    "summary": {
+      "showing": "Mostrando {count} de {total} productos",
+      "filtered": "(filtrado por \"{term}\")",
+      "total": "{total} productos encontrados"
+    },
+    "empty": {
+      "noProducts": "No se encontraron productos",
+      "noData": "Sin datos disponibles"
+    },
+    "error": {
+      "loading": "Error al cargar productos"
+    },
+    "headers": {
+      "code": "Código",
+      "orders": "Pedidos",
+      "revenue": "Ingresos",
+      "averageTicket": "Ticket Promedio",
+      "refunds": "Reembolsos",
+      "status": "Estado"
+    },
+    "footer": {
+      "totalOrders": "Total de Pedidos:",
+      "totalRevenue": "Ingresos Totales:",
+      "averageTicketGeneral": "Ticket Promedio General:",
+      "averageRefundRate": "Tasa Promedio de Reembolso:"
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo",
+      "discontinued": "Descontinuado"
+    }
   }
 }

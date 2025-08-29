@@ -33,12 +33,7 @@ import { cn } from 'src/lib/utils'
 
 import { DesktopSidebarToggle } from './desktop-sidebar-toggle'
 
-const menuPrincipal = [
-  { href: '/dashboard', icon: Home, labelKey: 'dashboard' },
-  { href: '/radar', icon: Search, labelKey: 'contentRadar' },
-  { href: '/criar-post', icon: Edit3, labelKey: 'createPost' },
-  { href: '/calendario', icon: Calendar, labelKey: 'calendar' },
-]
+const menuPrincipal = [{ href: '/dashboard', icon: Home, labelKey: 'dashboard' }]
 
 const configuracoes = [
   { href: '/perfil', icon: User, labelKey: 'profile' },

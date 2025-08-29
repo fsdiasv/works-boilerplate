@@ -19,7 +19,7 @@ const protectedRoutes = [
   '/admin',
   '/workspace',
   '/faturamento',
-  '/analytics', // SECURITY FIX: Analytics now requires authentication
+  '/dashboard', // Dashboard requires authentication
 ]
 
 // Define public routes that don't require authentication
@@ -29,25 +29,31 @@ const publicRoutes: string[] = [
 ]
 
 // Define auth routes (where authenticated users shouldn't be)
-const authRoutes = ['/login', '/signup', '/forgot-password']
+const authRoutes = ['/auth/login', '/auth/signup', '/auth/forgot-password']
 
 // Define routes that require an active workspace
-const workspaceRequiredRoutes = ['/faturamento', '/workspace/settings', '/analytics']
+const workspaceRequiredRoutes = ['/faturamento', '/workspace/settings', '/dashboard']
+
+// Helper function for exact route matching or as parent segment
+function routeMatch(pathname: string, route: string): boolean {
+  // Exact route or as a parent segment (e.g., /admin or /admin/users)
+  return pathname === route || pathname.startsWith(`${route}/`)
+}
 
 function isProtectedRoute(pathname: string): boolean {
-  return protectedRoutes.some(route => pathname.includes(route))
+  return protectedRoutes.some(route => routeMatch(pathname, route))
 }
 
 function isPublicRoute(pathname: string): boolean {
-  return publicRoutes.some(route => pathname.includes(route))
+  return publicRoutes.some(route => routeMatch(pathname, route))
 }
 
 function isAuthRoute(pathname: string): boolean {
-  return authRoutes.some(route => pathname.includes(route))
+  return authRoutes.some(route => routeMatch(pathname, route))
 }
 
 function requiresWorkspace(pathname: string): boolean {
-  return workspaceRequiredRoutes.some(route => pathname.includes(route))
+  return workspaceRequiredRoutes.some(route => routeMatch(pathname, route))
 }
 
 export default async function middleware(request: NextRequest) {
@@ -82,21 +88,33 @@ export default async function middleware(request: NextRequest) {
   // First, handle i18n for all other routes
   const intlResponse = intlMiddleware(request)
 
-  // If intl middleware returns a response (redirect or rewrite), return it
+  // If intl middleware returns a response (redirect or rewrite), return it with CSP headers
   if (intlResponse instanceof NextResponse) {
+    const isDev = env.NODE_ENV === 'development'
+    addCSPHeaders(intlResponse.headers, isDev)
     return intlResponse
   }
 
   // Then, handle auth
   const { supabase, response: authResponse, user } = await updateSession(request)
 
-  // Get the pathname without locale prefix
+  // Get the pathname without locale prefix (keep leading slash)
   const pathnameWithoutLocale =
-    locales.reduce((path, locale) => path.replace(`/${locale}`, ''), pathname).replace(/^\//, '') ||
-    '/'
+    pathname.replace(new RegExp(`^/(?:${locales.join('|')})(?=/|$)`), '') || '/'
 
   // Get locale from pathname or default
   const locale = locales.find(l => pathname.startsWith(`/${l}`)) ?? defaultLocale
+
+  // Redirect /analytics to /dashboard for backward compatibility
+  if (pathnameWithoutLocale === '/analytics' || pathnameWithoutLocale.startsWith('/analytics/')) {
+    const newPath = pathnameWithoutLocale.replace('/analytics', '/dashboard')
+    const redirectUrl = new URL(`/${locale}${newPath}`, request.url)
+    redirectUrl.search = request.nextUrl.search
+    const redirectResponse = NextResponse.redirect(redirectUrl)
+    const isDev = env.NODE_ENV === 'development'
+    addCSPHeaders(redirectResponse.headers, isDev)
+    return redirectResponse
+  }
 
   // Allow public routes without authentication
   if (isPublicRoute(pathnameWithoutLocale)) {
@@ -114,7 +132,10 @@ export default async function middleware(request: NextRequest) {
       // Preserve original URL including query parameters
       const originalUrl = `${pathname}${request.nextUrl.search}`
       redirectUrl.searchParams.set('redirectTo', originalUrl)
-      return NextResponse.redirect(redirectUrl)
+      const redirectResponse = NextResponse.redirect(redirectUrl)
+      const isDev = env.NODE_ENV === 'development'
+      addCSPHeaders(redirectResponse.headers, isDev)
+      return redirectResponse
     }
 
     // Check if route requires workspace and user has no active workspace
@@ -138,7 +159,10 @@ export default async function middleware(request: NextRequest) {
           userData.active_workspace_id === null
         ) {
           const createWorkspaceUrl = new URL(`/${locale}/onboarding/workspace`, request.url)
-          return NextResponse.redirect(createWorkspaceUrl)
+          const workspaceRedirect = NextResponse.redirect(createWorkspaceUrl)
+          const isDev = env.NODE_ENV === 'development'
+          addCSPHeaders(workspaceRedirect.headers, isDev)
+          return workspaceRedirect
         }
       }
     }
@@ -149,7 +173,10 @@ export default async function middleware(request: NextRequest) {
     if (user) {
       // Redirect to dashboard if already authenticated
       const redirectUrl = new URL(`/${locale}/dashboard`, request.url)
-      return NextResponse.redirect(redirectUrl)
+      const analyticsRedirect = NextResponse.redirect(redirectUrl)
+      const isDev = env.NODE_ENV === 'development'
+      addCSPHeaders(analyticsRedirect.headers, isDev)
+      return analyticsRedirect
     }
   }
 
