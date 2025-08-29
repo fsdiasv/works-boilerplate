@@ -173,7 +173,7 @@ function DisputesFilters({
 }
 
 // Disputes insights component
-function DisputesInsights({ data, loading }: { data?: DisputesSummary; loading: boolean }) {
+function DisputesInsights({ data, loading }: { data: DisputesSummary | undefined; loading: boolean }) {
   if (loading) {
     return (
       <div className='space-y-3'>

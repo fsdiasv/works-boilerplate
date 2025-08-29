@@ -1,23 +1,61 @@
 'use client'
 
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, Settings, Users } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 import { useTheme } from 'next-themes'
 import React from 'react'
 
-import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'
+import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
+
+/**
+ * Analyze error to provide better user experience
+ */
+function analyzeError(error: string) {
+  const errorLower = error.toLowerCase()
+  
+  if (errorLower.includes('unauthorized') || errorLower.includes('401')) {
+    return {
+      type: 'auth',
+      icon: Users,
+      titleKey: 'error.auth.title',
+      descriptionKey: 'error.auth.description',
+      actionKey: 'error.auth.action',
+    }
+  }
+  
+  if (errorLower.includes('no active workspace') || 
+      errorLower.includes('precondition_failed') ||
+      errorLower.includes('workspace')) {
+    return {
+      type: 'workspace',
+      icon: Settings,
+      titleKey: 'error.workspace.title',
+      descriptionKey: 'error.workspace.description',
+      actionKey: 'error.workspace.action',
+    }
+  }
+  
+  return {
+    type: 'generic',
+    icon: AlertCircle,
+    titleKey: 'error.generic.title',
+    descriptionKey: 'error.generic.description',
+    actionKey: 'error.generic.action',
+  }
+}
 
 /**
  * Base props interface for all chart components
  */
 export interface BaseChartProps {
   loading?: boolean
-  error?: string
+  error?: string | undefined
   height?: number
   locale?: string
   timezone?: string
-  className?: string
+  className?: string | undefined
 }
 
 /**
@@ -58,12 +96,41 @@ export function BaseChartWrapper({
   }
 
   if (error) {
+    const errorInfo = analyzeError(error)
+    const IconComponent = errorInfo.icon
+    
+    const handleErrorAction = () => {
+      if (errorInfo.type === 'auth') {
+        // Redirect to login or refresh page
+        window.location.reload()
+      } else if (errorInfo.type === 'workspace') {
+        // Redirect to workspace selection
+        window.location.href = '/workspace/select'
+      } else {
+        // Generic retry action
+        window.location.reload()
+      }
+    }
+    
     return (
       <div className={`h-[${height}px] w-full ${className}`}>
-        <div className='flex h-full items-center justify-center'>
+        <div className='flex h-full items-center justify-center p-4'>
           <Alert variant='destructive' className='max-w-md'>
-            <AlertCircle className='h-4 w-4' />
-            <AlertDescription>{t('error.loading', { fallback: error })}</AlertDescription>
+            <IconComponent className='h-4 w-4' />
+            <AlertTitle>
+              {t(errorInfo.titleKey, { fallback: 'Error loading chart' })}
+            </AlertTitle>
+            <AlertDescription className='mt-2 space-y-3'>
+              <p>{t(errorInfo.descriptionKey, { fallback: error })}</p>
+              <Button 
+                variant='outline' 
+                size='sm' 
+                onClick={handleErrorAction}
+                className='w-full'
+              >
+                {t(errorInfo.actionKey, { fallback: 'Try again' })}
+              </Button>
+            </AlertDescription>
           </Alert>
         </div>
       </div>
@@ -114,12 +181,12 @@ export const CHART_COLORS = {
 /**
  * Get theme-aware color
  */
-export function getThemeColor(colorKey: keyof typeof CHART_COLORS.grid, isDark: boolean) {
-  const colorMap = CHART_COLORS[colorKey as keyof typeof CHART_COLORS]
+export function getThemeColor(colorKey: keyof typeof CHART_COLORS, isDark: boolean) {
+  const colorMap = CHART_COLORS[colorKey]
   if (typeof colorMap === 'object' && 'light' in colorMap && 'dark' in colorMap) {
     return isDark ? colorMap.dark : colorMap.light
   }
-  return colorMap
+  return colorMap as string
 }
 
 /**

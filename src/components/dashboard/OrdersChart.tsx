@@ -228,7 +228,7 @@ export function OrdersChart({
               strokeDasharray='5 5'
               label={{
                 value: `Média: ${Math.round(avgOrders).toLocaleString(locale)}`,
-                position: 'topRight',
+                position: 'top',
                 style: {
                   fontSize: '12px',
                   fill: isDark ? '#9ca3af' : '#6b7280',

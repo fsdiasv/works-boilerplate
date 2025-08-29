@@ -217,7 +217,7 @@ export function RevenueChart({
                   value: t('reference.average', {
                     value: formatBRL(avgRevenue, { locale, showSymbol: false }),
                   }),
-                  position: 'topRight',
+                  position: 'top',
                   style: {
                     fontSize: '12px',
                     fill: isDark ? '#9ca3af' : '#6b7280',
@@ -315,7 +315,7 @@ export function DualAxisRevenueChart({
     return (
       <RevenueChart
         data={data}
-        loading={loading}
+        loading={loading ?? false}
         error={error}
         height={height}
         locale={locale}

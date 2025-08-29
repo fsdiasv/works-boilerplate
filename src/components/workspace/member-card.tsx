@@ -30,7 +30,7 @@ interface MemberCardProps {
       email: string
       fullName: string | null
       avatarUrl: string | null
-      lastActiveAt: Date
+      lastActiveAt: Date | null
     }
   }
   isOwner: boolean

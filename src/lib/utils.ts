@@ -86,11 +86,14 @@ export function sleep(ms: number): Promise<void> {
  */
 export function isTouchDevice(): boolean {
   if (typeof window === 'undefined') return false
+  
+  // Legacy IE navigator interface extension
+  const legacyNavigator = navigator as Navigator & { msMaxTouchPoints?: number }
+  
   return (
     'ontouchstart' in window ||
     navigator.maxTouchPoints > 0 ||
-    // @ts-expect-error Legacy IE touch detection
-    navigator.msMaxTouchPoints > 0
+    (legacyNavigator.msMaxTouchPoints ?? 0) > 0
   )
 }
 

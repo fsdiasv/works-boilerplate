@@ -1,0 +1,112 @@
+
+> works-boilerplate@0.1.0 typecheck /home/fsdias/coding/vibe/works-boilerplate
+> tsc --noEmit
+
+src/__tests__/fixtures/users.ts(5,16): error TS2352: Conversion of type '{ id: string; aud: string; role: string; email: string; email_confirmed_at: string; phone: null; phone_confirmed_at: null; confirmed_at: string; last_sign_in_at: string; app_metadata: { provider: string; providers: string[]; }; ... 4 more ...; is_anonymous: false; }' to type 'User' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'phone' are incompatible.
+    Type 'null' is not comparable to type 'string'.
+src/__tests__/fixtures/users.ts(29,14): error TS2352: Conversion of type '{ id: string; aud: string; role: string; email: string; email_confirmed_at: string; phone: null; phone_confirmed_at: null; confirmed_at: string; last_sign_in_at: string; app_metadata: { provider: string; providers: string[]; }; ... 4 more ...; is_anonymous: false; }' to type 'User' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'phone' are incompatible.
+    Type 'null' is not comparable to type 'string'.
+src/__tests__/fixtures/users.ts(54,19): error TS2352: Conversion of type '{ id: string; aud: string; role: string; email: string; email_confirmed_at: null; phone: null; phone_confirmed_at: null; confirmed_at: null; last_sign_in_at: null; app_metadata: { provider: string; providers: string[]; }; ... 4 more ...; is_anonymous: false; }' to type 'User' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'phone' are incompatible.
+    Type 'null' is not comparable to type 'string'.
+src/__tests__/fixtures/users.ts(78,14): error TS2352: Conversion of type '{ id: string; aud: string; role: string; email: string; email_confirmed_at: string; phone: null; phone_confirmed_at: null; confirmed_at: string; last_sign_in_at: string; app_metadata: { provider: string; providers: string[]; }; ... 4 more ...; is_anonymous: false; }' to type 'User' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Types of property 'phone' are incompatible.
+    Type 'null' is not comparable to type 'string'.
+src/app/[locale]/(app)/dashboard/disputes/page.tsx(407,14): error TS2375: Type '{ data: { cb_losses_brl: string; total_disputas: number; abertas: number; resolvidas: number; perdidas: number; ganhas: number; } | undefined; loading: boolean; }' is not assignable to type '{ data?: DisputesSummary; loading: boolean; }' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'data' are incompatible.
+    Type '{ cb_losses_brl: string; total_disputas: number; abertas: number; resolvidas: number; perdidas: number; ganhas: number; } | undefined' is not assignable to type 'DisputesSummary'.
+      Type 'undefined' is not assignable to type 'DisputesSummary'.
+src/app/[locale]/(app)/dashboard/subscriptions/page.tsx(189,8): error TS2375: Type '{ value: number; loading: boolean; error: string | undefined; }' is not assignable to type 'SubscriptionsCardProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/app/[locale]/(app)/dashboard/subscriptions/page.tsx(191,8): error TS2375: Type '{ value: string; loading: boolean; error: string | undefined; }' is not assignable to type 'MRRCardProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/app/[locale]/(app)/dashboard/subscriptions/page.tsx(389,9): error TS2412: Type '{ assinaturas_ativas: number; mrr_realizado_brl: string; novas_assinaturas: number; churn_assinaturas: number; } | undefined' is not assignable to type 'SubscriptionSummary | undefined' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+src/app/[locale]/(app)/dashboard/subscriptions/page.tsx(470,35): error TS2412: Type '{ assinaturas_ativas: number; mrr_realizado_brl: string; novas_assinaturas: number; churn_assinaturas: number; } | undefined' is not assignable to type 'SubscriptionSummary | undefined' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the type of the target.
+src/app/[locale]/(app)/workspace/settings/members/page.tsx(181,15): error TS2322: Type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; }'.
+  The types of 'user.lastActiveAt' are incompatible between these types.
+    Type 'Date | null' is not assignable to type 'Date'.
+      Type 'null' is not assignable to type 'Date'.
+src/app/[locale]/(app)/workspace/settings/members/page.tsx(185,60): error TS2345: Argument of type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to parameter of type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; } | null | undefined'.
+  Type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; }'.
+    The types of 'user.lastActiveAt' are incompatible between these types.
+      Type 'Date | null' is not assignable to type 'Date'.
+        Type 'null' is not assignable to type 'Date'.
+src/app/[locale]/(app)/workspace/settings/members/page.tsx(186,52): error TS2345: Argument of type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to parameter of type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; } | null | undefined'.
+  Type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; }'.
+    The types of 'user.lastActiveAt' are incompatible between these types.
+      Type 'Date | null' is not assignable to type 'Date'.
+        Type 'null' is not assignable to type 'Date'.
+src/app/[locale]/(app)/workspace/settings/members/page.tsx(187,65): error TS2345: Argument of type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to parameter of type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; } | null | undefined'.
+  Type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; }'.
+    The types of 'user.lastActiveAt' are incompatible between these types.
+      Type 'Date | null' is not assignable to type 'Date'.
+        Type 'null' is not assignable to type 'Date'.
+src/app/[locale]/(app)/workspace/settings/members/page.tsx(281,73): error TS2345: Argument of type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to parameter of type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; } | null | undefined'.
+  Type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; }'.
+    The types of 'user.lastActiveAt' are incompatible between these types.
+      Type 'Date | null' is not assignable to type 'Date'.
+        Type 'null' is not assignable to type 'Date'.
+src/app/[locale]/(app)/workspace/settings/members/page.tsx(291,67): error TS2345: Argument of type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to parameter of type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; } | null | undefined'.
+  Type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; }'.
+    The types of 'user.lastActiveAt' are incompatible between these types.
+      Type 'Date | null' is not assignable to type 'Date'.
+        Type 'null' is not assignable to type 'Date'.
+src/app/[locale]/(app)/workspace/settings/members/page.tsx(299,69): error TS2345: Argument of type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to parameter of type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; } | null | undefined'.
+  Type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; }'.
+    The types of 'user.lastActiveAt' are incompatible between these types.
+      Type 'Date | null' is not assignable to type 'Date'.
+        Type 'null' is not assignable to type 'Date'.
+src/app/[locale]/(app)/workspace/settings/members/page.tsx(309,69): error TS2345: Argument of type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to parameter of type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; } | null | undefined'.
+  Type '{ user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date | null; }; } & { role: WorkspaceRole; joinedAt: Date; userId: string; workspaceId: string; }' is not assignable to type '{ userId: string; workspaceId: string; role: WorkspaceRole; joinedAt: Date; user: { id: string; email: string; fullName: string | null; avatarUrl: string | null; lastActiveAt: Date; }; }'.
+    The types of 'user.lastActiveAt' are incompatible between these types.
+      Type 'Date | null' is not assignable to type 'Date'.
+        Type 'null' is not assignable to type 'Date'.
+src/components/dashboard/BaseChart.tsx(210,30): error TS2345: Argument of type '"grid"' is not assignable to parameter of type '"light" | "dark"'.
+src/components/dashboard/BaseChart.tsx(211,30): error TS2345: Argument of type '"text"' is not assignable to parameter of type '"light" | "dark"'.
+src/components/dashboard/BaseChart.tsx(212,30): error TS2345: Argument of type '"axis"' is not assignable to parameter of type '"light" | "dark"'.
+src/components/dashboard/BaseChart.tsx(213,30): error TS2345: Argument of type '"tooltip"' is not assignable to parameter of type '"light" | "dark"'.
+src/components/dashboard/DisputesTable.tsx(124,29): error TS2345: Argument of type 'string | number' is not assignable to parameter of type 'string'.
+  Type 'number' is not assignable to type 'string'.
+src/components/dashboard/OrdersChart.tsx(231,17): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: Props): ReferenceLine', gave the following error.
+    Type '"topRight"' is not assignable to type 'LabelPosition | undefined'.
+  Overload 2 of 2, '(props: Props, context: any): ReferenceLine', gave the following error.
+    Type '"topRight"' is not assignable to type 'LabelPosition | undefined'.
+src/components/dashboard/ProductRevenueChart.tsx(62,20): error TS2532: Object is possibly 'undefined'.
+src/components/dashboard/ProductSalesChart.tsx(61,20): error TS2532: Object is possibly 'undefined'.
+src/components/dashboard/RevenueChart.tsx(80,6): error TS2375: Type '{ children: Element; loading: boolean; error: string | undefined; height: number; className: string | undefined; translationKey: string; }' is not assignable to type 'BaseChartWrapperProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'error' are incompatible.
+    Type 'string | undefined' is not assignable to type 'string'.
+      Type 'undefined' is not assignable to type 'string'.
+src/components/dashboard/RevenueChart.tsx(220,19): error TS2769: No overload matches this call.
+  Overload 1 of 2, '(props: Props): ReferenceLine', gave the following error.
+    Type '"topRight"' is not assignable to type 'LabelPosition | undefined'.
+  Overload 2 of 2, '(props: Props, context: any): ReferenceLine', gave the following error.
+    Type '"topRight"' is not assignable to type 'LabelPosition | undefined'.
+src/components/dashboard/RevenueChart.tsx(316,8): error TS2375: Type '{ data: RevenueDataPoint[]; loading: boolean | undefined; error: string | undefined; height: number; locale: string; className: string | undefined; }' is not assignable to type 'RevenueChartProps' with 'exactOptionalPropertyTypes: true'. Consider adding 'undefined' to the types of the target's properties.
+  Types of property 'loading' are incompatible.
+    Type 'boolean | undefined' is not assignable to type 'boolean'.
+      Type 'undefined' is not assignable to type 'boolean'.
+src/components/dashboard/SalesByDayOfWeekChart.tsx(62,26): error TS2339: Property 'payload' does not exist on type 'Props'.
+src/components/dashboard/SalesByDayOfWeekChart.tsx(68,12): error TS18048: 'x' is possibly 'undefined'.
+src/components/dashboard/SalesByDayOfWeekChart.tsx(68,12): error TS2365: Operator '+' cannot be applied to types 'string | number' and 'number'.
+src/components/dashboard/SalesByDayOfWeekChart.tsx(68,16): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/components/dashboard/SalesByDayOfWeekChart.tsx(68,16): error TS18048: 'width' is possibly 'undefined'.
+src/components/dashboard/SalesByDayOfWeekChart.tsx(69,12): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/components/dashboard/SalesByDayOfWeekChart.tsx(69,12): error TS18048: 'y' is possibly 'undefined'.
+src/components/dashboard/SalesByDayOfWeekChart.tsx(83,20): error TS2532: Object is possibly 'undefined'.
+src/components/dashboard/SalesByHourChart.tsx(64,26): error TS2339: Property 'payload' does not exist on type 'Props'.
+src/components/dashboard/SalesByHourChart.tsx(70,12): error TS18048: 'x' is possibly 'undefined'.
+src/components/dashboard/SalesByHourChart.tsx(70,12): error TS2365: Operator '+' cannot be applied to types 'string | number' and 'number'.
+src/components/dashboard/SalesByHourChart.tsx(70,16): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/components/dashboard/SalesByHourChart.tsx(70,16): error TS18048: 'width' is possibly 'undefined'.
+src/components/dashboard/SalesByHourChart.tsx(71,12): error TS2362: The left-hand side of an arithmetic operation must be of type 'any', 'number', 'bigint' or an enum type.
+src/components/dashboard/SalesByHourChart.tsx(71,12): error TS18048: 'y' is possibly 'undefined'.
+src/components/dashboard/SalesByHourChart.tsx(85,20): error TS2532: Object is possibly 'undefined'.
+ ELIFECYCLE  Command failed with exit code 1.

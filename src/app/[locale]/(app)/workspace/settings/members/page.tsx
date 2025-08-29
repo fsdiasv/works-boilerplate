@@ -84,7 +84,7 @@ export default function WorkspaceMembersPage() {
       email: string
       fullName: string | null
       avatarUrl: string | null
-      lastActiveAt: Date
+      lastActiveAt: Date | null
     }
   } | null>(null)
   const [dialogState, setDialogState] = useState<{

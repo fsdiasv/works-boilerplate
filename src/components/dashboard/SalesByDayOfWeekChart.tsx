@@ -12,6 +12,7 @@ import {
   Tooltip,
   Cell,
   LabelList,
+  type TooltipProps,
 } from 'recharts'
 
 import { Skeleton } from '@/components/ui/skeleton'
@@ -58,13 +59,17 @@ export function SalesByDayOfWeekChart({
   // Custom label component for percentages
   const renderCustomLabel = (props: any) => {
     const { x, y, width, payload } = props
-    const percentage = payload?.percentage
+    
+    // Type guard: ensure all required properties exist
+    if (x === undefined || y === undefined || width === undefined || !payload) return null
+    
+    const percentage = payload.percentage
     // Don't show labels for zero percentages to reduce clutter
     if (!percentage || percentage === 0) return null
     return (
       <text
-        x={x + width / 2}
-        y={y - 5}
+        x={Number(x) + Number(width) / 2}
+        y={Number(y) - 5}
         fill={isDark ? '#F3F4F6' : '#374151'}
         textAnchor='middle'
         fontSize='12'
@@ -76,9 +81,10 @@ export function SalesByDayOfWeekChart({
   }
 
   // Custom tooltip
-  function CustomTooltip({ active, payload, label }: any) {
+  function CustomTooltip({ active, payload, label }: TooltipProps<number, string>) {
     if (active && payload?.length) {
-      const data = payload[0].payload
+      const data = payload[0]?.payload
+      if (!data) return null
       return (
         <div className='bg-background rounded-lg border p-3 shadow-lg'>
           <p className='font-medium'>{label}</p>

@@ -100,8 +100,8 @@ export function DisputesTable({
 
     // Apply sorting (safe since we already have a copy)
     filtered.sort((a, b) => {
-      let aValue: any = a[sortField as keyof DisputeData]
-      let bValue: any = b[sortField as keyof DisputeData]
+      let aValue: string | number | undefined = a[sortField as keyof DisputeData]
+      let bValue: string | number | undefined = b[sortField as keyof DisputeData]
 
       // Handle special sort fields
       if (sortField === 'amount') {
@@ -121,7 +121,7 @@ export function DisputesTable({
       // Handle numeric values
       if (typeof aValue === 'string' && !isNaN(parseFloat(aValue))) {
         aValue = parseFloat(aValue)
-        bValue = parseFloat(bValue || '0')
+        bValue = typeof bValue === 'string' ? parseFloat(bValue || '0') : (bValue || 0)
       }
 
       if (typeof aValue === 'number' && typeof bValue === 'number') {

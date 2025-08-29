@@ -11,6 +11,7 @@ import {
   CartesianGrid,
   Tooltip,
   Cell,
+  type TooltipProps,
 } from 'recharts'
 
 import { Skeleton } from '@/components/ui/skeleton'
@@ -56,9 +57,10 @@ export function ProductRevenueChart({
   }))
 
   // Custom tooltip
-  function CustomTooltip({ active, payload, label }: any) {
+  function CustomTooltip({ active, payload, label }: TooltipProps<number, string>) {
     if (active && payload?.length) {
-      const data = payload[0].payload
+      const data = payload[0]?.payload
+      if (!data) return null
       return (
         <div className='bg-background rounded-lg border p-3 shadow-lg'>
           <p className='font-medium'>{label}</p>

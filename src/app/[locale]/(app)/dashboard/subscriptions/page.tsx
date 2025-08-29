@@ -158,12 +158,6 @@ interface SubscriptionSummary {
   mrr_realizado_brl: string
   novas_assinaturas: number
   churn_assinaturas: number
-  canceladas: number
-  total_disputas: number
-  cb_losses_brl: string
-  ganhas: number
-  perdidas: number
-  resolvidas: number
 }
 
 // Subscription metrics component
@@ -172,9 +166,9 @@ function SubscriptionMetrics({
   loading,
   error,
 }: {
-  data?: SubscriptionSummary
+  data: SubscriptionSummary | undefined
   loading: boolean
-  error?: string
+  error?: string | undefined
 }) {
   const churnRate = data
     ? (data.churn_assinaturas / (data.assinaturas_ativas + data.churn_assinaturas)) * 100
@@ -186,9 +180,9 @@ function SubscriptionMetrics({
 
   return (
     <div className='grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4'>
-      <SubscriptionsCard value={data?.assinaturas_ativas || 0} loading={loading} error={error} />
+      <SubscriptionsCard value={data?.assinaturas_ativas || 0} loading={loading} error={error ?? undefined} />
 
-      <MRRCard value={data?.mrr_realizado_brl || '0'} loading={loading} error={error} />
+      <MRRCard value={data?.mrr_realizado_brl || '0'} loading={loading} error={error ?? undefined} />
 
       <SalesMetricCard
         title='Novas Assinaturas'
@@ -212,7 +206,7 @@ function SubscriptionMetrics({
 }
 
 // Subscription insights component
-function SubscriptionInsights({ data, loading }: { data?: SubscriptionSummary; loading: boolean }) {
+function SubscriptionInsights({ data, loading }: { data: SubscriptionSummary | undefined; loading: boolean }) {
   if (loading) {
     return (
       <div className='space-y-3'>

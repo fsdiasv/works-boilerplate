@@ -78,6 +78,12 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
             }
             return headers
           },
+          fetch(url, options) {
+            return fetch(url, {
+              ...(options as RequestInit),
+              credentials: 'include', // Send cookies with requests for Supabase auth
+            })
+          },
         }),
       ],
     })

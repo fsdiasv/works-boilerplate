@@ -368,7 +368,7 @@ interface SubscriptionsCardProps {
   change?: number
   changeDirection?: 'up' | 'down' | 'neutral'
   loading?: boolean
-  error?: string
+  error?: string | undefined
   className?: string
 }
 
@@ -400,7 +400,7 @@ interface MRRCardProps {
   change?: number
   changeDirection?: 'up' | 'down' | 'neutral'
   loading?: boolean
-  error?: string
+  error?: string | undefined
   className?: string
 }
 

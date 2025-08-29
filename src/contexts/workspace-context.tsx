@@ -24,7 +24,7 @@ export function WorkspaceProvider({ children }: { children: ReactNode }) {
     refetchOnWindowFocus: false,
     // Skip retries for auth/permission errors; retry once for transient failures
     retry: (failureCount, error) => {
-      const message = (error as any)?.message ?? ''
+      const message = error instanceof Error ? error.message : String(error)
       if (/401|403|unauthor/i.test(message)) return false
       return failureCount < 1
     },
