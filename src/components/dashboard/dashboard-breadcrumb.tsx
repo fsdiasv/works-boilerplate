@@ -18,15 +18,15 @@ import {
 const routeMap: Record<string, { titleKey: string; href?: string }[]> = {
   '/': [{ titleKey: 'dashboard' }],
   '/dashboard': [{ titleKey: 'dashboard' }],
-  '/faturamento': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'billing' }],
-  '/perfil': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'profile' }],
-  '/contas-sociais': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'socialAccounts' }],
-  '/chaves-api': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'apiKeys' }],
-  '/settings': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'settings' }],
-  '/pricing': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'pricing' }],
-  '/documentation': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'documentation' }],
-  '/community': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'community' }],
-  '/feedback': [{ titleKey: 'dashboard', href: '/' }, { titleKey: 'feedback' }],
+  '/faturamento': [{ titleKey: 'dashboard', href: '/dashboard' }, { titleKey: 'billing' }],
+  '/perfil': [{ titleKey: 'dashboard', href: '/dashboard' }, { titleKey: 'profile' }],
+  '/contas-sociais': [{ titleKey: 'dashboard', href: '/dashboard' }, { titleKey: 'socialAccounts' }],
+  '/chaves-api': [{ titleKey: 'dashboard', href: '/dashboard' }, { titleKey: 'apiKeys' }],
+  '/settings': [{ titleKey: 'dashboard', href: '/dashboard' }, { titleKey: 'settings' }],
+  '/pricing': [{ titleKey: 'dashboard', href: '/dashboard' }, { titleKey: 'pricing' }],
+  '/documentation': [{ titleKey: 'dashboard', href: '/dashboard' }, { titleKey: 'documentation' }],
+  '/community': [{ titleKey: 'dashboard', href: '/dashboard' }, { titleKey: 'community' }],
+  '/feedback': [{ titleKey: 'dashboard', href: '/dashboard' }, { titleKey: 'feedback' }],
 }
 
 export function DashboardBreadcrumb() {
@@ -51,7 +51,7 @@ export function DashboardBreadcrumb() {
             // Add locale prefix to href
             const href =
               item.href != null
-                ? `/${locale}${item.href === '/' ? '/dashboard' : item.href}`
+                ? `/${locale}${item.href}`
                 : undefined
 
             return (

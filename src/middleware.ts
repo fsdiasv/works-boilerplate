@@ -19,7 +19,7 @@ const protectedRoutes = [
   '/admin',
   '/workspace',
   '/faturamento',
-  '/analytics', // SECURITY FIX: Analytics now requires authentication
+  '/dashboard', // Dashboard requires authentication
 ]
 
 // Define public routes that don't require authentication
@@ -32,7 +32,7 @@ const publicRoutes: string[] = [
 const authRoutes = ['/auth/login', '/auth/signup', '/auth/forgot-password']
 
 // Define routes that require an active workspace
-const workspaceRequiredRoutes = ['/faturamento', '/workspace/settings', '/analytics']
+const workspaceRequiredRoutes = ['/faturamento', '/workspace/settings', '/dashboard']
 
 // Helper function for exact route matching or as parent segment
 function routeMatch(pathname: string, route: string): boolean {
@@ -105,6 +105,17 @@ export default async function middleware(request: NextRequest) {
   // Get locale from pathname or default
   const locale = locales.find(l => pathname.startsWith(`/${l}`)) ?? defaultLocale
 
+  // Redirect /analytics to /dashboard for backward compatibility
+  if (pathnameWithoutLocale === '/analytics' || pathnameWithoutLocale.startsWith('/analytics/')) {
+    const newPath = pathnameWithoutLocale.replace('/analytics', '/dashboard')
+    const redirectUrl = new URL(`/${locale}${newPath}`, request.url)
+    redirectUrl.search = request.nextUrl.search
+    const redirectResponse = NextResponse.redirect(redirectUrl)
+    const isDev = env.NODE_ENV === 'development'
+    addCSPHeaders(redirectResponse.headers, isDev)
+    return redirectResponse
+  }
+
   // Allow public routes without authentication
   if (isPublicRoute(pathnameWithoutLocale)) {
     // Skip auth checks for public routes like analytics
@@ -162,10 +173,10 @@ export default async function middleware(request: NextRequest) {
     if (user) {
       // Redirect to dashboard if already authenticated
       const redirectUrl = new URL(`/${locale}/dashboard`, request.url)
-      const dashboardRedirect = NextResponse.redirect(redirectUrl)
+      const analyticsRedirect = NextResponse.redirect(redirectUrl)
       const isDev = env.NODE_ENV === 'development'
-      addCSPHeaders(dashboardRedirect.headers, isDev)
-      return dashboardRedirect
+      addCSPHeaders(analyticsRedirect.headers, isDev)
+      return analyticsRedirect
     }
   }
 
